@@ -9,7 +9,11 @@ if TYPE_CHECKING:
     from .generate.tkg_rel_4tuple_conversation_generator import TKGRelationTripletDialogueQAGeneration
     from .generate.tkg_4tuple_merge import TKGTupleMerger
     
-    # from .refinement.tkg_4tuple_disambiguation import TKGTupleDisambiguation
+    from .refinement.tkg_4tuple_disambiguation import TKGTupleDisambiguation
+
+    from .filter.tkg_4tuple_time_sampling import TKGTupleTimeFilter
+
+    from .eval.tkg_4tuple_time_summary import TKGTemporalStatistics
 
     
 else:
