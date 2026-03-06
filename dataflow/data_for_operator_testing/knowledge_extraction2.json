@@ -1,0 +1,37 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Henry, a talented musician from Canada, originally trained as a classical pianist under renowned conductor Maria Rodriguez. Henry later formed a rock band called The Maple Leaves with his sister Lucy, who studied music composition at the University of Toronto. The Maple Leaves released their debut album, Polar Lights, on August 12, 2020, earning critical acclaim for blending classical and rock influences. Lucy also pursued environmental activism and joined Clean Earth as a regional ambassador, where she campaigned for stricter wildlife protection laws. Henry was inspired by Lucy’s passion for charity work, so he started volunteering at local animal shelters in his hometown. Although Henry and Lucy initially struggled with creative differences, they eventually found harmony in combining Lucy’s classical compositions with Henry’s rock guitar riffs. The Maple Leaves toured across Europe in 2021, performing sold-out shows in major cities like Paris, Berlin, and Rome. During the tour, Henry developed a keen interest in international cuisine and collaborated with local chefs to film a short documentary on regional cooking techniques.",
+    "entity":"Henry, Maria Rodriguez, Canada, Maple Leaves, Lucy, University Toronto, Polar Lights, August 12 2020, Clean Earth, Paris, Berlin, Rome",
+    "triple":[
+      "<entity> Henry <attribute> nationality <value> Canadian",
+      "<entity> Henry <attribute> profession <value> musician",
+      "<entity> Henry <attribute> specialty <value> classical pianist",
+      "<entity> Maple Leaves <attribute> type <value> rock band",
+      "<entity> Maple Leaves <attribute> origin <value> Canada",
+      "<entity> Maple Leaves <attribute> debut_album <value> Polar Lights",
+      "<entity> Polar Lights <attribute> release_date <value> August 12, 2020",
+      "<entity> Lucy <attribute> profession <value> musician",
+      "<entity> Lucy <attribute> education <value> music composition",
+      "<entity> Clean Earth <attribute> role <value> regional ambassador"
+    ]
+  },
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Henry, a talented musician from Canada, originally trained as a classical pianist under renowned conductor Maria Rodriguez. Henry later formed a rock band called The Maple Leaves with his sister Lucy, who studied music composition at the University of Toronto. The Maple Leaves released their debut album, Polar Lights, on August 12, 2020, earning critical acclaim for blending classical and rock influences. Lucy also pursued environmental activism and joined Clean Earth as a regional ambassador, where she campaigned for stricter wildlife protection laws. Henry was inspired by Lucy’s passion for charity work, so he started volunteering at local animal shelters in his hometown. Although Henry and Lucy initially struggled with creative differences, they eventually found harmony in combining Lucy’s classical compositions with Henry’s rock guitar riffs. The Maple Leaves toured across Europe in 2021, performing sold-out shows in major cities like Paris, Berlin, and Rome. During the tour, Henry developed a keen interest in international cuisine and collaborated with local chefs to film a short documentary on regional cooking techniques.",
+    "entity":"Henry, Maria Rodriguez, Canada, Maple Leaves, Lucy, University Toronto, Polar Lights, August 12 2020, Clean Earth, Paris, Berlin, Rome",
+    "triple":[
+      "<entity> Henry <attribute> profession <value> musician",
+      "<entity> Henry <attribute> training <value> classical pianist",
+      "<entity> Henry <attribute> nationality <value> Canadian",
+      "<entity> Maple Leaves <attribute> type <value> rock band",
+      "<entity> Maple Leaves <attribute> debut_album <value> Polar Lights",
+      "<entity> Lucy <attribute> occupation <value> regional ambassador",
+      "<entity> Lucy <attribute> area_of_study <value> music composition",
+      "<entity> Clean Earth <attribute> activity <value> environmental activism",
+      "<entity> Polar Lights <attribute> release_date <value> August 12 2020"
+    ]
+  }
+]

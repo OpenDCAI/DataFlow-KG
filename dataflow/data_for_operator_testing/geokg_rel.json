@@ -1,0 +1,13 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"On June 3, 2024, a massive flood occurred along the Yangtze River in China, affecting several provinces including Hubei, Hunan, and Jiangxi. The floodwaters originated from heavy rainfall in the upper reaches of the river, causing the water level to rise above the danger mark at multiple hydrological stations. The Three Gorges Dam, located in Yichang, Hubei Province, successfully regulated part of the floodwaters, preventing significant damage downstream. Several cities including Wuhan, Yichang, and Chongqing experienced severe inundation, with major roads and bridges temporarily closed. Emergency relief efforts involved local and national authorities, and temporary shelters were established in towns and villages adjacent to the river. Scientists reported that the flood's intensity was partially influenced by the melting glaciers in the Tibetan Plateau, which feed into the Yangtze River and its tributaries."
+  },
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"In August 2023, a volcanic eruption occurred at Mount Etna, located on the east coast of Sicily, Italy. The eruption produced lava flows that moved toward nearby villages, including Nicolosi and Zafferana Etnea, while ash clouds affected the city of Catania. Roads and railways connecting these towns were temporarily closed due to safety concerns, and the local airport was shut down for several hours. Emergency services coordinated with municipal authorities to evacuate residents from towns at risk. Historical records indicate that Mount Etna has experienced multiple eruptions over the centuries, and its lava flows have repeatedly altered the topography of the surrounding plateau. Scientists also noted that the nearby rivers were partially obstructed by past lava deposits, which impacted water flow toward the Ionian Sea."
+  }
+]
+

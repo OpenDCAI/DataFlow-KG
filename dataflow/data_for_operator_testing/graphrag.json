@@ -1,0 +1,74 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Henry, a talented musician from Canada, originally trained as a classical pianist under renowned conductor Maria Rodriguez. Henry later formed a rock band called The Maple Leaves with his sister Lucy, who studied music composition at the University of Toronto. The Maple Leaves released their debut album, Polar Lights, on August 12, 2020, earning critical acclaim for blending classical and rock influences. Lucy also pursued environmental activism and joined Clean Earth as a regional ambassador, where she campaigned for stricter wildlife protection laws. Henry was inspired by Lucy’s passion for charity work, so he started volunteering at local animal shelters in his hometown. Although Henry and Lucy initially struggled with creative differences, they eventually found harmony in combining Lucy’s classical compositions with Henry’s rock guitar riffs. The Maple Leaves toured across Europe in 2021, performing sold-out shows in major cities like Paris, Berlin, and Rome. During the tour, Henry developed a keen interest in international cuisine and collaborated with local chefs to film a short documentary on regional cooking techniques.",
+    "entity":"Henry, Maria Rodriguez, Canada, Maple Leaves, Lucy, University Toronto, Polar Lights, August 12 2020, Clean Earth, Paris, Berlin, Rome",
+    "question":[
+      "On which date was Polar Lights released?",
+      "Who is Henry trained by?",
+      "Which organization that Lucy joins inspires Henry?",
+      "Which cities has Maple Leaves performed in?"
+    ],
+    "entities":[
+      [
+        "Polar Lights"
+      ],
+      [
+        "Henry"
+      ],
+      [
+        "Lucy",
+        "Henry"
+      ],
+      [
+        "Maple Leaves"
+      ]
+    ],
+    "relations":[
+      [
+        "release_date"
+      ],
+      [
+        "trained_by"
+      ],
+      [
+        "joins",
+        "inspires"
+      ],
+      [
+        "performed_in"
+      ]
+    ],
+    "triplet":[
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by",
+      "<subj> Henry <obj> Maple Leaves <rel> forms",
+      "<subj> Lucy <obj> University Toronto <rel> studies_at",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> releases",
+      "<subj> Polar Lights <obj> August 12 2020 <rel> is_released_on",
+      "<subj> Lucy <obj> Clean Earth <rel> joins",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by",
+      "<subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Maple Leaves <obj> Rome <rel> performs_in"
+    ],
+    "subgraph_prompt":[
+      "You are given a question and relevant knowledge graph facts.\nUse ONLY the provided facts to answer the question.\n\nQuestion:\nOn which date was Polar Lights released?\n\nSubgraph centered at [Polar Lights]:\n- <subj> Polar Lights <obj> August 12 2020 <rel> is_released_on\n- <subj> Maple Leaves <obj> Polar Lights <rel> releases\n\nAnswer the question based on the above knowledge graph subgraphs.",
+      "You are given a question and relevant knowledge graph facts.\nUse ONLY the provided facts to answer the question.\n\nQuestion:\nWho is Henry trained by?\n\nSubgraph centered at [Henry]:\n- <subj> Henry <obj> Maple Leaves <rel> forms\n- <subj> Henry <obj> Lucy <rel> is_inspired_by\n- <subj> Henry <obj> Maria Rodriguez <rel> is_trained_by\n\nAnswer the question based on the above knowledge graph subgraphs.",
+      "You are given a question and relevant knowledge graph facts.\nUse ONLY the provided facts to answer the question.\n\nQuestion:\nWhich organization that Lucy joins inspires Henry?\n\nSubgraph centered at [Lucy]:\n- <subj> Henry <obj> Lucy <rel> is_inspired_by\n- <subj> Lucy <obj> University Toronto <rel> studies_at\n- <subj> Lucy <obj> Clean Earth <rel> joins\n\nSubgraph centered at [Henry]:\n- <subj> Henry <obj> Maple Leaves <rel> forms\n- <subj> Henry <obj> Lucy <rel> is_inspired_by\n- <subj> Henry <obj> Maria Rodriguez <rel> is_trained_by\n\nAnswer the question based on the above knowledge graph subgraphs.",
+      "You are given a question and relevant knowledge graph facts.\nUse ONLY the provided facts to answer the question.\n\nQuestion:\nWhich cities has Maple Leaves performed in?\n\nSubgraph centered at [Maple Leaves]:\n- <subj> Maple Leaves <obj> Rome <rel> performs_in\n- <subj> Maple Leaves <obj> Paris <rel> performs_in\n- <subj> Maple Leaves <obj> Polar Lights <rel> releases\n- <subj> Maple Leaves <obj> Berlin <rel> performs_in\n- <subj> Henry <obj> Maple Leaves <rel> forms\n\nAnswer the question based on the above knowledge graph subgraphs."
+    ],
+    "answer":[
+      "Polar Lights was released on August 12, 2020.",
+      "Henry is trained by Maria Rodriguez.",
+      "The organization that Lucy joins and which inspires Henry is Clean Earth.",
+      "Maple Leaves has performed in Rome, Paris, and Berlin."
+    ],
+    "truth":[
+      "August 12, 2020.",
+      "Maria Rodriguez.",
+      "Clean Earth.",
+      "Rome, Paris, and Berlin."
+    ]    
+  }
+]

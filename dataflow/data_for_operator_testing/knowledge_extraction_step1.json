@@ -1,0 +1,116 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Henry, a talented musician from Canada, originally trained as a classical pianist under renowned conductor Maria Rodriguez. Henry later formed a rock band called The Maple Leaves with his sister Lucy, who studied music composition at the University of Toronto. The Maple Leaves released their debut album, Polar Lights, on August 12, 2020, earning critical acclaim for blending classical and rock influences. Lucy also pursued environmental activism and joined Clean Earth as a regional ambassador, where she campaigned for stricter wildlife protection laws. Henry was inspired by Lucy’s passion for charity work, so he started volunteering at local animal shelters in his hometown. Although Henry and Lucy initially struggled with creative differences, they eventually found harmony in combining Lucy’s classical compositions with Henry’s rock guitar riffs. The Maple Leaves toured across Europe in 2021, performing sold-out shows in major cities like Paris, Berlin, and Rome. During the tour, Henry developed a keen interest in international cuisine and collaborated with local chefs to film a short documentary on regional cooking techniques.",
+    "entity":"Henry, Maria Rodriguez, Canada, Maple Leaves, Lucy, University Toronto, Polar Lights, August 12 2020, Clean Earth, Paris, Berlin, Rome",
+    "triple":[
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by",
+      "<subj> Henry <obj> Maple Leaves <rel> forms",
+      "<subj> Lucy <obj> University Toronto <rel> studies_at",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> releases",
+      "<subj> Polar Lights <obj> August 12 2020 <rel> is_released_on",
+      "<subj> Lucy <obj> Clean Earth <rel> joins",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by",
+      "<subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Maple Leaves <obj> Rome <rel> performs_in"
+    ],
+    "3_hop_paths":[
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Polar Lights <obj> August 12 2020 <rel> is_released_on",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Polar Lights <rel> releases",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Rome <rel> performs_in",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Lucy <obj> University Toronto <rel> studies_at",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Lucy <obj> Clean Earth <rel> joins"
+    ],
+    "ambiguous":[
+      "<entity> Henry <attribute> nationality <value> Canada | Canadian",
+      "<entity> Henry <attribute> instrument <value> violin | violins",
+      "<entity> Lucy <attribute> nationality <value> American | USA",
+      "<entity> Lucy <attribute> major <value> Music Performance | Musical Performance",
+      "<entity> Maple Leaves <attribute> type <value> band | music band",
+      "<entity> Polar Lights <attribute> type <value> album | music album",
+      "<entity> Polar Lights <attribute> genre <value> folk | folk music",
+      "<entity> University Toronto <attribute> country <value> CA | Canada",
+      "<entity> Clean Earth <attribute> type <value> NGO | environmental organization"
+    ],
+    "2_hop_paths":[
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Polar Lights <rel> releases",
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Rome <rel> performs_in",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Lucy <obj> University Toronto <rel> studies_at",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Lucy <obj> Clean Earth <rel> joins",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Maple Leaves <rel> forms",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Lucy <rel> is_inspired_by",
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Henry <obj> Lucy <rel> is_inspired_by",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Polar Lights <obj> August 12 2020 <rel> is_released_on",
+      "<subj> Lucy <obj> University Toronto <rel> studies_at || <subj> Lucy <obj> Clean Earth <rel> joins",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Maple Leaves <obj> Rome <rel> performs_in",
+      "<subj> Maple Leaves <obj> Paris <rel> performs_in || <subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Maple Leaves <obj> Paris <rel> performs_in || <subj> Maple Leaves <obj> Rome <rel> performs_in",
+      "<subj> Maple Leaves <obj> Berlin <rel> performs_in || <subj> Maple Leaves <obj> Rome <rel> performs_in"
+    ]
+  },
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Henry, a talented musician from Canada, originally trained as a classical pianist under renowned conductor Maria Rodriguez. Henry later formed a rock band called The Maple Leaves with his sister Lucy, who studied music composition at the University of Toronto. The Maple Leaves released their debut album, Polar Lights, on August 12, 2020, earning critical acclaim for blending classical and rock influences. Lucy also pursued environmental activism and joined Clean Earth as a regional ambassador, where she campaigned for stricter wildlife protection laws. Henry was inspired by Lucy’s passion for charity work, so he started volunteering at local animal shelters in his hometown. Although Henry and Lucy initially struggled with creative differences, they eventually found harmony in combining Lucy’s classical compositions with Henry’s rock guitar riffs. The Maple Leaves toured across Europe in 2021, performing sold-out shows in major cities like Paris, Berlin, and Rome. During the tour, Henry developed a keen interest in international cuisine and collaborated with local chefs to film a short documentary on regional cooking techniques.",
+    "entity":"Henry, Maria Rodriguez, Canada, Maple Leaves, Lucy, University Toronto, Polar Lights, August 12 2020, Clean Earth, Paris, Berlin, Rome",
+    "triple":[
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by",
+      "<subj> Henry <obj> Maple Leaves <rel> formed",
+      "<subj> Lucy <obj> University Toronto <rel> studied_at",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> released",
+      "<subj> Maple Leaves <obj> August 12 2020 <rel> released_on",
+      "<subj> Lucy <obj> Clean Earth <rel> joined",
+      "<subj> Maple Leaves <obj> Paris <rel> toured_across",
+      "<subj> Maple Leaves <obj> Berlin <rel> toured_across",
+      "<subj> Maple Leaves <obj> Rome <rel> toured_across"
+    ],
+    "3_hop_paths":[
+      "<subj> Henry <obj> Maple Leaves <rel> forms || <subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Lucy <obj> Clean Earth <rel> joins",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Polar Lights <rel> releases",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by || <subj> Henry <obj> Maple Leaves <rel> forms || <subj> Maple Leaves <obj> Rome <rel> performs_in",
+      "<subj> Polar Lights <obj> August 12 2020 <rel> is_released_on || <subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> Polar Lights <obj> August 12 2020 <rel> is_released_on || <subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Polar Lights <obj> August 12 2020 <rel> is_released_on || <subj> Maple Leaves <obj> Polar Lights <rel> releases || <subj> Maple Leaves <obj> Rome <rel> performs_in"
+    ],
+    "ambiguous":[
+      "<entity> Henry <attribute> nationality <value> Canada | Canadian",
+      "<entity> Henry <attribute> instrument <value> violin | violins",
+      "<entity> Lucy <attribute> nationality <value> American | USA",
+      "<entity> Lucy <attribute> major <value> Music Performance | Musical Performance",
+      "<entity> Maple Leaves <attribute> type <value> band | music band",
+      "<entity> Polar Lights <attribute> type <value> album | music album",
+      "<entity> Polar Lights <attribute> genre <value> folk | folk music",
+      "<entity> University Toronto <attribute> country <value> CA | Canada",
+      "<entity> Clean Earth <attribute> type <value> NGO | environmental organization"
+    ],
+    "2_hop_paths":[
+      "<subj> Henry <obj> Maple Leaves <rel> formed || <subj> Maple Leaves <obj> Polar Lights <rel> released",
+      "<subj> Henry <obj> Maple Leaves <rel> formed || <subj> Maple Leaves <obj> August 12 2020 <rel> released_on",
+      "<subj> Henry <obj> Maple Leaves <rel> formed || <subj> Maple Leaves <obj> Paris <rel> toured_across",
+      "<subj> Henry <obj> Maple Leaves <rel> formed || <subj> Maple Leaves <obj> Berlin <rel> toured_across",
+      "<subj> Henry <obj> Maple Leaves <rel> formed || <subj> Maple Leaves <obj> Rome <rel> toured_across",
+      "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by || <subj> Henry <obj> Maple Leaves <rel> formed",
+      "<subj> Lucy <obj> University Toronto <rel> studied_at || <subj> Lucy <obj> Clean Earth <rel> joined",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> released || <subj> Maple Leaves <obj> August 12 2020 <rel> released_on",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> released || <subj> Maple Leaves <obj> Paris <rel> toured_across",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> released || <subj> Maple Leaves <obj> Berlin <rel> toured_across",
+      "<subj> Maple Leaves <obj> Polar Lights <rel> released || <subj> Maple Leaves <obj> Rome <rel> toured_across",
+      "<subj> Maple Leaves <obj> August 12 2020 <rel> released_on || <subj> Maple Leaves <obj> Paris <rel> toured_across",
+      "<subj> Maple Leaves <obj> August 12 2020 <rel> released_on || <subj> Maple Leaves <obj> Berlin <rel> toured_across",
+      "<subj> Maple Leaves <obj> August 12 2020 <rel> released_on || <subj> Maple Leaves <obj> Rome <rel> toured_across",
+      "<subj> Maple Leaves <obj> Paris <rel> toured_across || <subj> Maple Leaves <obj> Berlin <rel> toured_across",
+      "<subj> Maple Leaves <obj> Paris <rel> toured_across || <subj> Maple Leaves <obj> Rome <rel> toured_across",
+      "<subj> Maple Leaves <obj> Berlin <rel> toured_across || <subj> Maple Leaves <obj> Rome <rel> toured_across"
+    ]
+  }
+]

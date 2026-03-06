@@ -1,0 +1,41 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"After graduating from Stanford University in 2004, Elon Musk co-founded multiple technology companies, including Zip2 and X.com, which later became PayPal. In 2008, he took over Tesla Motors as CEO and began steering the company toward mass-market electric vehicles. By 2015, Tesla introduced the Powerwall home battery system, expanding into energy storage solutions. Elon Musk has been recognized for his visionary leadership, earning titles such as Time Magazine’s “Person of the Year” in 2021. Outside of his professional work, Musk is known for his interest in space exploration and founded SpaceX in 2002, which has since achieved milestones like the first commercial spacecraft docking with the ISS in 2012. Additionally, he has invested in renewable energy initiatives and artificial intelligence research, including founding Neuralink in 2016 to develop brain–computer interfaces. His hobbies include reading science fiction novels, attending technology conferences, and occasionally hosting charity events focused on education and sustainability.",
+    "tuple":[
+      "<entity> Elon Musk <attribute> university graduation <value> Stanford University <time> 2004",
+      "<entity> Elon Musk <attribute> company co-founded <value> Zip2 <time> NA",
+      "<entity> Elon Musk <attribute> company co-founded <value> X.com <time> NA",
+      "<entity> X.com <attribute> became <value> PayPal <time> NA",
+      "<entity> Elon Musk <attribute> CEO position <value> Tesla Motors <time> 2008",
+      "<entity> Tesla Motors <attribute> product introduction <value> Powerwall <time> 2015",
+      "<entity> Elon Musk <attribute> leadership recognition <value> Person of the Year <time> 2021",
+      "<entity> Elon Musk <attribute> interest <value> space exploration <time> NA",
+      "<entity> Elon Musk <attribute> company founded <value> SpaceX <time> 2002",
+      "<entity> SpaceX <attribute> milestone achieved <value> first commercial spacecraft docking with the ISS <time> 2012",
+      "<entity> Elon Musk <attribute> investment area <value> renewable energy <time> NA",
+      "<entity> Elon Musk <attribute> research investment <value> artificial intelligence <time> NA",
+      "<entity> Elon Musk <attribute> company founded <value> Neuralink <time> 2016",
+      "<entity> Elon Musk <attribute> hobby <value> reading science fiction novels <time> NA",
+      "<entity> Elon Musk <attribute> hobby <value> attending technology conferences <time> NA",
+      "<entity> Elon Musk <attribute> hobby <value> hosting charity events <time> NA",
+      "<entity> Elon Musk <attribute> charity focus <value> education and sustainability <time> NA"
+    ]
+  },
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Jeff Bezos, after stepping down as Amazon CEO in July 2021, continued to focus on his space exploration company Blue Origin, which he founded in 2000. In 2021, Blue Origin successfully launched its first crewed suborbital flight with Jeff Bezos onboard, marking a milestone in commercial space tourism. Amazon announced in 2022 the expansion of its Amazon Web Services (AWS) data centers in Europe, aiming to improve cloud services for regional customers. Jeff Bezos also established the Bezos Earth Fund in 2020, which pledged $10 billion to combat climate change globally. In addition to his business endeavors, Bezos has taken an active role in philanthropy, including donations to educational initiatives and scientific research programs. His interests include astronomy, technological innovation, and writing science fiction books. Bezos occasionally participates in international conferences discussing AI and space technology, advocating for sustainable practices and innovation.",
+    "tuple":[
+      "<entity> Jeff Bezos <attribute> position <value> Amazon CEO <time> July 2021",
+      "<entity> Blue Origin <attribute> founding year <value> 2000 <time> NA",
+      "<entity> Blue Origin <attribute> first crewed suborbital flight <value> success <time> 2021",
+      "<entity> Amazon <attribute> AWS expansion <value> Europe <time> 2022",
+      "<entity> Bezos Earth Fund <attribute> pledge <value> $10 billion <time> 2020",
+      "<entity> Jeff Bezos <attribute> role <value> philanthropy <time> NA",
+      "<entity> Jeff Bezos <attribute> interests <value> astronomy, technological innovation, writing science fiction books <time> NA",
+      "<entity> Jeff Bezos <attribute> participation <value> international conferences on AI and space technology <time> NA"
+    ]
+  }
+]

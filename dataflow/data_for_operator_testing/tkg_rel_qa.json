@@ -1,0 +1,11 @@
+[
+  {
+    "2_hop_paths":"<subj> Elon Musk <obj> SpaceX <rel> founded <time> 2002 || <subj> SpaceX <obj> ISS <rel> first commercial spacecraft docking with <time> 2012"
+  },
+  {
+    "2_hop_paths":"<subj> Elon Musk <obj> Stanford University <rel> graduated from <time> 2004 || <subj> Elon Musk <obj> multiple technology companies <rel> co-founded <time> NA"
+  },
+  {
+    "2_hop_paths":"<subj> Elon Musk <obj> Stanford University <rel> graduated from <time> 2004 || <subj> Elon Musk <obj> Tesla Motors <rel> took over as CEO <time> 2008"
+  }
+]

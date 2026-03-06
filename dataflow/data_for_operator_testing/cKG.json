@@ -1,0 +1,214 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Alice wakes up every morning at 7 a.m. because her alarm clock rings. She usually drinks a glass of water first to stay hydrated. After that, she brushes her teeth and washes her face to feel refreshed. If it is sunny outside, she likes to go for a short jog in the neighborhood. Walking or jogging regularly helps improve physical health and mood. On her way to work, Alice often greets her neighbors, which makes both her and the neighbors feel happy. She sometimes buys coffee from a nearby café because caffeine helps her concentrate better. During lunch breaks, she eats fruits and vegetables, which provide essential vitamins. If she feels stressed, listening to music calms her down. At the office, Alice collaborates with colleagues to finish tasks on time. Working together encourages teamwork and strengthens relationships. After work, she sometimes goes grocery shopping to prepare dinner. Cooking meals at home saves money and is healthier than eating out. When cooking, she handles knives carefully to avoid accidents. Before going to bed, Alice reads a book to relax and improve her knowledge. Sleeping 7–8 hours helps maintain energy and focus for the next day. On weekends, she enjoys visiting parks, where children play and families have picnics. Spending time outdoors boosts mood and reduces stress. If it rains, she carries an umbrella to stay dry. Feeding her pet dog daily makes the pet happy and strengthens their bond. Alice occasionally calls friends to chat, which helps maintain friendships. She also waters her indoor plants regularly; healthy plants improve indoor air quality and provide a calming atmosphere.",
+    "triple":[
+      "<subj> alarm clock <obj> waking up <rel> UsedFor",
+      "<subj> water <obj> staying hydrated <rel> UsedFor",
+      "<subj> brushing teeth <obj> feeling refreshed <rel> UsedFor",
+      "<subj> washing face <obj> feeling refreshed <rel> UsedFor",
+      "<subj> jogging <obj> physical health <rel> Helps",
+      "<subj> jogging <obj> mood <rel> Helps",
+      "<subj> caffeine <obj> concentration <rel> Helps",
+      "<subj> fruits and vegetables <obj> essential vitamins <rel> Provides",
+      "<subj> listening to music <obj> calming down <rel> UsedFor",
+      "<subj> collaborating with colleagues <obj> finishing tasks <rel> Helps",
+      "<subj> working together <obj> teamwork <rel> Encourages",
+      "<subj> working together <obj> relationships <rel> Strengthens",
+      "<subj> cooking meals at home <obj> healthier <rel> HasProperty",
+      "<subj> cooking meals at home <obj> saving money <rel> UsedFor",
+      "<subj> handling knives carefully <obj> avoiding accidents <rel> UsedFor",
+      "<subj> reading a book <obj> relaxing <rel> UsedFor",
+      "<subj> reading a book <obj> improving knowledge <rel> Helps",
+      "<subj> sleeping 7–8 hours <obj> maintaining energy <rel> Helps",
+      "<subj> sleeping 7–8 hours <obj> maintaining focus <rel> Helps",
+      "<subj> visiting parks <obj> boosting mood <rel> Helps",
+      "<subj> visiting parks <obj> reducing stress <rel> Helps",
+      "<subj> carrying an umbrella <obj> staying dry <rel> UsedFor",
+      "<subj> feeding pet dog <obj> making pet happy <rel> Makes",
+      "<subj> feeding pet dog <obj> strengthening bond <rel> Helps",
+      "<subj> calling friends <obj> maintaining friendships <rel> Helps",
+      "<subj> watering indoor plants <obj> improving indoor air quality <rel> Helps",
+      "<subj> watering indoor plants <obj> providing calming atmosphere <rel> Helps",
+      "<subj> parks <obj> children playing <rel> AtLocation",
+      "<subj> parks <obj> families having picnics <rel> AtLocation"
+    ],
+    "set_triple":[
+      [
+        "<subj> water <obj> hydration <rel> UsedFor",
+        "<subj> water <obj> staying hydrated <rel> UsedFor"
+      ],
+      [
+        "<subj> jogging <obj> mood <rel> Helps",
+        "<subj> jogging <obj> neighborhood <rel> AtLocation",
+        "<subj> jogging <obj> physical health <rel> Helps"
+      ],
+      [
+        "<subj> fruits and vegetables <obj> essential vitamins <rel> Provides",
+        "<subj> fruits and vegetables <obj> vitamins <rel> Provides"
+      ],
+      [
+        "<subj> listening to music <obj> calming down <rel> UsedFor",
+        "<subj> listening to music <obj> calmness <rel> Causes"
+      ],
+      [
+        "<subj> collaborating with colleagues <obj> finishing tasks <rel> Helps",
+        "<subj> collaborating with colleagues <obj> tasks <rel> UsedFor"
+      ],
+      [
+        "<subj> working together <obj> relationships <rel> Strengthens",
+        "<subj> working together <obj> teamwork <rel> Encourages"
+      ],
+      [
+        "<subj> cooking meals at home <obj> health <rel> Improves",
+        "<subj> cooking meals at home <obj> healthier <rel> HasProperty",
+        "<subj> cooking meals at home <obj> saving money <rel> UsedFor"
+      ],
+      [
+        "<subj> reading a book <obj> improving knowledge <rel> Helps",
+        "<subj> reading a book <obj> knowledge <rel> Improves",
+        "<subj> reading a book <obj> relaxation <rel> UsedFor",
+        "<subj> reading a book <obj> relaxing <rel> UsedFor"
+      ],
+      [
+        "<subj> sleeping 7–8 hours <obj> energy <rel> Helps",
+        "<subj> sleeping 7–8 hours <obj> focus <rel> Helps",
+        "<subj> sleeping 7–8 hours <obj> maintaining energy <rel> Helps",
+        "<subj> sleeping 7–8 hours <obj> maintaining focus <rel> Helps"
+      ],
+      [
+        "<subj> visiting parks <obj> boosting mood <rel> Helps",
+        "<subj> visiting parks <obj> mood <rel> Boosts",
+        "<subj> visiting parks <obj> reducing stress <rel> Helps",
+        "<subj> visiting parks <obj> stress <rel> Reduces"
+      ],
+      [
+        "<subj> feeding pet dog <obj> bond strength <rel> Strengthens",
+        "<subj> feeding pet dog <obj> happiness <rel> Makes",
+        "<subj> feeding pet dog <obj> making pet happy <rel> Makes",
+        "<subj> feeding pet dog <obj> strengthening bond <rel> Helps"
+      ],
+      [
+        "<subj> calling friends <obj> friendships <rel> Helps",
+        "<subj> calling friends <obj> maintaining friendships <rel> Helps"
+      ],
+      [
+        "<subj> watering indoor plants <obj> air quality <rel> Improves",
+        "<subj> watering indoor plants <obj> atmosphere <rel> Provides",
+        "<subj> watering indoor plants <obj> improving indoor air quality <rel> Helps",
+        "<subj> watering indoor plants <obj> providing calming atmosphere <rel> Helps"
+      ],
+      [
+        "<subj> parks <obj> children playing <rel> AtLocation",
+        "<subj> parks <obj> families having picnics <rel> AtLocation"
+      ]
+    ]
+  },
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"Alice wakes up every morning at 7 a.m. because her alarm clock rings. She usually drinks a glass of water first to stay hydrated. After that, she brushes her teeth and washes her face to feel refreshed. If it is sunny outside, she likes to go for a short jog in the neighborhood. Walking or jogging regularly helps improve physical health and mood. On her way to work, Alice often greets her neighbors, which makes both her and the neighbors feel happy. She sometimes buys coffee from a nearby café because caffeine helps her concentrate better. During lunch breaks, she eats fruits and vegetables, which provide essential vitamins. If she feels stressed, listening to music calms her down. At the office, Alice collaborates with colleagues to finish tasks on time. Working together encourages teamwork and strengthens relationships. After work, she sometimes goes grocery shopping to prepare dinner. Cooking meals at home saves money and is healthier than eating out. When cooking, she handles knives carefully to avoid accidents. Before going to bed, Alice reads a book to relax and improve her knowledge. Sleeping 7–8 hours helps maintain energy and focus for the next day. On weekends, she enjoys visiting parks, where children play and families have picnics. Spending time outdoors boosts mood and reduces stress. If it rains, she carries an umbrella to stay dry. Feeding her pet dog daily makes the pet happy and strengthens their bond. Alice occasionally calls friends to chat, which helps maintain friendships. She also waters her indoor plants regularly; healthy plants improve indoor air quality and provide a calming atmosphere.",
+    "triple":[
+      "<subj> alarm clock <obj> waking up <rel> UsedFor",
+      "<subj> water <obj> hydration <rel> UsedFor",
+      "<subj> brushing teeth <obj> feeling refreshed <rel> UsedFor",
+      "<subj> washing face <obj> feeling refreshed <rel> UsedFor",
+      "<subj> jogging <obj> neighborhood <rel> AtLocation",
+      "<subj> jogging <obj> physical health <rel> Helps",
+      "<subj> jogging <obj> mood <rel> Helps",
+      "<subj> greeting neighbors <obj> happiness <rel> Makes",
+      "<subj> caffeine <obj> concentration <rel> Helps",
+      "<subj> fruits and vegetables <obj> vitamins <rel> Provides",
+      "<subj> listening to music <obj> calmness <rel> Causes",
+      "<subj> collaborating with colleagues <obj> tasks <rel> UsedFor",
+      "<subj> working together <obj> teamwork <rel> Encourages",
+      "<subj> working together <obj> relationships <rel> Strengthens",
+      "<subj> cooking meals at home <obj> saving money <rel> UsedFor",
+      "<subj> cooking meals at home <obj> health <rel> Improves",
+      "<subj> handling knives carefully <obj> avoiding accidents <rel> UsedFor",
+      "<subj> reading a book <obj> relaxation <rel> UsedFor",
+      "<subj> reading a book <obj> knowledge <rel> Improves",
+      "<subj> sleeping 7–8 hours <obj> energy <rel> Helps",
+      "<subj> sleeping 7–8 hours <obj> focus <rel> Helps",
+      "<subj> visiting parks <obj> mood <rel> Boosts",
+      "<subj> visiting parks <obj> stress <rel> Reduces",
+      "<subj> carrying umbrella <obj> staying dry <rel> UsedFor",
+      "<subj> feeding pet dog <obj> happiness <rel> Makes",
+      "<subj> feeding pet dog <obj> bond strength <rel> Strengthens",
+      "<subj> calling friends <obj> friendships <rel> Helps",
+      "<subj> watering indoor plants <obj> air quality <rel> Improves",
+      "<subj> watering indoor plants <obj> atmosphere <rel> Provides"
+    ],
+    "set_triple":[
+      [
+        "<subj> water <obj> hydration <rel> UsedFor",
+        "<subj> water <obj> staying hydrated <rel> UsedFor"
+      ],
+      [
+        "<subj> jogging <obj> mood <rel> Helps",
+        "<subj> jogging <obj> neighborhood <rel> AtLocation",
+        "<subj> jogging <obj> physical health <rel> Helps"
+      ],
+      [
+        "<subj> fruits and vegetables <obj> essential vitamins <rel> Provides",
+        "<subj> fruits and vegetables <obj> vitamins <rel> Provides"
+      ],
+      [
+        "<subj> listening to music <obj> calming down <rel> UsedFor",
+        "<subj> listening to music <obj> calmness <rel> Causes"
+      ],
+      [
+        "<subj> collaborating with colleagues <obj> finishing tasks <rel> Helps",
+        "<subj> collaborating with colleagues <obj> tasks <rel> UsedFor"
+      ],
+      [
+        "<subj> working together <obj> relationships <rel> Strengthens",
+        "<subj> working together <obj> teamwork <rel> Encourages"
+      ],
+      [
+        "<subj> cooking meals at home <obj> health <rel> Improves",
+        "<subj> cooking meals at home <obj> healthier <rel> HasProperty",
+        "<subj> cooking meals at home <obj> saving money <rel> UsedFor"
+      ],
+      [
+        "<subj> reading a book <obj> improving knowledge <rel> Helps",
+        "<subj> reading a book <obj> knowledge <rel> Improves",
+        "<subj> reading a book <obj> relaxation <rel> UsedFor",
+        "<subj> reading a book <obj> relaxing <rel> UsedFor"
+      ],
+      [
+        "<subj> sleeping 7–8 hours <obj> energy <rel> Helps",
+        "<subj> sleeping 7–8 hours <obj> focus <rel> Helps",
+        "<subj> sleeping 7–8 hours <obj> maintaining energy <rel> Helps",
+        "<subj> sleeping 7–8 hours <obj> maintaining focus <rel> Helps"
+      ],
+      [
+        "<subj> visiting parks <obj> boosting mood <rel> Helps",
+        "<subj> visiting parks <obj> mood <rel> Boosts",
+        "<subj> visiting parks <obj> reducing stress <rel> Helps",
+        "<subj> visiting parks <obj> stress <rel> Reduces"
+      ],
+      [
+        "<subj> feeding pet dog <obj> bond strength <rel> Strengthens",
+        "<subj> feeding pet dog <obj> happiness <rel> Makes",
+        "<subj> feeding pet dog <obj> making pet happy <rel> Makes",
+        "<subj> feeding pet dog <obj> strengthening bond <rel> Helps"
+      ],
+      [
+        "<subj> calling friends <obj> friendships <rel> Helps",
+        "<subj> calling friends <obj> maintaining friendships <rel> Helps"
+      ],
+      [
+        "<subj> watering indoor plants <obj> air quality <rel> Improves",
+        "<subj> watering indoor plants <obj> atmosphere <rel> Provides",
+        "<subj> watering indoor plants <obj> improving indoor air quality <rel> Helps",
+        "<subj> watering indoor plants <obj> providing calming atmosphere <rel> Helps"
+      ],
+      [
+        "<subj> parks <obj> children playing <rel> AtLocation",
+        "<subj> parks <obj> families having picnics <rel> AtLocation"
+      ]
+    ]
+  }
+]

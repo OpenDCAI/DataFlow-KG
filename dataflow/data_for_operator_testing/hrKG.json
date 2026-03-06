@@ -1,0 +1,28 @@
+[
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"On May 15, 2025, Elon Musk announced at the Tesla Gigafactory in Berlin, Germany, that the Tesla Model Y would adopt the 4680 battery in the European market starting from the third quarter of 2025. With this upgrade, the cruising range of Model Y will be increased to 600 kilometers, while its price will remain unchanged at 49,990 euros. The 4680 battery is produced at Tesla’s Gigafactory in Nevada, United States, using silicon-carbon anode material, and its energy density is 15% higher than that of the previous generation. The Berlin Gigafactory officially started production in March 2022, with a designed annual capacity of 500,000 vehicles, mainly supplying the European Union, the United Kingdom, and Norway.",
+    "tuple":[
+      "<subj> Elon Musk <obj> Announcement <rel> MadeAt <Time> May 15, 2025 <Location> Tesla Gigafactory, Berlin, Germany",
+      "<subj> Tesla Model Y <obj> 4680 Battery <rel> WillAdopt <Time> Third quarter of 2025 <Location> European market",
+      "<subj> Tesla Model Y <obj> Cruising Range <rel> IncreasedTo <Value> 600 kilometers",
+      "<subj> Tesla Model Y <obj> Price <rel> RemainsUnchanged <Value> 49,990 euros",
+      "<subj> 4680 Battery <obj> Tesla Gigafactory, Nevada, United States <rel> ProducedAt <Material> Silicon-carbon anode <EnergyDensity> 15% higher",
+      "<subj> Berlin Gigafactory <obj> Production <rel> Started <Time> March 2022 <Capacity> 500,000 vehicles <Market> European Union, United Kingdom, Norway"
+    ]
+  },
+  {
+    "source":"..\/example_data\/KBCleaningPipeline\/bitter_lesson.pdf",
+    "text_path":"..\/example_data\/KBCleaningPipeline\/raw\/mineru\/bitter_lesson\/vlm\/bitter_lesson.md",
+    "raw_chunk":"On May 15, 2025, Elon Musk announced at the Tesla Gigafactory in Berlin, Germany, that the Tesla Model Y would adopt the 4680 battery in the European market starting from the third quarter of 2025. With this upgrade, the cruising range of Model Y will be increased to 600 kilometers, while its price will remain unchanged at 49,990 euros. The 4680 battery is produced at Tesla’s Gigafactory in Nevada, United States, using silicon-carbon anode material, and its energy density is 15% higher than that of the previous generation. The Berlin Gigafactory officially started production in March 2022, with a designed annual capacity of 500,000 vehicles, mainly supplying the European Union, the United Kingdom, and Norway.",
+    "tuple":[
+      "<subj> Tesla Model Y <obj> 4680 battery <rel> Adopt <Time> Starting third quarter of 2025 <Location> European market",
+      "<subj> 4680 battery <obj> Previous generation battery <rel> HasProperty <Attribute> Energy density 15% higher",
+      "<subj> Tesla Gigafactory Berlin <obj> European Union, United Kingdom, Norway <rel> Supply <Condition> Mainly",
+      "<subj> Tesla Model Y <obj> Cruising range <rel> Increase <Degree> To 600 kilometers",
+      "<subj> 4680 battery <obj> Tesla Gigafactory Nevada <rel> Produced <Method> Using silicon-carbon anode material"
+    ]
+  }
+]
+
