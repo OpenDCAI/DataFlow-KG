@@ -247,7 +247,7 @@ class LazyFileStorage(DataFlowStorage):
         return self._convert_output(df, output_type)
 
     # ---------- 写（仅缓冲，不落盘） ----------
-    def write(self, data: Any) -> Any:
+    def write(self, data: Any, use_current_step: bool = False, file_path: str = None) -> Any:
         """
         将数据写入内存缓冲（目标 step = operator_step + 1），不触盘。
         返回该 step 对应未来落盘的文件路径，便于日志对齐。
@@ -278,13 +278,24 @@ class LazyFileStorage(DataFlowStorage):
         else:
             raise ValueError(f"Unsupported data type: {type(data)}")
 
-        target_step = self.operator_step + 1
-        with self._lock:
-            self._buffers[target_step] = dataframe.reset_index(drop=True)
-            self._dirty_steps.add(target_step)
+        ####################  Added by Zhengpin on 2026.03.06  ####################  
+        if file_path is None:
+            target_step = self.operator_step + 1
+            if use_current_step:
+                target_step = self.operator_step
+            file_path = self._get_cache_file_path(target_step)
+        else:
+        # 手动指定路径，不修改 operator_step
+            target_step = None   
+        
+        if target_step is not None:
+            with self._lock:
+                self._buffers[target_step] = dataframe.reset_index(drop=True)
+                self._dirty_steps.add(target_step)
 
         self.logger.success(f"[buffer] Buffered data for step {target_step} (type={self.cache_type}); not persisted yet.")
-        return self._get_cache_file_path(target_step)
+        return file_path
+        ####################  Added by Zhengpin on 2026.03.06  #################### 
 
     # ---------- 落盘 ----------
     def flush_step(self, step: int):
@@ -450,7 +461,7 @@ class FileStorage(DataFlowStorage):
             return dataframe.to_dict(orient="records")
         raise ValueError(f"Unsupported output type: {output_type}")
 
-    def read(self, output_type: Literal["dataframe", "dict"]="dataframe") -> Any:
+    def read(self, output_type: Literal["dataframe", "dict"]="dataframe", file_path: str = None) -> Any:
         """
         Read data from current file managed by storage.
         
@@ -468,6 +479,38 @@ class FileStorage(DataFlowStorage):
         Raises:
             ValueError: For unsupported file types or output types
         """
+
+        ####################  Added by Zhengpin on 2026.03.06  #################### 
+        if file_path:
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"File {file_path} does not exist.")
+
+            ext = file_path.split(".")[-1].lower()
+            try:
+                if ext == "json":
+                    df = pd.read_json(file_path)
+                elif ext == "jsonl":
+                    df = pd.read_json(file_path, lines=True)
+                elif ext == "csv":
+                    df = pd.read_csv(file_path)
+                elif ext == "parquet":
+                    df = pd.read_parquet(file_path)
+                elif ext == "pickle":
+                    df = pd.read_pickle(file_path)
+                else:
+                    raise ValueError(f"Unsupported file type: {ext}")
+            except Exception as e:
+                raise ValueError(f"Failed to load {file_path}: {e}")
+            
+            # 输出类型转换
+            if output_type == "dataframe":
+                return df
+            elif output_type == "dict":
+                return df.to_dict(orient="records")
+            else:
+                raise ValueError(f"Unsupported output_type: {output_type}")        
+        ####################  Added by Zhengpin on 2026.03.06  #################### 
+
         if self.operator_step == 0 and self.first_entry_file_name == "":
             self.logger.info("first_entry_file_name is empty, returning empty dataframe")
             empty_dataframe = pd.DataFrame()
@@ -515,7 +558,7 @@ class FileStorage(DataFlowStorage):
         dataframe = self._load_local_file(file_path, local_cache)
         return self._convert_output(dataframe, output_type)
         
-    def write(self, data: Any) -> Any:
+    def write(self, data: Any, file_path: str = None, use_current_step: bool = False)  -> Any:
         """
         Write data to current file managed by storage.
         data: Any, the data to write, it should be a dataframe, List[dict], etc.
@@ -564,7 +607,17 @@ class FileStorage(DataFlowStorage):
         # else:
         #     raise ValueError(f"Unsupported data type: {type(data)}")
 
-        file_path = self._get_cache_file_path(self.operator_step + 1)
+        ####################  Added by Zhengpin on 2026.03.06  ####################  
+        if file_path is None:
+            target_step = self.operator_step + 1
+            if use_current_step:
+                target_step = self.operator_step
+            file_path = self._get_cache_file_path(target_step)
+        else:
+        # 手动指定路径，不修改 operator_step
+            target_step = None   
+        ####################  Added by Zhengpin on 2026.03.06  #################### 
+
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         self.logger.success(f"Writing data to {file_path} with type {self.cache_type}")
         if self.cache_type == "json":

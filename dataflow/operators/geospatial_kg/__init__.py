@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .
+    from .geokg_get_ontology import GeoKGGetBasicOntology
+    from .geokg_triple_extractor import GeoKGTripleExtraction
 
     
 else:
