@@ -244,8 +244,8 @@ class KGTripleHallucinationEvaluator(OperatorABC):
         self,
         storage: DataFlowStorage = None,
         input_key: str = "raw_chunk",
-        triple_key: str = "triple",
-        test_triple_key: str = "test_triple"
+        input_key_meta1: str = "triple",
+        input_key_meta2: str = "test_triple"
     ):
 
         if storage is None:
@@ -257,8 +257,8 @@ class KGTripleHallucinationEvaluator(OperatorABC):
         for _, r in df.iterrows():
             records.append({
                 "raw_chunk": r.get(input_key, ""),
-                "triple": r.get(triple_key, []),
-                "test_triple": r.get(test_triple_key, None)
+                "triple": r.get(input_key_meta1, []),
+                "test_triple": r.get(input_key_meta2, None)
             })
 
         outputs = self.process_batch(records)

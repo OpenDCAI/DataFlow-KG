@@ -44,7 +44,7 @@ class KGRelationTripleConsistencyEvaluator(OperatorABC):
         self.llm_serving = llm_serving
         self.sample_rate = sample_rate
         self.max_samples = max_samples
-        self.prompt_manager = KGConsistencyEvaluationPrompt(lang)
+        self.prompt_manager = KGRelationConsistencyEvaluationPrompt(lang)
 
     # ============================================================
     # Parsing
@@ -299,7 +299,7 @@ class KGRelationTripleConsistencyEvaluator(OperatorABC):
     # Run
     # ============================================================
 
-    def run(self, storage: DataFlowStorage = None, triple_key: str = "triple"):
+    def run(self, storage: DataFlowStorage = None, input_key: str = "triple"):
 
         if storage is None:
             raise ValueError("Storage is required.")
@@ -309,7 +309,7 @@ class KGRelationTripleConsistencyEvaluator(OperatorABC):
         records = []
         for _, r in df.iterrows():
             records.append({
-                "triple": r.get(triple_key, []),
+                "triple": r.get(input_key, []),
                 "test_triple": r.get("test_triple", None)
             })
 

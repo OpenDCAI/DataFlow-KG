@@ -517,7 +517,7 @@ class FileStorage(DataFlowStorage):
             return self._convert_output(empty_dataframe, output_type)
 
         file_path = self._get_cache_file_path(self.operator_step)
-        self.logger.info(f"Reading data from {file_path} with type {output_type}")
+        self.logger.info(f"Reading data from {file_path} with type {output_type}") 
 
         if self.operator_step == 0:
             source = self.first_entry_file_name

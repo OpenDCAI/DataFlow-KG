@@ -426,8 +426,8 @@ class KGHallucinationEvaluationPrompt(PromptABC):
             {triples_block}
 
             请仅返回 JSON 格式的评估结果。"""
-                    else:
-                        return f"""Verify these triples against the source text.
+        else:
+            return f"""Verify these triples against the source text.
 
             --- Source Text ---
             {text}

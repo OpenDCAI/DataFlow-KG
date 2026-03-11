@@ -46,7 +46,7 @@ class KGRelationTriplePathQAGeneration(OperatorABC):
         llm_serving: LLMServingABC,
         seed: int = 0,
         lang="en",
-        w
+        hop=2,
         num_q: int = 5
     ):
         """Initialize the processor.

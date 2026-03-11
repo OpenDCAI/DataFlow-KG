@@ -192,7 +192,7 @@ class KGRelationTripleTopologyEvaluator(OperatorABC):
     def run(
         self,
         storage: DataFlowStorage = None,
-        triple_key: str = "triple"
+        input_key: str = "triple"
     ):
 
         if storage is None:
@@ -204,7 +204,7 @@ class KGRelationTripleTopologyEvaluator(OperatorABC):
         records = []
         for _, r in df.iterrows():
             records.append({
-                "triple": r.get(triple_key, [])
+                "triple": r.get(input_key, [])
             })
 
         outputs = self.process_batch(records)

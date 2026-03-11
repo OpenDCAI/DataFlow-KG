@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from .eval.kg_rel_triple_strength_eval import KGRelationStrengthScoring
     from .eval.kg_rel_triple_consistency_eval import KGRelationTripleConsistencyEvaluator
     from .eval.kg_triple_hallucination_eval import KGTripleHallucinationEvaluator
-    # from .eval.kg_entity_redundancy_eval import KGEntityRedundancyEvaluator  ## Need refinement
+    from .eval.kg_triple_sementic_preserving_eval import KGTripleSemanticPreservationEvaluator  ## Need refinement
     from .eval.kg_rel_triple_topology_eval import KGRelationTripleTopologyEvaluator
     
 else:
