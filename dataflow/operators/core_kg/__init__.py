@@ -21,6 +21,12 @@ if TYPE_CHECKING:
     from .filter.kg_tuple_remove_repeated import KGTupleRemoveRepeated
     from .filter.kg_tuple_deletion import KGTupleDeletion
     from .filter.kg_attri_tuple_sampling import KGAttributeTupleSampler
+    from .filter.kg_rel_triple_strength_filtering import KGTripleStrengthFilter
+    from .filter.kg_subgraph_consistence_filtering import KGSubgraphConsistenceFilter
+    from .filter.kg_subgraph_scale_filtering import KGSubgraphScaleFilter
+    from .filter.kg_subgraph_connectivity_filtering import KGSubgraphConnectivityFilter
+    from .filter.kg_qa_concise_filtering import KGQAConciseFilter
+
 
     from .refinement.kg_entity_alignment import KGGraphEntityAligner
     from .refinement.kg_entity_classification import KGEntityClassification
@@ -36,8 +42,14 @@ if TYPE_CHECKING:
     from .eval.kg_rel_triple_strength_eval import KGRelationStrengthScoring
     from .eval.kg_rel_triple_consistency_eval import KGRelationTripleConsistencyEvaluator
     from .eval.kg_triple_hallucination_eval import KGTripleHallucinationEvaluator
-    from .eval.kg_triple_sementic_preserving_eval import KGTripleSemanticPreservationEvaluator  ## Need refinement
     from .eval.kg_rel_triple_topology_eval import KGRelationTripleTopologyEvaluator
+    from .eval.kg_subgraph_consistence_eval import KGSubgraphConsistency
+    from .eval.kg_subgraph_scale_eval import KGSubgraphScaleEvaluator
+    from .eval.kg_subgraph_connectivity_eval import KGSubgraphConnectivityEvaluator
+    from .eval.kg_qa_concise_eval import KGQAConcisenessEvaluator
+    
+    
+    
     
 else:
     import sys

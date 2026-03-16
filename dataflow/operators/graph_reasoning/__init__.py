@@ -6,6 +6,10 @@ if TYPE_CHECKING:
     from .reasoning_constrained_path_search import KGConstrainedPathSearch
     from .reasoning_rel_generator import KGReasoningRelationGeneration
 
+    from .eval.reasoning_path_length_eval import KGReasoningPathLengthEvaluator
+    from .eval.reasoning_path_redundancy_eval import KGPathRedundancyEvaluator
+
+    from .filter.reasoning_path_length_filtering import KGReasoningPathLengthFilter
 
     
 else:

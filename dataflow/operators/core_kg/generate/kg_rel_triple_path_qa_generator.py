@@ -46,7 +46,7 @@ class KGRelationTriplePathQAGeneration(OperatorABC):
         llm_serving: LLMServingABC,
         seed: int = 0,
         lang="en",
-        hop=2,
+        hop=1,
         num_q: int = 5
     ):
         """Initialize the processor.
@@ -156,7 +156,7 @@ class KGRelationTriplePathQAGeneration(OperatorABC):
         self,
         storage: DataFlowStorage = None,
         input_key_meta: str = 'hop_paths',
-        output_key_meta: str = 'QA_pairs'
+        output_key: str = 'QA_pairs'
     ):
         """Main entry point for processing a dataframe via DataFlowStorage.
 
@@ -168,18 +168,18 @@ class KGRelationTriplePathQAGeneration(OperatorABC):
         Returns:
             List[str]: List containing the output_key.
         """
-        self.input_key_meta, self.output_key_meta = input_key_meta, output_key_meta
+        self.input_key_meta, self.output_key = input_key_meta, output_key
         dataframe = storage.read("dataframe")
         if self.hop > 1:
             self.input_key = f"{self.hop}_{self.input_key_meta}"
         elif self.hop == 1:
             self.input_key = "triple"
-        self.output_key = f"{self.hop}_{self.output_key_meta}"
+
         self._validate_dataframe(dataframe)
         texts = dataframe[self.input_key].tolist()
         outputs = self.process_batch(texts)
 
-        dataframe[self.output_key] = [o[self.output_key_meta] for o in outputs]
+        dataframe[self.output_key] = [o[self.output_key] for o in outputs]
         output_file = storage.write(dataframe)
         self.logger.info(f"Results saved to {output_file}")
 

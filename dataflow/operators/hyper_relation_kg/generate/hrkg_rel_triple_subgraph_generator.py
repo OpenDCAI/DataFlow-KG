@@ -25,7 +25,7 @@ from dataflow.core import OperatorABC, LLMServingABC
 
 
 @OPERATOR_REGISTRY.register()
-class KGEntityBasedSubgraphSampling(OperatorABC):
+class HRKGEntityBasedSubgraphSampling(OperatorABC):
     """
     Knowledge Graph subgraph sampling operator.
     Supports BFS / Random Walk / Hop-based sampling.
@@ -43,14 +43,14 @@ class KGEntityBasedSubgraphSampling(OperatorABC):
         self.logger = get_logger()
 
 
-    # 修改 _parse_triple 支持多元组
     def _parse_triple(self, triple_str: str) -> tuple[str, str, str]:
         """
-        Parse '<subj> ... <obj> ... <rel> ... <attr> ...' -> (subject, full_relation_str, object)
+        Parse '<subj> ... <obj> ... <rel> ... <attr1> ... <attr2> ...' -> (subject, full_relation_str, object)
         - subject: 紧跟 <subj> 的实体名
         - object: 紧跟 <obj> 的实体名
-        - full_relation_str: <rel> + 所有附加属性原文
+        - full_relation_str: <rel> + 所有附加属性原文（如 <Time>, <Location>, <Value> 等）
         """
+
         triple_str = triple_str.strip()
 
         # 找 <subj>
@@ -65,13 +65,16 @@ class KGEntityBasedSubgraphSampling(OperatorABC):
             raise ValueError(f"No <obj> found in triple: {triple_str}")
         obj = obj_match.group(1).strip()
 
-        # 找 <rel> 到结尾
+        # 找 <rel> 到字符串末尾（包含后续所有属性）
         rel_match = re.search(r"<rel>\s*(.+)$", triple_str)
         if not rel_match:
             raise ValueError(f"No <rel> found in triple: {triple_str}")
-        full_rel = rel_match.group(1).strip()  # 包含 <Time> ... <Capacity> ... 等全部属性
+        full_rel = rel_match.group(1).strip()
 
+        # 保留所有 <...> 属性
+        # full_rel 已经包含 <Time>, <Location>, <Value>, <Capacity>, <Market>, <Method>, 等全部内容
         return subj, full_rel, obj
+
 
     def _collect_entities(self, triple_groups: List[List[str]]) -> List[str]:
         entities = set()
@@ -241,7 +244,7 @@ class KGEntityBasedSubgraphSampling(OperatorABC):
     def run(
         self,
         storage: DataFlowStorage = None,
-        input_key: str = "triple",
+        input_key: str = "tuple",
         output_key: str = "subgraph",
         sampling_type: str = "hop",     # bfs | rw | hop
         start_entity: Optional[str] = None,

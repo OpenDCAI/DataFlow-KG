@@ -3,6 +3,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     # graphrag
     from .hrkg_rel_triple_extractor import HRKGTripleExtraction
+    from .generate.hrkg_rel_triple_subgraph_qa_generator import HRKGEntityBasedSubgraphSampling
+    from .generate.hrkg_rel_triple_path_qa_generator import HRKGRelationTuplePathGenerator
+
+    from .eval.hrkg_rel_triple_completeness_eval import HRKGTripleCompletenessEvaluator
+    from .eval.hrkg_rel_triple_attri_summary import HRKGTupleAttributeFrequencyEvaluator
+
+    from .filter.hrkg_rel_triple_attri_filtering import HRKGRelationTripleAttributeFilter
 
     
 else:

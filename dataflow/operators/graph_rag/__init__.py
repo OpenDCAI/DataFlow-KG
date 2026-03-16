@@ -7,6 +7,11 @@ if TYPE_CHECKING:
     from .graphrag_get_answer import KGGraphRAGGetAnswer
     from .graphrag_evaluate import KGGraphRAGAnswerLLMEvaluation
 
+    from .eval.graphrag_answer_plausibility_eval import KGRAGQuestionPlausibilityEvaluation
+    from .eval.graphrag_answer_token_eval import KGRAGAnswerTokenCount
+    from .eval.graphrag_question_difficulty_eval import KGRAGQuestionDifficultyEvaluation
+    from .filter.graphrag_answer_plausibility_filtering import KGRAGAnswerPlausibilityFilter
+
     
 else:
     import sys

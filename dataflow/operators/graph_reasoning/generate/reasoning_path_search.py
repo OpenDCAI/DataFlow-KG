@@ -132,6 +132,7 @@ class KGReasoningPathSearch(OperatorABC):
     def run(
         self,
         storage: DataFlowStorage = None,
+        input_key: str = "triple",
         output_key: str = "mpath",
     ) -> List[str]:
 
@@ -144,7 +145,7 @@ class KGReasoningPathSearch(OperatorABC):
         all_paths = []
 
         for _, row in tqdm(df.iterrows(), total=len(df), desc="KG multi-hop path reasoning"):
-            triplets = row["triplet"]
+            triplets = row[input_key]
             target_raw = row["target_entity"]
 
             if not isinstance(triplets, list):

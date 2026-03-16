@@ -2,10 +2,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # graphrag
-    from .cskg_triple_extractor import CSKGTripleExtraction
-    from .cskg_triple_concept_generalization import CSKGTripleConceptGeneralization
-    from .cskg_rel_triple_set_sampling import CSKGRelationTripleSetSampling
-    from .cskg_rel_triple_qa_generator import CSKGRelationTripleQAGeneration
+    # from .cskg_triple_extractor import CSKGTripleExtraction
+    # from .cskg_triple_concept_generalization import CSKGTripleConceptGeneralization
+    # from .cskg_rel_triple_set_sampling import CSKGRelationTripleSetSampling
+    # from .cskg_rel_triple_qa_generator import CSKGRelationTripleQAGeneration
+
+    from .eval.cskg_triple_adapbility_eval import CSKGTripleAdapbilityEvaluator
+    from .eval.cskg_triple_rationale_eval import CSKGTripleRationaleEvaluator
     
 else:
     import sys

@@ -436,3 +436,381 @@ class KGHallucinationEvaluationPrompt(PromptABC):
             {triples_block}
 
             Provide the JSON evaluation."""
+
+
+@PROMPT_REGISTRY.register()
+class KGSubgraphConsistencyPrompt(PromptABC):
+    """
+    Judge the internal semantic consistency of a subgraph.
+    Accepts input as textual quadruples in the form:
+    "<subj> ... <obj> ... <rel> ..."
+    Supports English and Chinese.
+    Returns a consistency score between 0 (fully inconsistent) and 1 (fully consistent).
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名知识图谱审查专家。
+                你的任务是评估一个子图的内部语义一致性。
+
+                ### 判断要求
+                - 分析子图中之间是否存在逻辑冲突。
+                - 检查同一实体或关系在不同四元组中是否自洽。
+                - 考虑别名、代词、上下文语义，不局限于字符串匹配。
+
+                ### 输出
+                仅返回一个 JSON 对象：
+                {
+                    "consistency_score": <float>  // 范围 0-1，1表示完全一致，0表示完全矛盾
+                }
+                不要输出其他文本或解释。
+            """)
+        else:
+            return textwrap.dedent("""\
+                You are an expert in Knowledge Graph evaluation.
+                Your task is to assess the **internal semantic consistency** of a subgraph:
+
+                ### Instructions
+                - Analyze whether the triples in the subgraph have logical conflicts.
+                - Check if the same entities or relations are coherent across quadruples.
+                - Consider aliases, pronouns, and semantic context; do NOT rely solely on string matches.
+
+                ### Output
+                Return ONLY a JSON object:
+                {
+                    "consistency_score": <float>  // Range 0-1, 1 means fully consistent, 0 means fully contradictory
+                }
+                Do not output any explanations.
+            """)
+
+    def build_prompt(self, subgraph: list) -> str:
+        """
+        Format textual quadruples for LLM input and request consistency scoring.
+
+        Args:
+            subgraph (list): list of quadruples, each in string form:
+                "<subj> ... <obj> ... <rel> ..."
+        """
+        quadruples_block = ""
+        for idx, q in enumerate(subgraph):
+            quadruples_block += f"ID {idx}: {q}\n"
+
+        if self.lang == "zh":
+            return f"""请评估以下子图的内部一致性。
+
+            --- 子图 ---
+            {quadruples_block}
+
+            请仅返回 JSON 格式的一致性得分（0-1）。"""
+        else:
+            return f"""Assess the internal semantic consistency of the following subgraph.
+
+            --- Subgraph Quadruples ---
+            {quadruples_block}
+
+            Return ONLY a JSON object with a consistency score between 0 and 1."""
+
+
+
+@PROMPT_REGISTRY.register()
+class KGQAConcisenessPrompt(PromptABC):
+    """
+    Evaluate the conciseness of QA pairs.
+
+    Each QA pair is formatted as:
+        "Question: ... Answer: ..."
+
+    The model should score each QA pair independently based on how concise
+    and direct the answer is.
+
+    Score range:
+        0 = very verbose / redundant
+        1 = perfectly concise
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名问答质量评估专家。
+                你的任务是评估每个问答对的“简洁性”。
+
+                ### 判断标准
+                - 回答是否直接回答问题
+                - 是否包含多余或冗长信息
+                - 是否使用最少的必要词语表达答案
+                - 不要因为答案短就直接给高分，需要判断是否刚好回答问题
+
+                ### 输出格式
+                仅返回 JSON：
+                {
+                    "conciseness_scores": [float, float, ...]
+                }
+
+                每个 QA 对应一个分数，范围 0-1：
+                1 = 非常简洁
+                0 = 非常冗余
+                不要输出任何解释。
+            """)
+        else:
+            return textwrap.dedent("""\
+                You are an expert in QA quality evaluation.
+                Your task is to evaluate the **conciseness** of each QA pair.
+
+                ### Evaluation Criteria
+                - Does the answer directly respond to the question?
+                - Is the answer free of unnecessary information?
+                - Is the answer expressed using minimal necessary words?
+                - Do NOT give a high score just because the answer is short.
+
+                ### Output Format
+                Return ONLY a JSON object:
+
+                {
+                    "conciseness_scores": [float, float, ...]
+                }
+
+                Each score must correspond to one QA pair in order.
+                Score range: 0-1
+                1 = very concise
+                0 = very verbose or redundant
+
+                Do not output explanations.
+            """)
+
+    def build_prompt(self, QA_pairs: list) -> str:
+        """
+        Format QA pairs for LLM evaluation.
+
+        Args:
+            QA_pairs (list): list of QA strings
+        """
+
+        qa_block = ""
+        for idx, qa in enumerate(QA_pairs):
+            qa_block += f"ID {idx}: {qa}\n"
+
+        if self.lang == "zh":
+            return f"""请评估以下问答对的回答是否简洁。
+
+            --- QA Pairs ---
+            {qa_block}
+
+            请返回每个问答对的简洁性得分（0-1），并严格按照 JSON 输出。"""
+        else:
+            return f"""Evaluate the conciseness of the answers in the following QA pairs.
+
+            --- QA Pairs ---
+            {qa_block}
+
+            Return ONLY a JSON object containing conciseness scores for each QA pair (0-1)."""
+
+
+
+@PROMPT_REGISTRY.register()
+class KGQACorrelationPrompt(PromptABC):
+    """
+    Evaluate the correlation between question and answer in QA pairs.
+
+    Each QA pair is formatted as:
+        "Question: ... Answer: ..."
+
+    The model should determine whether the answer actually responds
+    to the question.
+
+    Score range:
+        0 = completely unrelated
+        1 = perfectly correlated
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名问答质量评估专家。
+                你的任务是评估每个问答对中“问题和答案之间的相关性”。
+
+                ### 判断标准
+                - 答案是否直接回答了问题
+                - 答案是否与问题语义相关
+                - 是否存在答非所问的情况
+                - 若答案仅部分回答问题，则给中等分数
+
+                ### 输出格式
+                仅返回 JSON：
+                {
+                    "correlation_scores": [float, float, ...]
+                }
+
+                每个 QA 对应一个分数，范围 0-1：
+                1 = 完全回答问题
+                0.5 = 部分相关
+                0 = 完全不相关
+
+                不要输出任何解释。
+            """)
+
+        else:
+            return textwrap.dedent("""\
+                You are an expert in QA quality evaluation.
+                Your task is to evaluate the **correlation between the question and answer**.
+
+                ### Evaluation Criteria
+                - Does the answer actually respond to the question?
+                - Is the answer semantically related to the question?
+                - Detect cases where the answer does not address the question.
+                - Partial answers should receive a medium score.
+
+                ### Output Format
+                Return ONLY a JSON object:
+
+                {
+                    "correlation_scores": [float, float, ...]
+                }
+
+                Each score must correspond to one QA pair in order.
+
+                Score range:
+                1 = perfectly answers the question
+                0.5 = partially related
+                0 = unrelated
+
+                Do not output explanations.
+            """)
+
+    def build_prompt(self, QA_pairs: list) -> str:
+        """
+        Format QA pairs for LLM evaluation.
+
+        Args:
+            QA_pairs (list): list of QA strings
+        """
+
+        qa_block = ""
+        for idx, qa in enumerate(QA_pairs):
+            qa_block += f"ID {idx}: {qa}\n"
+
+        if self.lang == "zh":
+            return f"""请评估以下问答对中“问题与答案之间的相关性”。
+
+            --- QA Pairs ---
+            {qa_block}
+
+            请返回每个问答对的相关性得分（0-1），并严格按照 JSON 输出。"""
+
+        else:
+            return f"""Evaluate the correlation between the question and answer in the following QA pairs.
+
+            --- QA Pairs ---
+            {qa_block}
+
+            Return ONLY a JSON object containing correlation scores for each QA pair (0-1)."""
+
+
+@PROMPT_REGISTRY.register()
+class KGQANaturalnessPrompt(PromptABC):
+    """
+    Evaluate the naturalness of QA pairs.
+
+    Each QA pair is formatted as:
+        "Question: ... Answer: ..."
+
+    The model should judge whether the QA pair sounds natural,
+    fluent, and human-like.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名问答质量评估专家。
+                你的任务是评估每个问答对的“自然性”。
+
+                ### 判断标准
+                - 问题和答案是否符合自然语言表达习惯
+                - 是否流畅、易读
+                - 是否像人类真实提出的问题和回答
+                - 是否存在机械翻译或模板化表达
+                - 是否存在语法或表达错误
+
+                ### 输出格式
+                仅返回 JSON：
+                {
+                    "naturalness_scores": [float, float, ...]
+                }
+
+                每个 QA 对应一个分数，范围 0-1：
+                1 = 非常自然，接近人类表达
+                0.5 = 一般自然，有轻微不自然
+                0 = 非常不自然或难以理解
+
+                不要输出任何解释。
+            """)
+
+        else:
+            return textwrap.dedent("""\
+                You are an expert in QA quality evaluation.
+                Your task is to evaluate the **naturalness** of QA pairs.
+
+                ### Evaluation Criteria
+                - Does the question sound like a natural human question?
+                - Does the answer sound fluent and natural?
+                - Is the QA pair easy to read and grammatically correct?
+                - Detect robotic, template-like, or awkward expressions.
+
+                ### Output Format
+                Return ONLY a JSON object:
+
+                {
+                    "naturalness_scores": [float, float, ...]
+                }
+
+                Each score must correspond to one QA pair in order.
+
+                Score range:
+                1 = very natural and human-like
+                0.5 = somewhat natural
+                0 = unnatural or awkward
+
+                Do not output explanations.
+            """)
+
+    def build_prompt(self, QA_pairs: list) -> str:
+        """
+        Format QA pairs for LLM evaluation.
+
+        Args:
+            QA_pairs (list): list of QA strings
+        """
+
+        qa_block = ""
+        for idx, qa in enumerate(QA_pairs):
+            qa_block += f"ID {idx}: {qa}\n"
+
+        if self.lang == "zh":
+            return f"""请评估以下问答对的自然性。
+
+            --- QA Pairs ---
+            {qa_block}
+
+            请返回每个问答对的自然性得分（0-1），并严格按照 JSON 输出。"""
+
+        else:
+            return f"""Evaluate the naturalness of the following QA pairs.
+
+            --- QA Pairs ---
+            {qa_block}
+
+            Return ONLY a JSON object containing naturalness scores for each QA pair (0-1)."""

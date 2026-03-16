@@ -142,3 +142,218 @@ class KGQueryExtractionPrompt(PromptABC):
 
                 请抽取实体与关系，并以 JSON 格式输出：
             """)
+
+
+@PROMPT_REGISTRY.register()
+class KGQuestionPlausibilityPrompt(PromptABC):
+    """
+    Prompt: 根据【问题 + 回答】评估问题的合理性
+
+    - 输入：
+        * question
+        * answer
+    - 输出：
+        * 问题合理性评分 (0-1)
+
+    评分含义：
+        1 = 问题清晰、合理，答案与问题完全匹配
+        0 = 问题不合理、无法回答，或答案与问题不匹配
+    """
+
+    def __init__(self, lang: str = "zh"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are an expert in question quality evaluation.
+
+                === TASK ===
+                Given a QUESTION and its ANSWER,
+                evaluate whether the QUESTION is reasonable and well-formed.
+
+                The goal is to determine whether the question:
+                - is clear and meaningful
+                - is logically answerable
+                - is consistent with the provided answer
+
+                === EVALUATION CRITERIA ===
+
+                High score (close to 1):
+                - Question is clear and meaningful
+                - Question can be answered using the provided answer
+                - Answer directly addresses the question
+
+                Low score (close to 0):
+                - Question is vague or nonsensical
+                - Question cannot logically be answered
+                - Answer does not match the question
+
+                === OUTPUT FORMAT ===
+                Return ONLY JSON:
+
+                {
+                    "question_plausibility_score": float
+                }
+
+                Score must be between 0 and 1.
+
+                Do NOT output explanations.
+            """)
+        else:
+            return textwrap.dedent("""\
+                你是一名【问答质量评估】专家。
+
+                === 任务 ===
+                给定一个【问题】和【回答】，
+                评估该问题是否合理，并给出 0-1 的评分。
+
+                === 评价标准 ===
+
+                高分（接近 1）：
+                - 问题表达清晰
+                - 问题逻辑合理
+                - 问题能够被回答
+                - 给定回答能够正确回答该问题
+
+                低分（接近 0）：
+                - 问题表达混乱或无意义
+                - 问题逻辑不合理
+                - 问题无法被回答
+                - 回答与问题明显不匹配
+
+                === 输出格式（严格 JSON）===
+                {
+                    "question_plausibility_score": float
+                }
+
+                分数范围：0-1  
+                只输出 JSON，不要输出解释或其他文字。
+            """)
+
+    def build_prompt(self, question: str, answer: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Question:
+                {question}
+
+                Answer:
+                {answer}
+
+                Evaluate the plausibility of the question and return JSON.
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                问题：
+                {question}
+
+                回答：
+                {answer}
+
+                请评估该问题的合理性，并返回 JSON 分数。
+            """)
+
+
+@PROMPT_REGISTRY.register()
+class KGQuestionDifficultyPrompt(PromptABC):
+    """
+    Prompt: 根据【问题】评估问题难度
+
+    - 输入：
+        * question
+    - 输出：
+        * question_difficulty (easy / medium / hard)
+
+    难度含义：
+        easy   = 常识或简单事实
+        medium = 需要一定知识或简单推理
+        hard   = 需要复杂推理或专业知识
+    """
+
+    def __init__(self, lang: str = "zh"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are an expert in question difficulty evaluation.
+
+                === TASK ===
+                Given a QUESTION, evaluate its difficulty level.
+
+                === DIFFICULTY LEVELS ===
+
+                easy:
+                - Simple factual question
+                - Can be answered with common knowledge
+                - Requires little reasoning
+
+                medium:
+                - Requires some domain knowledge
+                - May require simple reasoning
+                - Not immediately obvious
+
+                hard:
+                - Requires complex reasoning
+                - Requires specialized knowledge
+                - Multi-step thinking or inference
+
+                === OUTPUT FORMAT ===
+                Return ONLY JSON:
+
+                {
+                    "question_difficulty": "easy | medium | hard"
+                }
+
+                Do NOT output explanations.
+            """)
+        else:
+            return textwrap.dedent("""\
+                你是一名【问题难度评估】专家。
+
+                === 任务 ===
+                给定一个【问题】，判断该问题的难度等级。
+
+                === 难度等级 ===
+
+                easy（简单）：
+                - 常识问题
+                - 简单事实查询
+                - 几乎不需要推理
+
+                medium（中等）：
+                - 需要一定领域知识
+                - 可能需要简单推理
+                - 不是立即显而易见
+
+                hard（困难）：
+                - 需要复杂推理
+                - 需要专业知识
+                - 可能涉及多步推理
+
+                === 输出格式（严格 JSON）===
+                {
+                    "question_difficulty": "easy | medium | hard"
+                }
+
+                只输出 JSON，不要输出解释。
+            """)
+
+    def build_prompt(self, question: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Question:
+                {question}
+
+                Evaluate the difficulty of this question.
+                Return JSON.
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                问题：
+                {question}
+
+                请评估该问题的难度等级，并返回 JSON。
+            """)

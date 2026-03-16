@@ -13,7 +13,7 @@ License:
 """
 
 from dataflow.prompts.diverse_kg.geokg import GeoKGRelationExtractorPrompt
-# from dataflow.prompts.diverse_kg.geokg import GeoKGRelationExtractorPrompt
+from dataflow.prompts.diverse_kg.geokg import GeoKGAttributeExtractorPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -33,10 +33,10 @@ from typing import Union
 
 @prompt_restrict(
     GeoKGRelationExtractorPrompt,
-    # TKGAttributeQuadrupleExtractorPrompt
+    GeoKGAttributeExtractorPrompt
 )
 @OPERATOR_REGISTRY.register()
-class GeoKGTripleExtraction(OperatorABC):
+class GeoKGTupleExtraction(OperatorABC):
     r"""
     A processor for extracting knowledge graph triples from text.
 
@@ -72,7 +72,7 @@ class GeoKGTripleExtraction(OperatorABC):
 
         if triple_type == "attribute":
             self.prompt_template = (
-                TKGAttributeQuadrupleExtractorPrompt(lang=self.lang)
+                GeoKGAttributeExtractorPrompt(lang=self.lang)
             )
         elif triple_type == "relation":
             self.prompt_template = (
@@ -133,19 +133,19 @@ class GeoKGTripleExtraction(OperatorABC):
 
         return self._construct_examples(raw_data, ontology_lists)
 
-    def _validate_dataframe(self, dataframe: pd.DataFrame):
-        required_keys = [self.input_key]
-        forbidden_keys = [self.output_key]
+    # def _validate_dataframe(self, dataframe: pd.DataFrame):
+    #     required_keys = [self.input_key]
+    #     forbidden_keys = [self.output_key]
 
-        missing = [k for k in required_keys if k not in dataframe.columns]
-        conflict = [k for k in forbidden_keys if k in dataframe.columns]
+    #     missing = [k for k in required_keys if k not in dataframe.columns]
+    #     conflict = [k for k in forbidden_keys if k in dataframe.columns]
 
-        if missing:
-            raise ValueError(f"Missing required column(s): {missing}")
-        if conflict:
-            raise ValueError(
-                f"The following column(s) already exist and would be overwritten: {conflict}"
-            )
+    #     if missing:
+    #         raise ValueError(f"Missing required column(s): {missing}")
+    #     if conflict:
+    #         raise ValueError(
+    #             f"The following column(s) already exist and would be overwritten: {conflict}"
+    #         )
 
     def run(
         self,
@@ -153,14 +153,16 @@ class GeoKGTripleExtraction(OperatorABC):
         ontology_lists = None,
         input_key: str = "raw_chunk",
         input_key_meta: str = "ontology",
-        output_key: str = "triple"
+        output_key: str = "tuple",
+        output_key_meta: str = "entity_class"
     ):
         self.input_key = input_key
         self.input_key_meta = input_key_meta
         self.output_key = output_key
+        self.output_key_meta = output_key_meta
 
         dataframe = storage.read("dataframe")
-        self._validate_dataframe(dataframe)
+        # self._validate_dataframe(dataframe)
 
         texts = dataframe[self.input_key].tolist()
 
@@ -170,12 +172,21 @@ class GeoKGTripleExtraction(OperatorABC):
                 cache_type="json"
             )    
             ontology_lists = storage_meta.read(file_path=f"./.cache/api/{input_key_meta}.json", output_type="dataframe")
+            row = ontology_lists.iloc[0]
+            ontology_dict = {
+                "entity_type": row["entity_type"],
+                "relation_type": row["relation_type"],
+                "attribute_type": row.get("attribute_type", {})  # 可选
+            }
 
-        print(type(ontology_lists))
-        outputs = self.process_batch(texts, ontology_lists)
+        outputs = self.process_batch(texts, ontology_dict)
 
         dataframe[self.output_key] = [
             o.get(self.output_key, []) for o in outputs
+        ]
+
+        dataframe[self.output_key_meta] = [
+            o.get(self.output_key_meta, []) for o in outputs
         ]
 
         output_file = storage.write(dataframe)
@@ -218,21 +229,31 @@ class GeoKGTripleExtraction(OperatorABC):
                 system_prompt=system_prompt,
             )
 
-            triples = self._parse_llm_response(responses[0])
+            triples = self._tuple_parse_llm_response(responses[0])
+            entity_class = self._class_parse_llm_response(responses[0])
 
             results.append(
                 {
                     "source_text": processed_text,
-                    "triple": triples,
+                    "tuple": triples,
+                    "entity_class": entity_class
                 }
             )
 
         return results
 
-    def _parse_llm_response(self, response: str) -> List[Dict[str, Any]]:
+    def _tuple_parse_llm_response(self, response: str) -> List[Dict[str, Any]]:
         try:
             cleaned = response.strip().strip("```json").strip("```")
-            return json.loads(cleaned).get("triple", [])
+            return json.loads(cleaned).get("tuple", [])
+        except Exception as e:
+            self.logger.warning(f"Failed to parse LLM response: {e}")
+            return []
+
+    def _class_parse_llm_response(self, response: str) -> List[Dict[str, Any]]:
+        try:
+            cleaned = response.strip().strip("```json").strip("```")
+            return json.loads(cleaned).get("entity_class", [])
         except Exception as e:
             self.logger.warning(f"Failed to parse LLM response: {e}")
             return []

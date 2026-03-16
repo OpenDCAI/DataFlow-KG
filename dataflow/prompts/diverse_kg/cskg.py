@@ -805,3 +805,273 @@ class CSKGMultiRelationTripleQAPrompt(PromptABC):
 
                 仅以 JSON 格式输出 QA_pairs：
             """)
+
+
+@PROMPT_REGISTRY.register()
+class CSKGTripleAdaptabilityPrompt(PromptABC):
+    """
+    Evaluate the adaptability of Commonsense Knowledge Graph triples.
+
+    Adaptability measures whether a triple expresses general commonsense
+    knowledge that can be reused across contexts rather than a specific event.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are an expert in evaluating Commonsense Knowledge Graph (CSKG) triples.
+
+                Your task is to evaluate the **adaptability** of each triple.
+
+                === DEFINITION OF ADAPTABILITY ===
+                Adaptability measures whether the triple expresses general,
+                reusable commonsense knowledge that can apply across different
+                contexts, rather than describing a specific event.
+
+                === EVALUATION CRITERIA ===
+                Consider the following:
+
+                1. GENERALITY
+                   - Does the triple represent general knowledge?
+                   - Example: "alarm clock UsedFor waking up"
+
+                2. CONTEXT INDEPENDENCE
+                   - Can the triple apply in many situations?
+                   - Avoid context-specific statements.
+
+                3. ENTITY SPECIFICITY
+                   - Triples containing specific people, dates,
+                     or one-time events have LOW adaptability.
+
+                4. COMMONSENSE REUSABILITY
+                   - The more reusable across contexts, the higher the score.
+
+                === SCORING ===
+                Score range: 0 – 1
+
+                1.0 = highly general commonsense knowledge  
+                0.5 = partially general but somewhat context-specific  
+                0.0 = very specific event or entity-dependent fact  
+
+                === OUTPUT FORMAT ===
+                Return ONLY JSON:
+
+                {
+                  "adaptability_scores": [float, float, ...]
+                }
+
+                Each score corresponds to the triple with the same ID.
+                Do NOT output explanations.
+            """)
+
+        else:
+            return textwrap.dedent("""\
+                你是一名常识知识图谱（CSKG）评估专家。
+
+                你的任务是评估每个三元组的 **适应性（adaptability）**。
+
+                === 适应性定义 ===
+                适应性表示该三元组是否表达 **通用的常识知识**，
+                而不是特定事件或特定人物的事实。
+
+                === 评价标准 ===
+
+                1. 通用性
+                   - 是否描述普遍适用的常识
+                   - 例如：“闹钟 用于 叫醒”
+
+                2. 上下文独立性
+                   - 是否可以在不同情境中复用
+
+                3. 实体特异性
+                   - 包含具体人物、时间、一次性事件的三元组适应性较低
+
+                4. 常识复用性
+                   - 越容易跨场景复用，分数越高
+
+                === 评分范围 ===
+                0 – 1
+
+                1.0 = 高度通用的常识  
+                0.5 = 部分通用但有一定上下文依赖  
+                0.0 = 非常具体的事件或实体事实  
+
+                === 输出格式 ===
+                仅输出 JSON：
+
+                {
+                  "adaptability_scores": [float, float, ...]
+                }
+
+                每个分数对应输入的一个三元组。
+                不要输出解释。
+            """)
+
+    def build_prompt(self, triples: list):
+
+        triple_block = ""
+        for idx, t in enumerate(triples):
+            triple_block += f"ID {idx}: {t}\n"
+
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Evaluate the **adaptability** of the following CSKG triples.
+
+                --- Triples ---
+                {triple_block}
+
+                Return ONLY JSON:
+                {{
+                  "adaptability_scores": [float, float, ...]
+                }}
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                请评估以下常识三元组的 **适应性（adaptability）**。
+
+                --- 三元组 ---
+                {triple_block}
+
+                仅返回 JSON：
+                {{
+                  "adaptability_scores": [float, float, ...]
+                }}
+            """)
+
+
+
+@PROMPT_REGISTRY.register()
+class CSKGTripleRationalePrompt(PromptABC):
+    """
+    Evaluate the rationale (logical plausibility) of Commonsense Knowledge Graph triples.
+
+    Rationale measures whether the triple represents a logically valid and
+    plausible commonsense fact.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are an expert in evaluating Commonsense Knowledge Graph (CSKG) triples.
+
+                Your task is to evaluate the **rationale** of each triple.
+
+                === DEFINITION OF RATIONALE ===
+                Rationale measures whether the triple represents a logically
+                plausible commonsense fact that makes sense in the real world.
+
+                === EVALUATION CRITERIA ===
+                Consider the following:
+
+                1. LOGICAL PLAUSIBILITY
+                   - Does the triple make logical sense?
+
+                2. COMMONSENSE VALIDITY
+                   - Is the relation between the two concepts consistent with real-world knowledge?
+
+                3. RELATION APPROPRIATENESS
+                   - Is the relation correctly describing the connection between the entities?
+
+                4. CONTRADICTION CHECK
+                   - Detect impossible or contradictory facts.
+
+                === SCORING ===
+                Score range: 0 – 1
+
+                1.0 = highly plausible commonsense fact  
+                0.5 = partially plausible or uncertain  
+                0.0 = illogical or impossible statement  
+
+                === OUTPUT FORMAT ===
+                Return ONLY JSON:
+
+                {
+                  "rationale_scores": [float, float, ...]
+                }
+
+                Each score corresponds to the triple with the same ID.
+                Do NOT output explanations.
+            """)
+
+        else:
+            return textwrap.dedent("""\
+                你是一名常识知识图谱（CSKG）评估专家。
+
+                你的任务是评估每个三元组的 **合理性（rationale）**。
+
+                === 合理性定义 ===
+                合理性表示该三元组是否描述了一个符合现实世界常识、
+                逻辑上成立的事实。
+
+                === 评价标准 ===
+
+                1. 逻辑合理性
+                   - 三元组是否在逻辑上成立
+
+                2. 常识有效性
+                   - 实体之间的关系是否符合现实世界常识
+
+                3. 关系匹配度
+                   - 关系是否正确描述两个实体之间的联系
+
+                4. 矛盾检测
+                   - 是否存在不可能或明显错误的事实
+
+                === 评分范围 ===
+                0 – 1
+
+                1.0 = 完全合理的常识事实  
+                0.5 = 部分合理或不确定  
+                0.0 = 不合理或不可能的事实  
+
+                === 输出格式 ===
+                仅输出 JSON：
+
+                {
+                  "rationale_scores": [float, float, ...]
+                }
+
+                每个分数对应输入的一个三元组。
+                不要输出解释。
+            """)
+
+    def build_prompt(self, triples: list):
+
+        triple_block = ""
+        for idx, t in enumerate(triples):
+            triple_block += f"ID {idx}: {t}\n"
+
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Evaluate the **rationale (logical plausibility)** of the following CSKG triples.
+
+                --- Triples ---
+                {triple_block}
+
+                Return ONLY JSON:
+                {{
+                  "rationale_scores": [float, float, ...]
+                }}
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                请评估以下常识三元组的 **合理性（rationale）**。
+
+                --- 三元组 ---
+                {triple_block}
+
+                仅返回 JSON：
+                {{
+                  "rationale_scores": [float, float, ...]
+                }}
+            """)

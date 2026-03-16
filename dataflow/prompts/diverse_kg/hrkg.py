@@ -155,3 +155,195 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                   ]
                 }}
             """)
+
+
+@PROMPT_REGISTRY.register()
+class HRKGTripleCompletenessPrompt(PromptABC):
+    """
+    Evaluate the completeness of KG triples.
+
+    Each triple is formatted as:
+        "<subj> ... <obj> ... <rel> ... <attr1> ... <attr2> ..."
+
+    The model should judge whether the triple contains all necessary
+    information for the relation and its attributes.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名知识图谱三元组质量评估专家。
+                你的任务是评估每个三元组的**完整性**。
+
+                ### 判断标准
+                - 三元组是否包含主体、客体和关系
+                - 关系所需的关键属性是否齐全
+                - 属性信息是否清晰且合理
+                - 判断三元组是否缺失重要信息
+
+                ### 输出格式
+                仅返回 JSON：
+                {
+                    "completeness_scores": [float, float, ...]
+                }
+
+                每个三元组对应一个分数，范围 0-1：
+                1 = 信息完整
+                0.5 = 部分信息缺失
+                0 = 信息严重缺失或无法理解
+
+                不要输出任何解释。
+            """)
+
+        else:
+            return textwrap.dedent("""\
+                You are an expert in Knowledge Graph triple quality evaluation.
+                Your task is to evaluate the **completeness** of each triple.
+
+                ### Evaluation Criteria
+                - Does the triple contain subject, object, and relation?
+                - Are the key attributes for the relation present?
+                - Are attribute values clear and reasonable?
+                - Determine if the triple is missing important information.
+
+                ### Output Format
+                Return ONLY a JSON object:
+
+                {
+                    "completeness_scores": [float, float, ...]
+                }
+
+                Each score corresponds to one triple (0-1):
+                1 = fully complete
+                0.5 = partially complete
+                0 = severely incomplete or unclear
+
+                Do not output explanations.
+            """)
+
+    def build_prompt(self, triples: list) -> str:
+        """
+        Format triples for LLM evaluation.
+
+        Args:
+            triples (list): list of triple strings
+        """
+
+        triple_block = ""
+        for idx, t in enumerate(triples):
+            triple_block += f"ID {idx}: {t}\n"
+
+        if self.lang == "zh":
+            return f"""请评估以下知识图谱三元组的完整性。
+
+            --- Triples ---
+            {triple_block}
+
+            请返回每个三元组的完整性得分（0-1），并严格按照 JSON 输出。"""
+
+        else:
+            return f"""Evaluate the completeness of the following KG triples.
+
+            --- Triples ---
+            {triple_block}
+
+            Return ONLY a JSON object containing completeness scores for each triple (0-1)."""
+
+
+@PROMPT_REGISTRY.register()
+class HRKGTripleConsistencyPrompt(PromptABC):
+    """
+    Evaluate the consistency of KG triples.
+
+    Each triple is formatted as:
+        "<subj> ... <obj> ... <rel> ... <attr1> ... <attr2> ..."
+
+    The model should judge whether the triple's attributes are
+    logically consistent with each other and with the relation.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名知识图谱三元组质量评估专家。
+                你的任务是评估每个三元组的**一致性**。
+
+                ### 判断标准
+                - 三元组的主体、客体和关系是否逻辑上协调
+                - 关系的不同属性是否相互一致（例如时间、地点、数值等是否合理匹配）
+                - 检查是否存在明显矛盾或冲突信息
+
+                ### 输出格式
+                仅返回 JSON：
+                {
+                    "consistency_scores": [float, float, ...]
+                }
+
+                每个三元组对应一个分数，范围 0-1：
+                1 = 完全一致
+                0.5 = 部分一致，有轻微矛盾
+                0 = 严重不一致或属性冲突
+
+                不要输出任何解释。
+            """)
+
+        else:
+            return textwrap.dedent("""\
+                You are an expert in Knowledge Graph triple quality evaluation.
+                Your task is to evaluate the **consistency** of each triple.
+
+                ### Evaluation Criteria
+                - Check if the subject, object, and relation are logically coherent
+                - Check if the relation's different attributes are consistent (e.g., time, location, values)
+                - Detect any obvious contradictions or conflicts
+
+                ### Output Format
+                Return ONLY a JSON object:
+
+                {
+                    "consistency_scores": [float, float, ...]
+                }
+
+                Each score corresponds to one triple (0-1):
+                1 = fully consistent
+                0.5 = partially consistent, minor conflicts
+                0 = severely inconsistent or contradictory
+
+                Do not output explanations.
+            """)
+
+    def build_prompt(self, triples: list) -> str:
+        """
+        Format triples for LLM evaluation.
+
+        Args:
+            triples (list): list of triple strings
+        """
+
+        triple_block = ""
+        for idx, t in enumerate(triples):
+            triple_block += f"ID {idx}: {t}\n"
+
+        if self.lang == "zh":
+            return f"""请评估以下知识图谱三元组的属性一致性。
+
+            --- Triples ---
+            {triple_block}
+
+            请返回每个三元组的一致性得分（0-1），并严格按照 JSON 输出。"""
+
+        else:
+            return f"""Evaluate the consistency of the following KG triples.
+
+            --- Triples ---
+            {triple_block}
+
+            Return ONLY a JSON object containing consistency scores for each triple (0-1)."""
