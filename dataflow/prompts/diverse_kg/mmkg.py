@@ -104,6 +104,7 @@ class MMKGVisualTripleExtractionPrompt(PromptABC):
 
 
 
+@PROMPT_REGISTRY.register()
 class MMKGSubgraphBaseQAGenerationPrompt(PromptABC):
 
     def __init__(self, lang: str = "en"):
@@ -112,41 +113,43 @@ class MMKGSubgraphBaseQAGenerationPrompt(PromptABC):
     def build_system_prompt(self) -> str:
         if self.lang == "zh":
             return textwrap.dedent("""
-            你是视觉理解与知识图谱领域的资深专家，需严格按照以下规则生成问答对。
+            你是多模态知识图谱问答专家，基于子图和视觉信息生成问答对。
 
             核心任务：
-            基于图像的视觉内容和子图结构化信息，生成高质量的问答对（QA），且每个QA必须同时深度结合两类信息。
+            生成需要同时依赖子图关系和视觉信息的问答对。
 
-            严格规则：
-            1. **核心强制要求**：所有问答对必须同时引用「子图中的实体/关系信息」和「图像中的视觉事实」，禁止仅基于图片视觉特征（如颜色、形状、位置、动作）生成无子图关联的QA（例如仅问“图片中物体的颜色是什么？”“XX在图片的哪个位置？”）；
-            2. 问题必须明确涉及子图中的至少一个实体/关系，且需围绕该实体/关系结合图片视觉信息提问；
-            3. 答案必须同时满足：① 符合子图的结构化知识逻辑；② 基于图片可见的视觉事实验证；
-            4. 禁止生成子图中未包含的实体，禁止编造图像中未出现的视觉特征；
-            5. 每张图片需生成2-5个不同类型的问答对（如事实型、推理型、关联型），避免重复，且所有QA需覆盖子图核心实体/关系；
-            6. 问题需自然通顺、语义明确，答案需简洁准确、无歧义，禁止生成无意义或边缘的QA内容。
+            关键要求：
+            1. **KG推理优先**：问答必须基于给定的子图关系进行推理
+            2. **视觉结合**：以视觉实体为起点，通过子图关系推导答案
+            3. **约束**：只能使用子图中明确给出的实体和关系
 
-            输出要求：
-            - 仅返回JSON格式，无任何额外文本、示例或解释；
-            - JSON结构必须严格匹配指定格式，字段不可缺失、不可新增。
+            禁止的问题类型：
+            - 纯视觉问题："图像中的X是什么颜色？"
+            - 纯知识问题："子图中A与B的关系是什么？"
+            - 子图外信息：任何不在给定子图中的内容
+
+            输出格式：
+            仅返回JSON，无其他内容。
             """)
         else:
             return textwrap.dedent("""
-            You are a senior expert in visual understanding and knowledge graphs, and must generate question-answer pairs (QA) in strict accordance with the following rules.
+            You are a multimodal knowledge graph QA expert, generating QA pairs based on subgraphs and visual information.
 
             Core Task:
-            Generate high-quality question-answer pairs (QA) based on the visual content of the image and structured information of the subgraph, with each QA deeply combining both types of information simultaneously.
+            Generate QA pairs that require both subgraph relationships and visual information.
 
-            Strict Rules:
-            1. **Core Mandatory Requirement**: All QA pairs must reference both "entity/relation information in the subgraph" and "visual facts in the image" at the same time. It is prohibited to generate QA without subgraph association based solely on image visual features (e.g., color, shape, position, action) (e.g., only asking "What is the color of the object in the picture?" "Where is XX in the picture?");
-            2. Questions must explicitly involve at least one entity/relation from the subgraph, and must ask questions combining image visual information around the entity/relation;
-            3. Answers must simultaneously satisfy: ① Comply with the structured knowledge logic of the subgraph; ② Verified based on visible visual facts of the image;
-            4. Prohibit generating entities not included in the subgraph, and prohibit inventing visual features not present in the image;
-            5. Generate 2-5 different types of QA pairs per image (e.g., factual, inferential, associative), avoiding repetition, and all QA must cover core entities/relations in the subgraph;
-            6. Questions must be natural, fluent and semantically clear, answers must be concise, accurate and unambiguous, and meaningless or marginal QA content is prohibited.
+            Key Requirements:
+            1. **KG Reasoning First**: QA must be based on reasoning through given subgraph relationships
+            2. **Visual Integration**: Start from visual entities, derive answers through subgraph relationships
+            3. **Constraints**: Only use entities and relationships explicitly given in the subgraph
 
-            Output Requirements:
-            - Return ONLY JSON format, without any additional text, examples, or explanations;
-            - The JSON structure must strictly match the specified format, with no missing or additional fields.
+            Prohibited Question Types:
+            - Pure visual questions: "What color is X in the image?"
+            - Pure knowledge questions: "What is the relationship between A and B in the subgraph?"
+            - External information: Any content not in the given subgraph
+
+            Output Format:
+            Return ONLY JSON, no other content.
             """)
 
     def build_prompt(self, img_id: str, subgraph: List[str], vis_triple: List[str]) -> str:
@@ -162,25 +165,67 @@ class MMKGSubgraphBaseQAGenerationPrompt(PromptABC):
             return textwrap.dedent(f"""
             图像ID: {img_id}
 
-            子图三元组（结构化知识）：
+            子图网络（关系网络）：
             {subgraph_text}
 
-            图像视觉三元组（视觉事实）：
+            视觉锚点（视觉事实）：
             {vis_text}
 
-            任务执行细则：
-            1. 生成2-5个问答对，每个QA必须同时满足：
-               - 问题中明确包含子图中的至少一个实体/关系；
-               - 问题需围绕该实体/关系，结合图片视觉信息展开（而非仅问视觉特征）；
-               - 答案需同时基于子图逻辑和图片视觉事实给出；
-            2. 禁止生成仅询问图片视觉特征的QA（反例：“图片中的杯子是什么颜色？”）；
-            3. 正确示例方向：
-               - 子图：<咖啡杯, 所属场景, 咖啡店>；视觉三元组：<咖啡杯, 颜色, 白色>
-               - 合规问题：“图片中属于咖啡店场景的咖啡杯是什么颜色？”
-               - 合规答案：“白色”
-            4. 所有QA需紧密关联子图核心逻辑，避免脱离子图的纯视觉问答。
+            网络推理任务执行：
 
-            强制输出格式（仅返回此JSON）：
+            **任务执行步骤**：
+            1. **检查视觉实体**：确认视觉三元组中的实体是否在子图关系中出现（作为主语或宾语）
+            2. **生成QA对**：
+               - 如果实体不在子图中：生成报错QA 
+               {{"question": "[实体名]实体错误", "answer": "视觉实体[实体名]不存在于给定子图中"}}
+               - 如果实体在子图中：基于该实体的子图关系生成2-3个推理QA
+
+            **KG推理QA要求**：
+            - 从视觉实体出发，通过子图关系推导其他信息
+            - 答案必须完全基于给定的子图关系
+            - 问题要体现推理过程，不能是简单的关系查询
+
+            **约束**：
+            - 所有答案必须严格基于给定的子图关系
+            - 绝对禁止使用子图外的任何信息
+            - 必须输出QA对：包括正确QA和错误QA
+
+            **示例1**：
+            子图关系：
+            <subj> Lucy <obj> University Toronto <rel> studies_at
+            <subj> Lucy <obj> Clean Earth <rel> joins
+            <subj> Henry <obj> Lucy <rel> is_inspired_by
+
+            视觉锚点：
+            <subj> University Toronto <rel> depicted_in <obj> img_University_Toronto_02
+
+            输出：
+            {{
+              "QA_pairs": [
+                {{"question": "基于图像img_University_Toronto_02，在这所大学学习的人还参与了哪些组织？", "answer": "图像img_University_Toronto_02中是University Toronto，Lucy在该大学学习，同时参与了Clean Earth组织。"}},
+                {{"question": "基于图像img_University_Toronto_02，这所大学如何通过子图关系连接到环保活动？", "answer": "图像img_University_Toronto_02中是University Toronto，通过Lucy连接到环保活动，Lucy在该大学学习并加入了Clean Earth。"}}
+              ]
+            }}
+            
+
+            **示例2**：
+            子图关系：
+            <subj> Henry <obj> Maple Leaves <rel> forms
+            <subj> Maple Leaves <obj> Polar Lights <rel> releases
+            <subj> Maple Leaves <obj> Paris <rel> performs_in
+
+            视觉锚点：
+            <subj> Maple Leaves <rel> depicted_in <obj> img_canada_01
+
+            输出：
+            {{
+              "QA_pairs": [
+                {{"question": "基于图像img_canada_01，这个乐队发布了什么作品？", "answer": "图像img_canada_01中是Maple Leaves乐队的标志，根据子图，Maple Leaves发布了Polar Lights。"}},
+                {{"question": "基于图像img_canada_01，这个乐队在哪里演出？", "answer": "图像img_canada_01中是Maple Leaves乐队的标志，根据子图，Maple Leaves在Paris演出。"}}
+              ]
+            }}
+
+            输出格式：
             {{
               "QA_pairs": [
                   {{"question": "问题1", "answer": "答案1"}},
@@ -192,25 +237,67 @@ class MMKGSubgraphBaseQAGenerationPrompt(PromptABC):
             return textwrap.dedent(f"""
             Image ID: {img_id}
 
-            Subgraph Triples (Structured Knowledge):
+            Subgraph Network (Relationship Network):
             {subgraph_text}
 
-            Image Visual Triples (Visual Facts):
+            Visual Anchors (Visual Facts):
             {vis_text}
 
-            Task Execution Details:
-            1. Generate 2-5 QA pairs, each QA must simultaneously satisfy:
-               - The question explicitly contains at least one entity/relation from the subgraph;
-               - The question must be expanded around the entity/relation combined with image visual information (rather than only asking visual features);
-               - The answer must be given based on both subgraph logic and image visual facts;
-            2. Prohibit generating QA that only asks about image visual features (counterexample: "What color is the cup in the picture?");
-            3. Correct example direction:
-               - Subgraph: <Coffee cup, Belongs to scene, Coffee shop>; Visual triple: <Coffee cup, Color, White>
-               - Compliant question: "What color is the coffee cup belonging to the coffee shop scene in the picture?"
-               - Compliant answer: "White"
-            4. All QA must be closely related to the core logic of the subgraph, avoiding pure visual QA that is divorced from the subgraph.
+            Network Reasoning Task Execution:
 
-            Mandatory Output Format (return ONLY this JSON):
+            **Task Execution Steps**:
+            1. **Check Visual Entities**: Confirm if entities in visual triples appear in subgraph relationships (as subject or object)
+            2. **Generate QA Pairs**:
+               - If entity not in subgraph: Generate error QA {{"question": "[entity_name] entity error", "answer": "Visual entity [entity_name] does not exist in the given subgraph"}}
+               - If entity in subgraph: Generate 2-3 reasoning QA based on that entity's subgraph relationships
+
+            **KG Reasoning QA Requirements**:
+            - Start from visual entities, derive other information through subgraph relationships
+            - Answers must be completely based on given subgraph relationships
+            - Questions should reflect reasoning process, not simple relationship queries
+
+            **Constraints**:
+            - All answers must be strictly based on given subgraph relationships
+            - Absolutely prohibit using any information outside the subgraph
+            - Must output QA pairs: including correct QA and incorrect QA
+
+            **Example 1**:
+            Subgraph Relations:
+            <subj> Lucy <obj> University Toronto <rel> studies_at
+            <subj> Lucy <obj> Clean Earth <rel> joins
+            <subj> Henry <obj> Lucy <rel> is_inspired_by
+
+            Visual Anchors:
+            <subj> University Toronto <rel> depicted_in <obj> img_University_Toronto_02
+
+            Output:
+            {{
+              "QA_pairs": [
+                {{"question": "Based on the image img_University_Toronto_02, what organizations do people studying at this university participate in?", "answer": "The image img_University_Toronto_02 shows University Toronto, Lucy studies at this university and also participates in the Clean Earth organization."}},
+                {{"question": "Based on the image img_University_Toronto_02, how does this university connect to environmental activities through the subgraph?", "answer": "The image img_University_Toronto_02 shows University Toronto, which connects to environmental activities through Lucy, who studies there and joins Clean Earth."}}
+              ]
+            }}
+
+            
+
+            **Example 2**:
+            Subgraph Relations:
+            <subj> Henry <obj> Maple Leaves <rel> forms
+            <subj> Maple Leaves <obj> Polar Lights <rel> releases
+            <subj> Maple Leaves <obj> Paris <rel> performs_in
+
+            Visual Anchors:
+            <subj> Maple Leaves <rel> depicted_in <obj> img_canada_01
+
+            Output:
+            {{
+              "QA_pairs": [
+                {{"question": "Based on the image img_University_Toronto_02, what did this band release?", "answer": "The image img_University_Toronto_02 shows the Maple Leaves band symbol, according to the subgraph, Maple Leaves released Polar Lights."}},
+                {{"question": "Based on the image img_University_Toronto_02, where does this band perform?", "answer": "The image img_University_Toronto_02 shows the Maple Leaves band symbol, according to the subgraph, Maple Leaves performs in Paris."}}
+              ]
+            }}
+
+            Output Format:
             {{
               "QA_pairs": [
                   {{"question": "Question 1", "answer": "Answer 1"}},
@@ -220,120 +307,126 @@ class MMKGSubgraphBaseQAGenerationPrompt(PromptABC):
             """)
 
 
+@PROMPT_REGISTRY.register()
 class MMKGPathBasedQAGenerationPrompt(PromptABC):
 
     def __init__(self, lang: str = "en"):
         self.lang = lang
 
     def build_system_prompt(self) -> str:
-
         if self.lang == "zh":
             return textwrap.dedent("""
-            你是视觉理解与知识图谱领域的资深专家，需严格按照以下规则生成问答对。
+            你是多模态知识图谱问答专家，基于路径和视觉信息生成问答对。
 
             核心任务：
-            基于图像的视觉内容以及给定的知识图谱路径（path），生成高质量问答对（QA）。
+            生成需要完整路径推理的问答对。
 
-            严格规则：
-            1. 每个QA必须同时结合「路径中的实体/关系信息」和「图像中的视觉事实」；
-            2. 问题必须围绕路径中的关系逻辑进行提问；
-            3. 问题必须包含路径中的至少一个实体；
-            4. 答案必须符合路径的知识逻辑，并能够通过图像视觉信息验证；
-            5. 禁止生成路径中不存在的实体或关系；
-            6. 禁止生成仅基于视觉特征的问题（例如颜色、位置、形状等）；
-            7. 问题需自然流畅，答案需简洁准确；
-            8. **如果没有图像或视觉三元组信息，则必须返回空结果。**
+            关键要求：
+            1. 问答必须需要完整的A→B→...→C路径推理才能回答
+            2. 从视觉信息出发，通过路径推导最终答案
+            3. 只能使用路径中明确给出的实体和关系
 
-            输出要求：
-            - 仅返回JSON
-            - 不允许出现解释文本
-            - JSON结构必须严格符合指定格式
-            - 如果没有视觉信息，返回：
-              {"QA_pairs": []}
+            输出格式：
+            仅返回JSON，无其他内容。
             """)
-        else:
-            return textwrap.dedent("""
-            You are a senior expert in visual understanding and knowledge graphs.
+        return textwrap.dedent("""
+        You are a multimodal knowledge graph QA expert, generating QA pairs based on paths and visual information.
 
-            Core Task:
-            Generate high-quality question-answer pairs (QA) based on the visual content of the image and the given knowledge graph path.
+        Core Task:
+        Generate QA pairs that require complete path reasoning.
 
-            Strict Rules:
-            1. Each QA pair must combine both the "entity/relation information in the path" and the "visual facts in the image";
-            2. Questions must be based on the relational logic of the path;
-            3. The question must contain at least one entity from the path;
-            4. The answer must follow the knowledge logic of the path and be verifiable using visual evidence from the image;
-            5. Do NOT generate entities or relations not present in the path;
-            6. Do NOT generate questions based purely on visual attributes (e.g., color, shape, position);
-            7. Questions must be natural and clear; answers must be concise and accurate;
-            8. **If no image or visual triples are provided, you MUST return an empty result.**
+        Key Requirements:
+        1. QA must require complete A→B→...→C path reasoning to answer
+        2. Start from visual information, derive final answers through path reasoning
+        3. Only use entities and relationships explicitly given in the path
 
-            Output Requirements:
-            - Return JSON ONLY
-            - No explanation text
-            - JSON structure must strictly match the required format
-            - If no visual information exists, return:
-              {"QA_pairs": []}
-            """)
+        Output Format:
+        Return ONLY JSON, no other content.
+        """)
 
     def build_prompt(self, img_id: str, path: str, vis_triple: List[str]) -> str:
-
         vis_text = "\n".join([t for t in vis_triple if img_id in t])
 
         if self.lang == "zh":
             return textwrap.dedent(f"""
             图像ID: {img_id}
 
-            知识图谱路径（Path）：
+            知识图谱路径：
             {path}
 
-            图像视觉三元组：
+            视觉锚点：
             {vis_text if vis_text else "无"}
 
-            任务要求：
-            1. 如果没有视觉三元组或图像信息，直接返回：
-               {{"QA_pairs": []}}
-            2. 如果存在视觉信息：
-               - 根据路径中的实体与关系结构生成问题；
-               - 问题必须结合图片中的视觉事实；
-               - 每个QA必须同时使用：
-                 • 路径中的关系逻辑
-                 • 图像中的视觉信息；
+            任务：
+            如果无视觉锚点，返回空数组。
+            如果有视觉锚点，生成1-2个需要完整路径推理的问答对。
 
-            强制输出格式（仅返回此JSON）：
+            **示例1**：
+            路径：Henry forms Maple Leaves || Maple Leaves releases Polar Lights
+            视觉锚点：<subj> Maple Leaves <rel> depicted_in <obj> img_canada_01
+
+            输出：
             {{
               "QA_pairs": [
-                {{"question": "问题1", "answer": "答案1"}},
-                {{"question": "问题2", "answer": "答案2"}}
+                {{"question": "基于图像img_canada_01，这个实体的创建者发布了什么作品？", "answer": "图像img_canada_01中是Maple Leaves，根据路径Henry forms Maple Leaves，然后Maple Leaves releases Polar Lights，所以Henry通过Maple Leaves发布了Polar Lights。"}},
+                {{"question": "基于图像img_canada_01，什么作品是通过这个乐队发布的？", "answer": "图像img_canada_01中是Maple Leaves，根据路径Maple Leaves releases Polar Lights，所以通过Maple Leaves发布的作品是Polar Lights。"}}
               ]
             }}
-            """)
-        else:
-            return textwrap.dedent(f"""
-            Image ID: {img_id}
 
-            Knowledge Graph Path:
-            {path}
+            **示例2（时序推理）**：
+            路径：Maple Leaves releases Polar Lights || Polar Lights is_released_on August 12 2020
+            视觉锚点：<subj> Maple Leaves <rel> depicted_in <obj> img_canada_01
 
-            Image Visual Triples:
-            {vis_text if vis_text else "None"}
-
-            Task Requirements:
-            1. If no visual triples or image information exist, directly return:
-               {{"QA_pairs": []}}
-
-            2. If visual information exists:
-               - Generate questions based on the relational structure of the path;
-               - Questions must combine visual evidence from the image;
-               - Each QA must use BOTH:
-                 • the logical relations in the path
-                 • visual facts from the image;
-
-            Mandatory Output Format (return ONLY JSON):
+            输出：
             {{
               "QA_pairs": [
-                {{"question": "Question 1", "answer": "Answer 1"}},
-                {{"question": "Question 2", "answer": "Answer 2"}}
+                {{"question": "基于图像img_canada_01，这个乐队的作品是什么时候发布的？", "answer": "图像img_canada_01中是Maple Leaves，根据路径Maple Leaves releases Polar Lights，然后Polar Lights is_released_on August 12 2020，所以这个乐队的作品在2020年8月12日发布。"}}
               ]
             }}
+
             """)
+        return textwrap.dedent(f"""
+        Image ID: {img_id}
+
+        Knowledge Graph Path:
+        {path}
+
+        Visual Anchors:
+        {vis_text if vis_text else "None"}
+
+        Task:
+        If no visual anchors, return empty array.
+        If visual anchors exist, generate 1-2 QA pairs requiring complete path reasoning.
+
+        **Example 1**:
+        Path: Henry forms Maple Leaves || Maple Leaves releases Polar Lights
+        Visual Anchors: <subj> Maple Leaves <rel> depicted_in <obj> img_canada_01
+
+        Output:
+        {{
+          "QA_pairs": [
+            {{"question": "Based on the image img_canada_01, what work did the creator of this entity release?", "answer": "The image img_canada_01 shows Maple Leaves, according to path Henry forms Maple Leaves, then Maple Leaves releases Polar Lights, so Henry released Polar Lights through Maple Leaves."}},
+            {{"question": "Based on the image img_canada_01, what work was released through this band?", "answer": "The image img_canada_01 shows Maple Leaves, according to path Maple Leaves releases Polar Lights, so the work released through Maple Leaves is Polar Lights."}}
+          ]
+        }}
+
+        **Example 2 (Temporal reasoning)**:
+        Path: Maple Leaves releases Polar Lights || Polar Lights is_released_on August 12 2020
+        Visual Anchors: <subj> Maple Leaves <rel> depicted_in <obj> img_canada_01
+
+        Output:
+        {{
+          "QA_pairs": [
+            {{"question": "Based on the image img_canada_01, when was this band's work released?", "answer": "The image img_canada_01 shows Maple Leaves, according to path Maple Leaves releases Polar Lights, then Polar Lights is_released_on August 12 2020, so this band's work was released on August 12, 2020."}}
+          ]
+        }}
+
+
+        Output Format:
+        {{
+          "QA_pairs": [
+              {{"question": "Question 1", "answer": "Answer 1"}},
+              {{"question": "Question 2", "answer": "Answer 2"}}
+          ]
+        }}
+        """)
