@@ -50,8 +50,8 @@ class LegalKGTupleExtraction(OperatorABC):
         self,
         llm_serving: LLMServingABC,
         seed: int = 0,
-        triple_type: str = "relation",
-        lang: str = "en",
+        triple_type: str = "attribute",
+        lang: str = "zh",
         num_q: int = 5
     ):
         """
@@ -80,7 +80,7 @@ class LegalKGTupleExtraction(OperatorABC):
             )            
 
     @staticmethod
-    def get_desc(lang: str = "en") -> tuple:
+    def get_desc(lang: str = "en") :
         """
         Return a short description of the operator.
 
@@ -88,7 +88,7 @@ class LegalKGTupleExtraction(OperatorABC):
             lang: Language of the description.
 
         Returns:
-            A tuple containing a brief description and the expected input/output.
+            A triple containing a brief description and the expected input/output.
         """
         if lang == "zh":
             return (
@@ -235,14 +235,14 @@ class LegalKGTupleExtraction(OperatorABC):
                 system_prompt=system_prompt,
             )
 
-            triples = self._tuple_parse_llm_response(responses[0])
+            triples = self._triple_parse_llm_response(responses[0])
             entity_class = self._class_parse_llm_response(responses[0])
             case_summary = self._summary_parse_llm_response(responses[0])
 
             results.append(
                 {
                     "source_text": processed_text,
-                    "tuple": triples,
+                    "triple": triples,
                     "entity_class": entity_class,
                     "case_summary": case_summary
                 }
@@ -250,10 +250,10 @@ class LegalKGTupleExtraction(OperatorABC):
 
         return results
 
-    def _tuple_parse_llm_response(self, response: str) -> List[Dict[str, Any]]:
+    def _triple_parse_llm_response(self, response: str) -> List[Dict[str, Any]]:
         try:
             cleaned = response.strip().strip("```json").strip("```")
-            return json.loads(cleaned).get("tuple", [])
+            return json.loads(cleaned).get("triple", [])
         except Exception as e:
             self.logger.warning(f"Failed to parse LLM response: {e}")
             return []

@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from .filter.mmkg_visual_triple_subgraph_sampling import MMKGEntityBasedSubgraphSampling
     from .filter.mmkg_visual_triple_path_sampling import MMKGRelationTuplePathGenerator
 
+    from .eval.mmkg_triple_hallucination_eval import MMKGTripleHallucinationEvaluator
+
     
 else:
     import sys

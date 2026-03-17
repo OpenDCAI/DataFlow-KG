@@ -3,6 +3,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .generate.legalkg_get_ontology import LegalKGGetBasicOntology
     from .generate.legalkg_triple_extractor import LegalKGTupleExtraction
+    
+    from .filter.legalkg_triple_ontology_filtering import LegalKGTripleFilter
+    from .filter.legalkg_case_similarity_filtering import LegalKGCaseSimilarityFilter
+
+    from .eval.legalkg_case_similarity_eval import LegalKGCaseSummarySimilarity
 
     
 else:

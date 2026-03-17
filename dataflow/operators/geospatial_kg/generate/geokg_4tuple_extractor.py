@@ -152,7 +152,7 @@ class GeoKGTupleExtraction(OperatorABC):
         storage: DataFlowStorage = None,
         ontology_lists = None,
         input_key: str = "raw_chunk",
-        input_key_meta: str = "ontology",
+        input_key_meta: str = "geokg_ontology",
         output_key: str = "tuple",
         output_key_meta: str = "entity_class"
     ):

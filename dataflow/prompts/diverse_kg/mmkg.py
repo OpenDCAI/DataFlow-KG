@@ -430,3 +430,148 @@ class MMKGPathBasedQAGenerationPrompt(PromptABC):
           ]
         }}
         """)
+
+
+@PROMPT_REGISTRY.register()  # type: ignore
+class MMKGTextTripleVerificationPrompt(PromptABC):
+    
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+    
+    def build_system_prompt(self) -> str:
+        """Build system prompt for text triple verification."""
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一个严格的知识图谱审计员。
+                你的任务是验证给定的三元组是否被上下文明确支持。
+                
+                判断标准：
+                1. 忽略外部知识，只使用提供的上下文
+                2. 如果三元组与文本矛盾或未被提及，返回 FALSE
+                3. 如果三元组被支持，返回 TRUE
+                
+                输出格式：
+                返回 JSON 对象：{"reasoning": "...", "verdict": true/false}
+            """)
+        else:
+            return textwrap.dedent("""\
+                You are a strict knowledge graph auditor.
+                Your task is to verify if the following Triple is explicitly supported by the Context.
+                
+                Requirements:
+                1. Ignore external knowledge. Only use the Context.
+                2. If the triple contradicts the text or is not mentioned, return FALSE.
+                3. If it is supported, return TRUE.
+                
+                Output format JSON: {"reasoning": "...", "verdict": true/false}
+            """)
+    
+    def build_prompt(self, context: str, subject: str, relation: str, obj: str) -> str:
+        """Build user prompt for text triple verification."""
+        if self.lang == "zh":
+            return textwrap.dedent(f"""\
+                上下文："{context}"
+                
+                三元组：
+                - 主体：{subject}
+                - 关系/属性：{relation}
+                - 客体/值：{obj}
+                
+                请判断这个三元组是否被上下文支持。
+                返回 JSON 对象：{{"reasoning": "...", "verdict": true/false}}
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                Context: "{context}"
+                
+                Triple:
+                - Subject: {subject}
+                - Relation/Attribute: {relation}
+                - Object/Value: {obj}
+                
+                Please determine if this triple is supported by the context.
+                Output format JSON: {{"reasoning": "...", "verdict": true/false}}
+            """)
+
+
+@PROMPT_REGISTRY.register()  # type: ignore
+class MMKGVisualTripleVerificationPrompt(PromptABC):
+    
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+    
+    def build_system_prompt(self) -> str:
+        """Build system prompt for visual triple verification."""
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一个知识图谱的视觉审计员。
+                你的任务是验证图片是否描绘了指定的实体。
+                
+                判断标准：
+                1. 仔细观察图片内容
+                2. 判断图片中是否包含或代表了指定的实体
+                3. 使用三值判断：
+                   - true: 确认图片包含该实体
+                   - false: 确认图片不包含该实体（明显错误/幻觉）
+                   - uncertain: 无法确定（图片模糊、信息不足、但有相关特征）
+                4. 给出置信度分数（0.0-1.0）
+                
+                重要提示：
+                - 只有当你确信图片与实体完全无关时，才返回 false
+                - 如果图片质量差但有相关特征，应返回 uncertain
+                - uncertain 不会被计入幻觉率
+                
+                输出格式：
+                返回 JSON 对象：{"reasoning": "...", "verdict": "true/false/uncertain", "confidence": 0.0-1.0}
+            """)
+        else:
+            return textwrap.dedent("""\
+                You are a visual auditor for a knowledge graph.
+                Your task is to verify if the image depicts the specified entity.
+                
+                Evaluation Criteria:
+                1. Carefully observe the image content
+                2. Determine if the image contains or represents the specified entity
+                3. Use three-value verdict:
+                   - true: Confirmed the image contains the entity
+                   - false: Confirmed the image does NOT contain the entity (clear hallucination)
+                   - uncertain: Cannot determine (blurry image, insufficient info, but has related features)
+                4. Provide a confidence score (0.0-1.0)
+                
+                Important:
+                - Only return false when you are certain the image is completely unrelated to the entity
+                - If image quality is poor but has related features, return uncertain
+                - uncertain cases will NOT be counted as hallucinations
+                
+                Output format JSON: {"reasoning": "...", "verdict": "true/false/uncertain", "confidence": 0.0-1.0}
+            """)
+    
+    def build_prompt(self, entity_name: str) -> str:
+        """Build user prompt for visual triple verification."""
+        if self.lang == "zh":
+            return textwrap.dedent(f"""\
+                三元组声明：这张图片与实体 "{entity_name}" 相关联。
+                
+                这张图片是否包含或代表 "{entity_name}"？
+                
+                请仔细分析后返回：
+                - verdict: "true"（确认包含）/ "false"（确认不包含）/ "uncertain"（无法确定）
+                - confidence: 置信度分数（0.0-1.0）
+                - reasoning: 判断理由
+                
+                返回 JSON 对象：{{"reasoning": "...", "verdict": "true/false/uncertain", "confidence": 0.0-1.0}}
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                Triple Claim: This image is linked to the entity "{entity_name}".
+                
+                Does this image contain or represent "{entity_name}"?
+                
+                Please analyze carefully and return:
+                - verdict: "true" (confirmed) / "false" (confirmed NOT) / "uncertain" (cannot determine)
+                - confidence: confidence score (0.0-1.0)
+                - reasoning: explanation
+                
+                Output format JSON: {{"reasoning": "...", "verdict": "true/false/uncertain", "confidence": 0.0-1.0}}
+            """)
+

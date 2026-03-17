@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from .filter.geokg_event_location_filtering import GeoKGEventTupleLocationFilter
 
     from .refine.geokg_rel_4tuple_inference import GeoKGRelationInference
+    from .refine.geokg_entity_link2database import GeoKGEntityLink2Database
 
     from .eval.geokg_event_consistence_eval import GeoKGEventConsistenceEvaluator
     from .eval.geokg_event_rationale_eval import GeoKGEventRationaleEvaluator
