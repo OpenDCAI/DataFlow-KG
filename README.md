@@ -30,4 +30,4 @@
 | @wanpeng | 10 | kg_rel_triple_consistency_eval.py, kg_rel_triple_topology_eval.py, kg_triple_hallucination_eval.py, mmkg_visual_triple_extractor.py, mmkg_visual_triple_path_qa_generator.py, mmkg_visual_triple_subgraph_qa_generator.py, mmkg_entity_link2database.py, mmkg_entity_link2img.py, mmkg_visual_triple_path_sampling.py, mmkg_visual_triple_subgraph_sampling.py | 0|
 | @xuemeng | 待定 | 尽快合并 @zhengpin | 0 |
 | @jinke | 待定 | 尽快提交 | 0 |
-| @zhengpin | 除以上剩余所有 | -  | - | 
+| @zhengpin | 除以上剩余 | -  | - | 
