@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    # from .
+    from .generate.legalkg_get_ontology import LegalKGGetBasicOntology
+    from .generate.legalkg_triple_extractor import LegalKGTupleExtraction
 
     
 else:
