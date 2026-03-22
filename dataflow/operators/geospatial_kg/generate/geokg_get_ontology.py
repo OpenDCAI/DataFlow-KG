@@ -58,10 +58,6 @@ class GeoKGGetBasicOntology(OperatorABC):
             "Infrastructure": [
                 "Road","Highway","Railway","Bridge",
                 "Tunnel","Airport","Port","Dam","Canal"
-            ],
-
-            "HumanSettlement": [
-                "MetropolitanArea","City","Town","Village"
             ]
         }
 
