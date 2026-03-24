@@ -25,8 +25,8 @@
 ## 3、DataFlow-KG算子开发负责表 📅
 | 成员 | 已合并算子个数 |已合并算子文件 | 已填写开发文档个数 |
 | --- | --- | --- | --- |
-| @runhao | 6 |tkg_4tuple_extractor.py, tkg_rel_4tuple_subgraph_qa_generator.py, tkg_4tuple_time_sampling.py, tkg_4tuple_time_summary.py, tkg_attri_4tuple_qa_generator.py, tkg_attri_4tuple_qa_generator.py | 6 |
-| @wanpeng | 11 | kg_rel_triple_consistency_eval.py, kg_rel_triple_topology_eval.py, kg_triple_hallucination_eval.py, mmkg_visual_triple_extractor.py, mmkg_visual_triple_path_qa_generator.py, mmkg_visual_triple_subgraph_qa_generator.py, mmkg_entity_link2database.py, mmkg_entity_link2img.py, mmkg_visual_triple_path_sampling.py, mmkg_visual_triple_subgraph_sampling.py, mmkg_triple_hallucination_eval.py | 0|
+| @runhao | 9 | tkg | 9 |
+| @wanpeng | 11 | kg_rel_triple_consistency_eval.py, kg_rel_triple_topology_eval.py, kg_triple_hallucination_eval.py, mmkg | 0|
 | @xuemeng | 待定 | 尽快合并 @zhengpin | 0 |
 | @jinke | 1 | geokg_entity_link2database.py | 0 |
 | @zhengpin | 剩余 | -  | - | 
