@@ -1,6 +1,7 @@
 import textwrap
 from dataflow.utils.registry import PROMPT_REGISTRY
 from dataflow.core.prompt import PromptABC
+from typing import Any, Dict, List, Union
 
 
 @PROMPT_REGISTRY.register()
@@ -502,4 +503,110 @@ Return JSON only:
 {{
   "similarity_score": <float>
 }}
+""")
+
+
+@PROMPT_REGISTRY.register()
+class LegalKGJudgementPredictionPrompt(PromptABC):
+    """
+    根据三元组预测判决，并返回支撑三元组
+    """
+
+    def __init__(self, lang: str = "zh"):
+        self.lang = lang.lower()
+
+    def build_system_prompt(self) -> str:
+        if self.lang == "zh":
+            return textwrap.dedent("""\
+                你是一名法律判决推理专家。
+
+                你的任务：
+                基于给定的知识图谱三元组（triple）和案件描述（case_description），预测案件判决，并给出支撑依据。
+
+                ====================
+                任务要求
+                ====================
+
+                1）判决预测（judgement）
+                - 给出合理的法律判决结果
+                - 必须简洁明确（如：有期徒刑三年，并处罚金）
+
+                2）理由（reason）
+                - 必须从输入 triple 中选择
+                - 不允许编造新的三元组
+                - 必须是与判决直接相关的关键事实
+
+                ====================
+                输出格式（严格）
+                ====================
+                仅输出 JSON：
+
+                {
+                  "judgement": "判决结果",
+                  "reason": [
+                    "<entity> ... <attribute> ... <value> ..."
+                  ]
+                }
+
+                禁止输出解释文本。
+            """)
+        else:
+            return textwrap.dedent("""\
+                You are a legal reasoning expert.
+
+                Task:
+                Given a set of triples and a case description, predict the judgement and provide supporting triples.
+
+                ====================
+                Requirements
+                ====================
+
+                1) Judgement
+                - Provide a concise legal decision
+
+                2) Reason
+                - MUST be selected from input triples
+                - NO hallucination
+                - Only include triples directly supporting the judgement
+
+                ====================
+                Output Format
+                ====================
+                Return JSON ONLY:
+
+                {
+                  "judgement": "predicted judgement",
+                  "reason": [
+                    "<entity> ... <attribute> ... <value> ..."
+                  ]
+                }
+            """)
+
+    def build_prompt(self, triples: List[str], case_desc: str) -> str:
+        triple_block = "\n".join(triples)
+
+        if self.lang == "zh":
+            return textwrap.dedent(f"""
+请根据以下三元组和案件描述预测判决结果：
+
+【案件描述】
+{case_desc}
+
+【知识图谱三元组】
+{triple_block}
+
+请输出判决结果和支撑三元组（必须从上面选择）。
+仅输出JSON：
+""")
+        else:
+            return textwrap.dedent(f"""
+Predict the judgement based on triples and case description.
+
+Case Description:
+{case_desc}
+
+Triples:
+{triple_block}
+
+Return judgement and supporting triples in JSON only.
 """)

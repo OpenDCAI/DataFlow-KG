@@ -347,3 +347,387 @@ class HRKGTripleConsistencyPrompt(PromptABC):
             {triple_block}
 
             Return ONLY a JSON object containing consistency scores for each triple (0-1)."""
+
+
+@PROMPT_REGISTRY.register()
+class HRKGOneHopQAPathGenerationPrompt(PromptABC):
+    """
+    Generate one-hop QA pairs from hyper-relational tuples.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are a hyper-relational knowledge graph question-answer generation expert.
+
+                Your task:
+                Generate ONE-HOP question-answer pairs strictly based on the given
+                hyper-relational tuples.
+
+                Definition of ONE-HOP QA:
+                - Each question must be answerable using exactly ONE tuple
+                - The answer must come directly from that tuple
+                - The question may ask about the subject, object, or explicit
+                  relation attributes in the tuple
+                - Do not combine information from multiple tuples
+                - Do not introduce external or implicit knowledge
+
+                Rules:
+                - Preserve the tuple meaning and explicit qualifiers
+                - Do not ignore relation attributes such as Time, Location,
+                  Condition, Purpose, Value, Degree, Market, or Method
+                - Do not invent missing attributes or values
+                - Do not explain reasoning
+                - Each tuple may generate one or more QA pairs
+                - Questions should be natural and fluent
+
+                Output format (STRICT JSON):
+                {
+                  "QA_pairs": [
+                    "Question: ... Answer: ...",
+                    "Question: ... Answer: ..."
+                  ]
+                }
+            """)
+
+        return textwrap.dedent("""\
+            你是超关系知识图谱问答生成专家。
+
+            你的任务：
+            严格基于给定的 hyper-relation tuples 生成一跳问答对。
+
+            一跳 QA 定义：
+            - 每个问题必须且只能由一条 tuple 直接回答
+            - 答案必须直接来自该 tuple
+            - 问题可以询问主体、客体或 tuple 中显式给出的关系属性
+            - 不允许跨 tuple 组合信息
+            - 不允许引入外部知识或隐含推断
+
+            规则：
+            - 保持 tuple 原始语义和限定条件
+            - 不要忽略 Time、Location、Condition、Purpose、Value、Degree、Market、Method 等关系属性
+            - 不要虚构缺失的属性或属性值
+            - 不输出推理过程
+            - 每条 tuple 可以生成一个或多个问答对
+            - 问题表达要自然流畅
+
+            输出格式（严格 JSON）：
+            {
+              "QA_pairs": [
+                "Question: ... Answer: ...",
+                "Question: ... Answer: ..."
+              ]
+            }
+        """)
+
+    def build_prompt(self, tuples: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Please generate one-hop QA pairs strictly following the rules above.
+
+                Hyper-relational tuples:
+                {tuples}
+
+                Output QA_pairs in JSON format only:
+            """)
+
+        return textwrap.dedent(f"""\
+            请严格按照上述规则，从以下超关系 tuples 中生成一跳问答对。
+
+            超关系 tuples：
+            {tuples}
+
+            仅以 JSON 格式输出 QA_pairs：
+        """)
+
+
+@PROMPT_REGISTRY.register()
+class HRKGTwoHopPathQAGenerationPrompt(PromptABC):
+    """
+    Generate two-hop QA pairs from hyper-relational paths.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are a hyper-relational multi-hop question-answer generation expert.
+
+                Your task:
+                Generate QUESTION-ANSWER pairs that require EXACTLY TWO HOPS of reasoning,
+                strictly based on the given two-hop hyper-relational paths.
+
+                Critical requirements:
+                1. Each QA must require both tuples in the path to answer.
+                2. Do not generate one-hop questions.
+                3. Relation attributes may be used as qualifiers in the question
+                   or answer, but the QA must still depend on both hops.
+                4. Do not introduce external knowledge or assumptions.
+                5. Do not modify entity names, relation meaning, or attribute values.
+
+                Allowed question patterns:
+                - Two-step entity relation inference
+                - Questions that use the first hop to identify an entity and the
+                  second hop to obtain the answer
+                - Questions that use explicit attributes as qualifiers in a
+                  two-hop reasoning chain
+
+                Forbidden question patterns:
+                - Any question answerable from only one tuple
+                - Direct one-hop subject-object questions
+                - Questions that ignore the path connection
+
+                Output format (STRICT JSON):
+                {
+                  "QA_pairs": [
+                    "Question: ... Answer: ...",
+                    "Question: ... Answer: ..."
+                  ]
+                }
+            """)
+
+        return textwrap.dedent("""\
+            你是超关系多跳知识图谱问答生成专家。
+
+            你的任务：
+            严格基于给定的两跳超关系路径生成问答对。
+
+            关键要求：
+            1. 每个 QA 必须依赖路径中的两条 tuple 才能回答。
+            2. 不允许生成一跳问题。
+            3. 关系属性可以作为问题或答案中的限定条件，但 QA 仍必须依赖两跳。
+            4. 不允许引入外部知识或隐含假设。
+            5. 不允许修改实体名、关系语义或属性值。
+
+            允许的问题类型：
+            - 两步实体关系推理
+            - 先由第一跳定位实体，再由第二跳得到答案的问题
+            - 使用显式属性作为限定条件的两跳推理问题
+
+            禁止的问题类型：
+            - 只依赖一条 tuple 就能回答的问题
+            - 直接的一跳主客体问题
+            - 无视路径连接关系的问题
+
+            输出格式（严格 JSON）：
+            {
+              "QA_pairs": [
+                "Question: ... Answer: ...",
+                "Question: ... Answer: ..."
+              ]
+            }
+        """)
+
+    def build_prompt(self, paths: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Please generate two-hop QA pairs strictly following the rules above.
+
+                Two-hop hyper-relational paths:
+                {paths}
+
+                Output QA_pairs in JSON format only:
+            """)
+
+        return textwrap.dedent(f"""\
+            请严格按照上述规则，从以下两跳超关系路径中生成问答对。
+
+            两跳超关系路径：
+            {paths}
+
+            仅以 JSON 格式输出 QA_pairs：
+        """)
+
+
+@PROMPT_REGISTRY.register()
+class HRKGRelationTripleSubgraphNumericQAPrompt(PromptABC):
+    """
+    Generate numeric QA pairs from a hyper-relational subgraph.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are a hyper-relational knowledge graph QA generation expert.
+
+                === TASK ===
+                Given a subgraph composed of hyper-relational tuples, generate
+                numeric QA pairs.
+
+                === CORE REQUIREMENTS ===
+                1. The answer must be a NUMBER.
+                2. Each question must rely on at least two tuples.
+                3. You may use explicit relation attributes such as Time,
+                   Location, Condition, Purpose, Value, Degree, Market, Method,
+                   Capacity, or Frequency when forming the question.
+                4. Use only the given tuples; do not introduce external knowledge.
+                5. Do not ignore explicit qualifiers in the tuples.
+
+                === OUTPUT FORMAT ===
+                {
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
+                }
+
+                Do not explain reasoning or mention tuples explicitly.
+            """)
+
+        return textwrap.dedent("""\
+            你是超关系知识图谱数值型问答生成专家。
+
+            === 任务 ===
+            给定由 hyper-relation tuples 构成的子图，生成数值型 QA。
+
+            === 核心要求 ===
+            1. 答案必须是数字。
+            2. 每个问题必须依赖至少两条 tuple。
+            3. 可以使用 Time、Location、Condition、Purpose、Value、Degree、Market、Method、Capacity、Frequency 等显式关系属性构造问题。
+            4. 只能使用给定 tuples，不允许引入外部知识。
+            5. 不要忽略 tuple 中显式给出的限定条件。
+
+            === 输出格式 ===
+            {
+              "QA_pairs": [
+                {
+                  "question": "...",
+                  "answer": "..."
+                }
+              ]
+            }
+
+            不输出推理过程，也不要直接提及 tuples 本身。
+        """)
+
+    def build_prompt(self, tuples: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Please generate numeric QA pairs strictly following the rules above.
+
+                Each question must rely on at least two tuples.
+
+                Hyper-relational subgraph tuples:
+                {tuples}
+
+                Output QA pairs in JSON format only:
+            """)
+
+        return textwrap.dedent(f"""\
+            请严格按照上述规则，从以下超关系子图 tuples 中生成数值型 QA。
+
+            每个问题必须依赖至少两条 tuple。
+
+            超关系子图 tuples：
+            {tuples}
+
+            仅以 JSON 格式输出 QA_pairs：
+        """)
+
+
+@PROMPT_REGISTRY.register()
+class HRKGRelationTripleSubgraphSetQAPrompt(PromptABC):
+    """
+    Generate set-based QA pairs from a hyper-relational subgraph.
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are a hyper-relational knowledge graph QA generation expert.
+
+                === TASK ===
+                Given a subgraph composed of hyper-relational tuples, generate
+                set-based QA pairs.
+
+                === CORE REQUIREMENTS ===
+                1. The answer must be a SET, such as a comma-separated list of entities,
+                   concepts, values, locations, or other explicit tuple results.
+                2. Each question must rely on at least two tuples.
+                3. You may use explicit relation attributes such as Time,
+                   Location, Condition, Purpose, Value, Degree, Market, Method,
+                   Capacity, or Frequency when forming the question.
+                4. Use only the given tuples; do not introduce external knowledge.
+                5. Do not ignore explicit qualifiers in the tuples.
+
+                === OUTPUT FORMAT ===
+                {
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
+                }
+
+                Do not explain reasoning or mention tuples explicitly.
+                Ensure answers are clear set-like outputs.
+            """)
+
+        return textwrap.dedent("""\
+            你是超关系知识图谱集合型问答生成专家。
+
+            === 任务 ===
+            给定由 hyper-relation tuples 构成的子图，生成集合型 QA。
+
+            === 核心要求 ===
+            1. 答案必须是集合形式，例如由逗号分隔的实体、概念、数值、地点或其他显式结果。
+            2. 每个问题必须依赖至少两条 tuple。
+            3. 可以使用 Time、Location、Condition、Purpose、Value、Degree、Market、Method、Capacity、Frequency 等显式关系属性构造问题。
+            4. 只能使用给定 tuples，不允许引入外部知识。
+            5. 不要忽略 tuple 中显式给出的限定条件。
+
+            === 输出格式 ===
+            {
+              "QA_pairs": [
+                {
+                  "question": "...",
+                  "answer": "..."
+                }
+              ]
+            }
+
+            不输出推理过程，也不要直接提及 tuples 本身。
+            确保答案是清晰的集合形式。
+        """)
+
+    def build_prompt(self, tuples: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Please generate set-based QA pairs strictly following the rules above.
+
+                Each question must rely on at least two tuples.
+
+                Hyper-relational subgraph tuples:
+                {tuples}
+
+                Output QA pairs in JSON format only:
+            """)
+
+        return textwrap.dedent(f"""\
+            请严格按照上述规则，从以下超关系子图 tuples 中生成集合型 QA。
+
+            每个问题必须依赖至少两条 tuple。
+
+            超关系子图 tuples：
+            {tuples}
+
+            仅以 JSON 格式输出 QA_pairs：
+        """)
