@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_generate import KGTupleTextGenerationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -52,15 +38,15 @@ class KGTupleTextGeneration(OperatorABC):
     def get_desc(lang: str = "en"):
         if lang == "zh":
             return (
-                "KGtripleTextGeneration 从知识图谱三元组生成自然语言描述",
-                "处理流程包括：读取三元组 → LLM生成文本 → 输出写入DataFrame",
-                "输入格式：triple: List[str]\n输出格式：description: str"
+                "KGTupleTextGeneration 用于将知识图谱三元组转换为自然语言描述。",
+                "读取三元组列表，通过 LLM 生成对应的自然语言段落，并写入 DataFrame。",
+                "输入列 triple（可通过 input_key_meta 配置）为三元组字符串列表，输出列 description（可通过 output_key_meta 配置）为对应的自然语言文本。"
             )
         else:
             return (
-                "KGtripleTextGeneration generates natural language text from knowledge graph triples",
-                "Processing steps: read triples → LLM generates text → write output to DataFrame",
-                "Input format: triple: List[str]\nOutput format: description: str"
+                "KGTupleTextGeneration converts knowledge graph triples into natural language descriptions.",
+                "Reads a list of triples, generates a natural language paragraph via LLM, and writes the result to the DataFrame.",
+                "Takes triple (configurable via input_key_meta) as input column and outputs description (configurable via output_key_meta) as natural language text per row."
             )
 
     def process_batch(self, triples_list: List[List[str]]) -> List[Dict[str, Any]]:

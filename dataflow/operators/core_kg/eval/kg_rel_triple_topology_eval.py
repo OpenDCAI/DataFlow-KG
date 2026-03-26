@@ -1,20 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Email: 2023090910014@std.uestc.edu.cn
-Created: 2026-02-23
-
-Author: Zhengpin
-Refined: 2026-03-04
-
-License:
-    MIT License
-"""
-
 import json
 import networkx as nx  # pyright: ignore[reportMissingModuleSource]
 from typing import List, Dict, Any
@@ -46,6 +29,24 @@ class KGRelationTripleTopologyEvaluator(OperatorABC):
     def __init__(self):
         super().__init__()
         self.logger = get_logger()
+
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGRelationTripleTopologyEvaluator 用于评估知识图谱的拓扑结构特征。",
+                "计算最大连通分量比例、平均度数、碎片化程度等图拓扑指标。",
+                "输入列 triple 为关系三元组字符串列表，输出列包括 lcc_ratio（最大连通分量比例）、structure_avg_degree（平均度数）、fragmentation_score（碎片化分数）、num_components（连通分量数）、node_count（节点数）、edge_count（边数）。"
+            )
+        else:
+            return (
+                "KGRelationTripleTopologyEvaluator evaluates the topological structure of a KG.",
+                "Computes LCC ratio, average degree, fragmentation score, and component metrics.",
+                "Takes triple (List[str] of relation triples) as input and outputs lcc_ratio, structure_avg_degree, fragmentation_score, num_components, node_count, and edge_count."
+            )
 
     # ============================================================
     # Parsing Relation Triple Only

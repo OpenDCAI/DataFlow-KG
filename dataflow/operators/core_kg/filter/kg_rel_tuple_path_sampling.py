@@ -1,18 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGRelationTriplePathGenerator
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -61,15 +46,15 @@ class KGRelationTuplePathGenerator(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGRelationTriplePathGenerator 用于从关系三元组中生成无向 k-hop 路径。",
-                "处理流程：解析三元组 → 构建无向图 → DFS 枚举 → 路径去重",
-                "输入：List[List[str]]\n输出：List[List[str]]"
+                "KGRelationTuplePathGenerator 用于从关系三元组中生成无向 k-hop 路径。",
+                "解析三元组并构建无向图，通过 DFS 枚举长度为 k 的路径，并对路径去重。",
+                "输入列 triple 为关系三元组字符串列表，输出列名由参数 k 和 output_key_meta 拼接而成（如 k=2 时为 2_hop_paths），每行为一条路径字符串。"
             )
         else:
             return (
-                "KGRelationTriplePathGenerator generates undirected k-hop paths from relation triples.",
-                "Steps: parse triples → build undirected graph → DFS enumeration → path deduplication",
-                "Input: List[List[str]]\nOutput: List[List[str]]"
+                "KGRelationTuplePathGenerator generates undirected k-hop paths from relation triples.",
+                "Parses triples into an undirected graph and enumerates paths of length k via DFS with deduplication.",
+                "Takes triple (List[str]) as input column and outputs a column named '{k}_{output_key_meta}' (e.g. '2_hop_paths' when k=2), where each row is a path string."
             )
 
     # =========================

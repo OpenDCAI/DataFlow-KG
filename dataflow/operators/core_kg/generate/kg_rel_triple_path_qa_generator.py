@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_generate import KGOneHopQAPathGenerationPrompt, KGTwoHopPathQAGenerationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -82,15 +68,15 @@ class KGRelationTriplePathQAGeneration(OperatorABC):
         """
         if lang == "zh":
             return (
-                "KGRelationTripleOneHopPathQAGeneration 是一个用于从结构化三元组生成一跳问答对的处理器。",
-                "处理流程包括：文本预处理 → LLM 生成 QA 对 → 输出过滤（至少 2 个 QA 对）",
-                "输入格式：\ntext: <三元组文本>\n输出格式：\n{\n  'source_text': ..., \n  'QA_pairs': [<至少2条问答对>]\n}"
+                "KGRelationTriplePathQAGeneration 用于从 KG 路径三元组生成 QA 对。",
+                "处理流程：读取路径三元组 → LLM 生成 QA 对 → 过滤（至少 2 个 QA 对）→ 写回 DataFrame。",
+                "当 hop=1 时输入列为 triple，hop>1 时输入列名由 hop 和 input_key_meta 拼接而成（如 hop=2 时为 2_hop_paths）；输出列 QA_pairs 为每条路径生成的问答对列表。"
             )
         else:
             return (
-                "KGRelationTripleOneHopPathQAGeneration generates one-hop QA pairs from structured triples.",
-                "Processing steps: text preprocessing → LLM-based QA generation → output filtering (minimum 2 QA pairs)",
-                "Input format:\ntext: <triple text>\nOutput format:\n{\n  'source_text': ..., \n  'QA_pairs': [<at least 2 QA pairs>]\n}"
+                "KGRelationTriplePathQAGeneration generates QA pairs from KG path triples.",
+                "Reads path triples, generates QA pairs via LLM, filters results to at least 2 pairs per path, and writes back to the DataFrame.",
+                "When hop=1, input column is triple; when hop>1, input column is named '{hop}_{input_key_meta}' (e.g. '2_hop_paths' when hop=2). Output column QA_pairs contains generated QA pairs per path."
             )
 
     def process_batch(self, texts: List[str], sources: Optional[List[str]] = None) -> List[Dict[str, Any]]:

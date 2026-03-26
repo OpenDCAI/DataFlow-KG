@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_refinement import KGEntityDisambiguationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -76,14 +62,14 @@ class KGEntityDisambiguation(OperatorABC):
         if lang == "zh":
             return (
                 "KGEntityDisambiguation 用于对文本中的歧义实体进行消歧处理。",
-                "处理流程：输入原始文本 + 待消歧实体列表 → LLM 消歧 → 输出标准化实体",
-                "输入格式: raw_chunk: [文本片段], entity: [实体列表]\n输出格式: List[str], 对应每个实体的消歧结果"
+                "结合原始文本上下文和待消歧实体列表，通过 LLM 输出每个实体的标准化形式。",
+                "输入列 raw_chunk 为原始文本，entity 为待消歧实体列表；输出列 disambiguated_entity 为消歧后的规范化实体字符串列表。"
             )
         else:
             return (
                 "KGEntityDisambiguation resolves ambiguous entity mentions in text.",
-                "Processing steps: input raw text + entities → LLM-based disambiguation → output canonical entities",
-                "Input format: raw_chunk: [text chunk], entity: [list of entities]\nOutput format: List[str], each entity's disambiguated form"
+                "Combines raw text context with a list of entity candidates and uses an LLM to output the canonical form of each entity.",
+                "Takes raw_chunk (str) and entity (List[str]) as input columns and outputs disambiguated_entity (List[str] of canonical entity forms)."
             )
 
     def process_batch(

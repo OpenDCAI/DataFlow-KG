@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGSubgraphStatistics
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
-License:
-    MIT License
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -46,14 +32,14 @@ class KGSubgraphScaleEvaluator(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGSubgraphStatistics 用于统计知识图谱子图的结构信息。",
-                "包括节点数、边数以及子图密度。",
-                "输入: subgraph\n输出: num_nodes, num_edges, density",
+                "KGSubgraphScaleEvaluator 用于统计知识图谱子图的结构规模指标。",
+                "计算每个子图的节点数、边数及密度。",
+                "输入列 subgraph 为子图三元组字符串列表，输出列 num_nodes（节点数）、num_edges（边数）和 density（密度）分别写入 DataFrame。",
             )
         return (
-            "KGSubgraphStatistics computes structural statistics of KG subgraphs.",
-            "Outputs number of nodes, edges, and graph density.",
-            "Input: subgraph\nOutput: num_nodes, num_edges, density",
+            "KGSubgraphScaleEvaluator computes structural scale metrics for KG subgraphs.",
+            "Calculates the number of nodes, number of edges, and density for each subgraph.",
+            "Takes subgraph (List[str] of relation triples) as input and outputs num_nodes, num_edges, and density columns.",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str):

@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGRelationTripleInference
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_generate import KGInferredTripleGenerationPrompt, KGRelationGenerationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -69,12 +55,14 @@ class KGRelationTripleInference(OperatorABC):
         if lang == "zh":
             return (
                 "KGRelationTripleInference 用于基于已有三元组推理隐含的关系三元组。",
-                "可选地将推理得到的三元组合并回原始输入，用于 KG 闭包扩展。"
+                "通过 LLM 对输入三元组进行推理，生成新的隐含关系三元组，可选地合并回原始输入以扩展 KG 闭包。",
+                "输入列 triple 为已有关系三元组字符串列表，输出列 inferred_triple 为推理得到的新三元组列表。"
             )
         else:
             return (
                 "KGRelationTripleInference infers implicit triples from observed relation triples.",
-                "Optionally merges inferred triples back into the original input."
+                "Uses an LLM to reason over input triples and generate new implicit relation triples; optionally merges them back into the original input for KG closure expansion.",
+                "Takes triple (List[str]) as input column and outputs inferred_triple (List[str] of newly inferred triple strings)."
             )
 
     def process_batch(

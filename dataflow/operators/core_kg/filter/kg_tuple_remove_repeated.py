@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 import random
 import re
@@ -55,15 +41,15 @@ class KGTupleRemoveRepeated(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleRemoveRepeated 用于清洗和去重关系三元组/属性三元组/多元组。",
-                "仅删除完全相同的元组，保留原始嵌套结构。",
-                "支持输入列为 'triple' 或 'tuple'。"
+                "KGTupleRemoveRepeated 用于清洗和去重关系三元组、属性三元组或多元组。",
+                "仅删除完全相同的元组字符串，保留原始嵌套结构。",
+                "输入列 triple（或 tuple）为元组字符串的嵌套列表，输出列同名，包含去重后的元组列表。"
             )
         else:
             return (
-                "KGTripleRemoveRepeated cleans and deduplicates relation, attribute, or general n-tuples.",
-                "Strict deduplication: only fully identical tuples are removed.",
-                "Supports input column named 'triple' or 'tuple'."
+                "KGTupleRemoveRepeated cleans and deduplicates relation, attribute, or general n-tuples.",
+                "Only fully identical tuple strings are removed; the original nested structure is preserved.",
+                "Takes triple (or tuple) as input column and outputs the same column with duplicate tuples removed."
             )
 
     def _remove_duplicates_strict(

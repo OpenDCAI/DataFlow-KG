@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGRelationTripletDialogueQAGeneration
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-"""
-
 import pandas as pd
 from typing import List, Dict, Any
 import json
@@ -48,6 +38,24 @@ class KGRelationTripletDialogueQAGeneration(OperatorABC):
         self.logger = get_logger()
 
         self.prompt = KGMultiHopPathDialogueQAGenerationPrompt(lang=self.lang)
+
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGRelationTripletDialogueQAGeneration 用于从多跳 KG 路径生成多轮对话 QA。",
+                "利用 LLM 将多跳路径转换为多轮问答对话。",
+                "输入列名由参数 k 和 input_key_meta 拼接而成（如 k=3 时为 3_hop_paths），输出列 multi_turn_dialogues 为每条路径对应的多轮对话列表。"
+            )
+        else:
+            return (
+                "KGRelationTripletDialogueQAGeneration generates multi-turn dialogue QA from multi-hop KG paths.",
+                "Uses an LLM to convert multi-hop paths into multi-turn question-answering dialogues.",
+                "Input column is constructed as '{k}_{input_key_meta}' (e.g. '3_hop_paths' when k=3), and outputs multi_turn_dialogues (List of dialogue turns per path)."
+            )
 
     # -------------------------
     # DataFrame validation

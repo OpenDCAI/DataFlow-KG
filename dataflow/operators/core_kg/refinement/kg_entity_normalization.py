@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_refinement import KGEntityNormalizationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -54,15 +40,15 @@ class KGEntityNormalization(OperatorABC):
         """Return processor description and input/output format."""
         if lang == "zh":
             return (
-                "KGEntityNormalization 用于对多个文本 chunk 中已抽取的实体结果进行统一规范化处理（不负责实体抽取）。",
-                "核心功能：实体同义归一、多对一标准化、一致化命名、去重，并保持与原始文本 chunk 对齐输出。",
-                "输入: texts: [chunk1, chunk2, ...]\nnorm_json: {\"canonical\": [variants...]}\n输出: [{\"normalized_entity\": <字符串>} ...]"
+                "KGEntityNormalization 用于对已抽取的实体进行统一规范化处理（不负责实体抽取）。",
+                "核心功能：实体同义归一、多对一标准化、一致化命名、去重。",
+                "输入列 entity 为实体字符串列表，输出列 normalized_entity 为规范化后的实体字符串列表。"
             )
         else:
             return (
-                "KGEntityNormalization canonicalizes and deduplicates entities extracted from multiple text chunks (does not extract entities).",
-                "Core tasks: multi-to-one entity normalization, consistent canonical naming, deduplication, aligned output per chunk.",
-                "Input: texts: [chunk1, chunk2, ...]\nnorm_json: {\"canonical\": [variants...]}\nOutput: [{\"normalized_entity\": <string>} ...]"
+                "KGEntityNormalization canonicalizes and deduplicates extracted entities (does not extract entities).",
+                "Core tasks: multi-to-one entity normalization, consistent canonical naming, and deduplication.",
+                "Takes entity (List[str]) as input column and outputs normalized_entity (List[str] of canonical entity strings)."
             )
 
     def process_batch(

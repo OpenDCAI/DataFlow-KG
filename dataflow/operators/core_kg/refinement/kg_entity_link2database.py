@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -58,15 +44,15 @@ class KGEntityLink2Database(OperatorABC):
         """Return description and input/output format of the processor."""
         if lang == "zh":
             return (
-                "KGEntityLink2Database 用于将文本中的实体链接到外部知识库（例如 Wikipedia）。",
-                "处理流程：输入文本实体列表 → 候选检索 → Wikipedia 页面匹配 → 输出链接结果",
-                "输入格式: entity: <字符串: 以逗号分隔的实体列表>\n输出格式: linked_result: <List[str]，包含实体及其链接>"
+                "KGEntityLink2Database 用于将实体链接到外部知识库（例如 Wikipedia）。",
+                "对输入实体列表进行候选检索并通过模糊匹配选择最相关的 Wikipedia 页面。",
+                "输入列 entity 为实体字符串列表，输出列 linked_result 为每个实体对应的 Wikipedia 链接结果列表。"
             )
         else:
             return (
-                "KGEntityLink2Database links entities in text to external knowledge sources (e.g., Wikipedia).",
-                "Processing: input entity list → candidate retrieval → Wikipedia page matching → output linked entities",
-                "Input format: entity: <string, comma-separated entities>\nOutput format: linked_result: <List[str] containing entities and their URLs>"
+                "KGEntityLink2Database links entities to external knowledge sources (e.g., Wikipedia).",
+                "Retrieves Wikipedia page candidates for each entity and selects the best match via fuzzy string matching.",
+                "Takes entity (List[str]) as input column and outputs linked_result (List of dicts containing entity names and their Wikipedia URLs)."
             )
 
     def process_batch(

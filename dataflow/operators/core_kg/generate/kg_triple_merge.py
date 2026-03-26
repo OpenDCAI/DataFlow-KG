@@ -1,15 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGTripleMerger
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-28
-License: MIT License
-"""
-
 from dataflow.core import OperatorABC
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow.utils.storage import DataFlowStorage
@@ -35,6 +23,24 @@ class KGTripleMerger(OperatorABC):
 
     def __init__(self):
         pass
+
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGTripleMerger 用于合并两个知识图谱或属性三元组集合。",
+                "支持关系三元组合并、属性三元组合并及混合合并，并自动检测歧义。",
+                "输入列 triples_kg1、triples_kg2 为两个图谱的三元组列表，entity_alignment 为实体对齐结果列表；输出列 merged_triples 为合并后的三元组字典（含 unambiguous 和 ambiguous 两个键）。"
+            )
+        else:
+            return (
+                "KGTripleMerger merges two KGs or two sets of attribute triples into one.",
+                "Supports relational, attribute, and mixed merges with ambiguity detection.",
+                "Takes triples_kg1 and triples_kg2 (List[str]) and entity_alignment (List[Dict]) as inputs, and outputs merged_triples (Dict with 'unambiguous' and 'ambiguous' triple lists)."
+            )
 
     # ---------------- Relational Triple Merge ----------------
     @staticmethod

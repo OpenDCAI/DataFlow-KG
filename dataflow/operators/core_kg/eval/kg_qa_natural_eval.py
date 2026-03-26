@@ -1,20 +1,3 @@
-"""
-====================================
-DataFlow-KG: QA Conciseness Evaluator
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Email: 2023090910014@std.uestc.edu.cn
-Created: 2026-02-23
-
-Author: Zhengpin
-Refined: 2026-03-16
-
-License:
-    MIT License
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm
@@ -41,6 +24,24 @@ class KGQANaturalEvaluator(OperatorABC):
 
         self.llm_serving = llm_serving
         self.prompt_manager = KGQANaturalnessPrompt(lang)
+
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGQANaturalEvaluator 用于评估知识图谱 QA 对的自然流畅性。",
+                "使用 LLM 对 QA 对进行自然性打分。",
+                "输入列 QA_pairs 为 QA 问答对列表，输出列 naturalness_scores 为每对 QA 的自然性评分列表。"
+            )
+        else:
+            return (
+                "KGQANaturalEvaluator evaluates the naturalness of KG-derived QA pairs.",
+                "Uses an LLM to score each QA pair on naturalness.",
+                "Takes QA_pairs (List of QA pairs) as input and outputs naturalness_scores (List of scores per QA pair)."
+            )
 
     # ============================================================
     # JSON Parse

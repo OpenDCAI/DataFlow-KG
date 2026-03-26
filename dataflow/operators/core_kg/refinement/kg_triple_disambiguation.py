@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGTripleDisambiguation
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 import random
 import json
@@ -88,15 +74,15 @@ class KGTripleDisambiguation(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleDisambiguation 用于对属性三元组和实体关系三元组进行自动消岐。",
-                "输入列：ambiguous（List[str]）",
-                "输出列：resolved（List[str]）",
+                "KGTripleDisambiguation 用于对歧义的属性三元组和关系三元组进行自动消歧。",
+                "从 merged_triples 列的 ambiguous 字段中读取歧义三元组，通过 LLM 选择最合理的候选值。",
+                "输入列 merged_triples 为合并后的三元组字典（含 ambiguous 列表），输出列 resolved 为消歧后的三元组字符串列表。",
             )
         else:
             return (
-                "KGTripleDisambiguation resolves ambiguous attribute and relation triples.",
-                "Input column: ambiguous (List[str])",
-                "Output column: resolved (List[str])",
+                "KGTripleDisambiguation resolves ambiguous attribute and relation triples using an LLM.",
+                "Reads ambiguous triples from the 'ambiguous' field of merged_triples and selects the most plausible candidate value.",
+                "Takes merged_triples (Dict with an 'ambiguous' key) as input column and outputs resolved (List[str] of disambiguated triple strings).",
             )
 
     # --------------------------------------------------

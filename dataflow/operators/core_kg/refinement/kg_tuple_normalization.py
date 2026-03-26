@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.attri_triple import KGAttributeNormalizationPrompt
 from dataflow.prompts.core_kg.rel_triple_refinement import KGRelationNormalizationPrompt
 import pandas as pd
@@ -71,15 +57,15 @@ class KGTupleNormalization(OperatorABC):
         """Return processor description and input/output format."""
         if lang == "zh":
             return (
-                "KGAttributeNormalization 用于对抽取的知识图谱属性进行统一规范化处理。",
-                "核心功能：属性同义归一、多对一标准化、去重，并保持与原始属性顺序对齐输出。",
-                "输入: attributes: [attr1, attr2, ...]\nnorm_json: {\"canonical\": [variants...]}\n输出: [{\"normalized_attribute\": <规范化后的属性>} ...]"
+                "KGTupleNormalization 用于对知识图谱三元组（属性型或关系型）进行规范化处理。",
+                "通过 LLM 对三元组中的属性或关系进行同义归一、多对一标准化和去重。",
+                "输入列 triple 为三元组字符串列表，输出列 normalized_triple 为规范化后的三元组列表。"
             )
         else:
             return (
-                "KGAttributeNormalization canonicalizes and deduplicates extracted KG attributes.",
-                "Core tasks: multi-to-one attribute normalization, consistent canonical naming, deduplication, output aligned to original attribute order.",
-                "Input: attributes: [attr1, attr2, ...]\nnorm_json: {\"canonical\": [variants...]}\nOutput: [{\"normalized_attribute\": <normalized attribute>} ...]"
+                "KGTupleNormalization normalizes KG triples (attribute or relation type) using an LLM.",
+                "Canonicalizes synonymous attributes or relations, applies multi-to-one mapping, and deduplicates.",
+                "Takes triple (List[str]) as input column and outputs normalized_triple (List[str] of normalized triple strings)."
             )
 
     def _detect_triple_type(self, triple: str) -> str:

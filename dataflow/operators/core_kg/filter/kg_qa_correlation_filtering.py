@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGTripleStrengthFilter
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -38,14 +26,14 @@ class KGQACorrelationFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleStrengthFilter 根据三元组强度得分筛选三元组。",
-                "输入列需包含三元组及其强度得分，输出符合得分范围的三元组。",
-                "输入: triple, triple_strength_score\n输出: filtered_triple",
+                "KGQACorrelationFilter 根据相关性得分对 QA 对进行过滤。",
+                "读取 QA 对及对应的相关性得分，保留得分在指定范围内的 QA 对。",
+                "输入列 QA_pairs 为 QA 问答对列表，correlation_scores 为对应得分列表；输出列 filtered_QA_pairs 为过滤后的 QA 对列表。",
             )
         return (
-            "KGTripleStrengthFilter filters knowledge graph triples based on strength scores.",
-            "Input columns must contain triples and their strength scores.",
-            "Output column: filtered_triple",
+            "KGQACorrelationFilter filters QA pairs based on correlation scores.",
+            "Reads QA pairs and their correlation scores, retaining only those within the specified score range.",
+            "Takes QA_pairs (List of QA pairs) and correlation_scores (List of float) as inputs, and outputs filtered_QA_pairs (List of QA pairs that pass the score threshold).",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str, score_key: str):

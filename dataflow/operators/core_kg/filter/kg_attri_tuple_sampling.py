@@ -1,18 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGAttributeTupleSampler
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-03
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -68,14 +53,14 @@ class KGAttributeTupleSampler(OperatorABC):
         if lang == "zh":
             return (
                 "KGAttributeTupleSampler 用于对实体属性多元组进行分组采样。",
-                "支持按实体或按属性分组。",
-                "输入: List[str]\n输出: List[Dict]"
+                "支持按实体或按属性分组，可限制组数和每组元组数量。",
+                "输入列 tuple（或 triple）为属性多元组字符串列表，输出列 subgraph 为按分组采样后的元组列表，每行对应一个分组。"
             )
         else:
             return (
-                "KGAttributeTupleSampler groups attribute tuples by entity or attribute.",
-                "Supports entity-based or attribute-based grouping.",
-                "Input: List[str]\nOutput: List[Dict]"
+                "KGAttributeTupleSampler groups and samples attribute tuples by entity or attribute.",
+                "Supports entity-based or attribute-based grouping with optional limits on group count and group size.",
+                "Takes tuple (or triple) as input column containing attribute tuple strings, and outputs subgraph (List[str] per group of sampled tuples)."
             )
 
     # =========================

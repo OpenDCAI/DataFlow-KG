@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_filter import KGRelationTupleValidityPrompt
 from dataflow.prompts.core_kg.attri_triple import KGAttributeTupleValidationPrompt
 import pandas as pd
@@ -70,15 +56,15 @@ class KGTupleValidity(OperatorABC):
         """
         if lang == "zh":
             return (
-                "KGRelationTripleValidity 用于对知识图谱中的三元组进行有效性判断。",
-                "该算子使用大语言模型判断每个三元组在语义上是否合理或可信。",
-                "输入为知识图谱三元组，输出为有效性判断结果或过滤后的三元组。",
+                "KGTupleValidity 用于对知识图谱中的三元组进行有效性判断。",
+                "该算子使用大语言模型判断每个三元组在语义上是否合理或可信，支持关系型和属性型三元组。",
+                "输入列 triple（或 tuple）为三元组字符串列表，输出列 valid_triple（或 valid_tuple）为经 LLM 验证后保留的有效三元组列表。",
             )
         else:
             return (
-                "KGRelationTripleValidity validates knowledge graph triples.",
-                "It uses a large language model to assess whether each triple is semantically valid.",
-                "Input consists of KG triples, and output provides validity judgments or filtered triples.",
+                "KGTupleValidity validates knowledge graph triples using an LLM.",
+                "Uses a large language model to assess whether each triple is semantically valid; supports both relation and attribute triple types.",
+                "Takes triple (or tuple) as input column and outputs valid_triple (or valid_tuple) containing the validated triples.",
             )
 
     def process_batch(

@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_generate import KGRelationTripleExtractionPrompt
 from dataflow.prompts.core_kg.attri_triple import TKGAttributeQuadrupleExtractorPrompt
 import pandas as pd
@@ -93,12 +79,14 @@ class KGTripleExtraction(OperatorABC):
         if lang == "zh":
             return (
                 "KGTripleExtraction 是一个三元组抽取算子，用于从文本中抽取知识图谱三元组。",
-                "输入为原始文本及其对应的合法实体列表，输出为结构化的三元组结果。"
+                "输入原始文本及对应的合法实体列表，通过 LLM 提取结构化的三元组。",
+                "输入列 raw_chunk 为原始文本，entity 为合法实体列表；输出列 triple 为抽取到的三元组字符串列表。"
             )
         else:
             return (
-                "KGTripleExtraction extracts triples from text.",
-                "Input: raw text and a list of valid entities. Output: extracted KG triples."
+                "KGTripleExtraction extracts knowledge graph triples from raw text.",
+                "Takes raw text and a predefined list of valid entities as input, and uses an LLM to extract structured triples.",
+                "Takes raw_chunk (str) and entity (List[str]) as input columns and outputs triple (List[str] of extracted triple strings)."
             )
 
     def process_batch(

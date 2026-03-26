@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 import random
 import re
@@ -42,6 +28,23 @@ class KGEntityBasedSubgraphSampling(OperatorABC):
         self.num_q = num_q
         self.logger = get_logger()
 
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGEntityBasedSubgraphSampling 用于从知识图谱中采样子图。",
+                "支持 BFS、随机游走和基于跳数的子图采样策略。",
+                "输入列 triple 为关系三元组字符串列表，输出列 subgraph 为按实体采样得到的子图三元组列表。"
+            )
+        else:
+            return (
+                "KGEntityBasedSubgraphSampling samples subgraphs from a KG.",
+                "Supports BFS, random walk, and hop-based subgraph sampling strategies.",
+                "Takes triple (List[str] of relation triples) as input and outputs subgraph (List[str] of sampled triples per entity)."
+            )
 
     # 修改 _parse_triple 支持多元组
     def _parse_triple(self, triple_str: str) -> tuple[str, str, str]:

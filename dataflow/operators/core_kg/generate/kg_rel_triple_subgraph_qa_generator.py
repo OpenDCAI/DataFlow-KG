@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGRelationTripleSubgraphQAGeneration
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_generate import KGRelationTripleSubgraphNumericQAPrompt, KGRelationTripleSubgraphSetQAPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -78,15 +64,15 @@ class KGRelationTripleSubgraphQAGeneration(OperatorABC):
         """
         if lang == "zh":
             return (
-                "KGRelationTripleSubgraphQAGeneration 从知识图谱三元组生成多实体问答对。",
-                "处理流程：输入三元组 → 通过 LLM 构建数值或集合型 QA → 输出结构化问答",
-                "输入：List[str]，每个元素为三元组字符串\n输出：List[Dict]，每个元素包含原始三元组和生成的 QA 对"
+                "KGRelationTripleSubgraphQAGeneration 从知识图谱子图三元组生成多实体问答对。",
+                "通过 LLM 对输入的子图三元组构建数值型或集合型 QA，输出结构化问答对。",
+                "输入列 subgraph 为子图三元组字符串列表，输出列 QA_pairs 为每行子图对应的问答对列表，每项包含 source_text 和 QA_pairs 字段。"
             )
         else:
             return (
-                "KGRelationTripleSubgraphQAGeneration generates multi-entity QA pairs from KG triples.",
-                "Processing steps: input triples → generate numeric or set-based QA via LLM → return structured QA pairs",
-                "Input format: List[str], each element is a triple string\nOutput format: List[Dict], each element contains 'source_text' and 'QA_pairs'"
+                "KGRelationTripleSubgraphQAGeneration generates multi-entity QA pairs from KG subgraph triples.",
+                "Uses an LLM to construct numeric or set-based QA pairs from the input subgraph triples.",
+                "Takes subgraph (List[str] of triple strings) as input and outputs QA_pairs (List of dicts with source_text and QA_pairs per subgraph)."
             )
 
     def process_batch(self, texts: List[str], sources: Optional[List[str]] = None) -> List[Dict[str, Any]]:

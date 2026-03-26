@@ -1,18 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
-
 from dataflow.prompts.core_kg.rel_triple_eval import KGRelationStrengthScoringPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY

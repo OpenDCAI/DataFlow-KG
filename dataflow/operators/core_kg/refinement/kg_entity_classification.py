@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.rel_triple_refinement import KGEntityTypeClassificationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -76,14 +62,14 @@ class KGEntityClassification(OperatorABC):
         if lang == "zh":
             return (
                 "KGEntityClassification 用于对已抽取的实体进行类型分类。",
-                "处理流程：输入实体列表 → LLM 类型分类 → 输出分类结果",
-                "输入格式: texts: [entity1, entity2, ...]\n输出格式: List[List[str]], 每个实体对应的类型列表"
+                "接收实体列表，通过 LLM 对每个实体预测其所属类型，输出类型标签。",
+                "输入列 entity 为实体字符串列表，输出列 entity_type 为每个实体对应的类型标签列表。"
             )
         else:
             return (
                 "KGEntityClassification classifies types for extracted entities.",
-                "Processing steps: input entity list → LLM-based type classification → output type labels",
-                "Input format: texts: [entity1, entity2, ...]\nOutput format: List[List[str]], each entity's predicted type(s)"
+                "Takes a list of entities and predicts a type label for each via an LLM.",
+                "Takes entity (List[str]) as input column and outputs entity_type (List of predicted type labels per entity)."
             )
 
     def process_batch(

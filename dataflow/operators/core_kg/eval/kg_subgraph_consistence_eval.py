@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGSubgraphConsistency
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-License:
-    MIT License
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -68,15 +54,15 @@ class KGSubgraphConsistency(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGSubgraphConsistency 用于评估知识图谱子图内部的一致性。",
+                "KGSubgraphConsistency 用于评估知识图谱子图内部的语义一致性。",
                 "该算子使用 LLM 对输入子图中的三元组集合进行一致性打分。",
-                "输入为子图三元组列表，输出为一致性得分（0~1）。"
+                "输入列 subgraph 为子图三元组列表，输出列 consistency_score 为 LLM 评估的一致性得分（0~1）。"
             )
         else:
             return (
-                "KGSubgraphConsistency evaluates the internal consistency of a KG subgraph.",
-                "It uses an LLM to score semantic coherence of a list of triples in a subgraph.",
-                "Input: List of triples per subgraph; Output: consistency score (0~1)."
+                "KGSubgraphConsistency evaluates the internal semantic consistency of a KG subgraph.",
+                "Uses an LLM to score the coherence of a set of triples within a subgraph.",
+                "Takes subgraph (List[str] of triples) as input and outputs consistency_score (float in 0~1) per subgraph."
             )
 
     def process_batch(

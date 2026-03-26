@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.core import OperatorABC
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow.utils.storage import DataFlowStorage
@@ -35,6 +21,24 @@ class KGGraphEntityAligner(OperatorABC):
         """
         self.top_k = top_k
         self.threshold = threshold
+
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGGraphEntityAligner 用于对齐两个知识图谱中的实体。",
+                "通过模糊字符串匹配生成候选对齐，并选取相似度最高的匹配。",
+                "输入列 triples_kg1 和 triples_kg2 为两个图谱的三元组字符串列表，输出列 entity_alignment 为实体对齐结果列表，每项包含 entity_kg1、entity_kg2 和 similarity 字段。"
+            )
+        else:
+            return (
+                "KGGraphEntityAligner aligns entities between two KG triple lists.",
+                "Generates candidates via fuzzy string matching and selects the highest-similarity match.",
+                "Takes triples_kg1 and triples_kg2 (List[str]) as inputs and outputs entity_alignment (List[Dict] with entity_kg1, entity_kg2, and similarity fields)."
+            )
 
     # ---------------- Entity Extraction ----------------
     def _extract_entities(self, tuples: List[str]) -> List[str]:

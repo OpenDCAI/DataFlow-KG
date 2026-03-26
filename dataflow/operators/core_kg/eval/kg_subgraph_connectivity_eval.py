@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGSubgraphConnectivityEvaluator
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
-License:
-    MIT License
-"""
-
 import pandas as pd
 import networkx as nx
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -47,14 +33,14 @@ class KGSubgraphConnectivityEvaluator(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGSubgraphConnectivityEvaluator 统计子图连通性指标。",
-                "包括点连通度、边连通度以及全局效率。",
-                "输入: subgraph\n输出: vertex_connectivity, edge_connectivity, global_efficiency",
+                "KGSubgraphConnectivityEvaluator 用于评估知识图谱子图的连通性指标。",
+                "计算每个子图的点连通度、边连通度以及全局效率。",
+                "输入列 subgraph 为子图三元组字符串列表，输出列 vertex_connectivity（点连通度）、edge_connectivity（边连通度）和 global_efficiency（全局效率）分别写入 DataFrame。",
             )
         return (
-            "Compute connectivity metrics of KG subgraphs.",
-            "Outputs vertex connectivity, edge connectivity, and global efficiency.",
-            "Input: subgraph\nOutput: vertex_connectivity, edge_connectivity, global_efficiency",
+            "KGSubgraphConnectivityEvaluator computes connectivity metrics for KG subgraphs.",
+            "Calculates vertex connectivity, edge connectivity, and global efficiency for each subgraph.",
+            "Takes subgraph (List[str] of relation triples) as input and outputs vertex_connectivity, edge_connectivity, and global_efficiency columns.",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str):

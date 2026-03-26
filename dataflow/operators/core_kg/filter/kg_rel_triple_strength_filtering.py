@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGTripleStrengthFilter
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -39,13 +27,13 @@ class KGTripleStrengthFilter(OperatorABC):
         if lang == "zh":
             return (
                 "KGTripleStrengthFilter 根据三元组强度得分筛选三元组。",
-                "输入列需包含三元组及其强度得分，输出符合得分范围的三元组。",
-                "输入: triple, triple_strength_score\n输出: filtered_triple",
+                "读取三元组列表及对应的强度得分，保留得分在指定范围内的三元组。",
+                "输入列 triple 为三元组字符串列表，triple_strength_score 为对应得分列表；输出列 filtered_triple 为过滤后的三元组列表。",
             )
         return (
             "KGTripleStrengthFilter filters knowledge graph triples based on strength scores.",
-            "Input columns must contain triples and their strength scores.",
-            "Output column: filtered_triple",
+            "Reads triples and their strength scores, retaining only those within the specified score range.",
+            "Takes triple (List[str]) and triple_strength_score (List[float]) as input columns and outputs filtered_triple (List[str] of triples that pass the score threshold).",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, triple_key: str, score_key: str):

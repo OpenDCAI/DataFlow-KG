@@ -1,20 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Email: 2023090910014@std.uestc.edu.cn
-Created: 2026-02-23
-
-Author: Zhengpin Li
-Refined: 2026-03-04
-
-License:
-    MIT License
-"""
-
 import json
 import random
 from typing import List, Dict, Any
@@ -45,6 +28,24 @@ class KGRelationTripleConsistencyEvaluator(OperatorABC):
         self.sample_rate = sample_rate
         self.max_samples = max_samples
         self.prompt_manager = KGRelationConsistencyEvaluationPrompt(lang)
+
+    # =========================
+    # Description
+    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGRelationTripleConsistencyEvaluator 用于评估知识图谱关系三元组的逻辑一致性。",
+                "通过采样三元组并利用 LLM 进行上下文一致性判断。",
+                "输入列 triple 为关系三元组字符串列表，输出列 logical_consistency_score 为一致性得分（0~1 浮点数），evaluated_sample_indices 为采样三元组的索引列表。"
+            )
+        else:
+            return (
+                "KGRelationTripleConsistencyEvaluator evaluates logical consistency of KG relation triples.",
+                "Samples triples and uses an LLM to judge contextual consistency.",
+                "Takes triple (List[str] of relation triples) as input and outputs logical_consistency_score (float in [0,1]) and evaluated_sample_indices (List of sampled indices)."
+            )
 
     # ============================================================
     # Parsing

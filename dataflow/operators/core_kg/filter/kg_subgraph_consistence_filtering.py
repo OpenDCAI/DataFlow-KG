@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGSubgraphConsistenceFilter
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -39,14 +27,14 @@ class KGSubgraphConsistenceFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGSubgraphConsistenceFilter 根据子图一致性得分筛选子图。",
-                "输入列需包含子图及其一致性得分，输出符合得分范围的子图。",
-                "输入: subgraph, consistency_score\n输出: filtered_subgraph",
+                "KGSubgraphConsistenceFilter 根据一致性得分筛选子图。",
+                "读取子图数据及对应的一致性得分列，保留得分在指定范围内的行。",
+                "输入列 subgraph 为子图三元组列表，consistency_score（可配置）为一致性得分列；过滤后直接写回 DataFrame，不新增输出列。",
             )
         return (
-            "KGSubgraphConsistenceFilter filters knowledge graph subgraphs based on consistency scores.",
-            "Input columns must contain subgraphs and their consistency scores.",
-            "Output column: filtered_subgraph",
+            "KGSubgraphConsistenceFilter filters subgraphs based on consistency scores.",
+            "Reads subgraph data and their consistency score column, retaining only rows within the specified score range.",
+            "Takes subgraph (List[str]) and a score column (default: consistency_score) as inputs; filtered rows are written back to the DataFrame without adding new columns.",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str, output_key: str):

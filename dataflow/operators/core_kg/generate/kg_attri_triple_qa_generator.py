@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAttributeTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.core_kg.attri_triple import (
     KGAttributeTripleMultiEntityBaseQAGenerationPrompt,
     KGAttributeTripleMultiEntityNumericQAGenrationPrompt,

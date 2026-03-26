@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -74,15 +60,15 @@ class KGRelationTripleVisualization(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleVisualization 用于将知识图谱三元组可视化为交互式图结构。",
-                "该算子基于实体关系三元组构建有向图，并输出 HTML 可视化结果。",
-                "适用于知识图谱分析、调试与结构检查。",
+                "KGRelationTripleVisualization 用于将知识图谱三元组可视化为交互式图结构。",
+                "该算子基于实体关系三元组构建有向图，并使用 PyVis 渲染为 HTML 文件。",
+                "输入列 triple 为关系三元组字符串列表，输出列 kg_visualization 为 HTML 可视化文件路径。",
             )
         else:
             return (
-                "KGTripleVisualization visualizes knowledge graph triples as an interactive graph.",
-                "It builds a directed graph from entity–relation–entity triples.",
-                "The output is an HTML file for inspecting graph structure and connectivity.",
+                "KGRelationTripleVisualization visualizes knowledge graph triples as an interactive graph.",
+                "Builds a directed graph from entity–relation–entity triples and renders it as an HTML file using PyVis.",
+                "Takes triple (List[str] of relation triples) as input column and outputs kg_visualization (path to the generated HTML file).",
             )
 
     def _visualize_kg_with_pyvis(
