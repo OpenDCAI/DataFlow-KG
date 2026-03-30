@@ -1,20 +1,3 @@
-"""
-====================================
-DataFlow-KG: QA Naturalness Evaluator
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Email: 2023090910014@std.uestc.edu.cn
-Created: 2026-02-23
-
-Author: Zhengpin
-Refined: 2026-03-16
-
-License:
-    MIT License
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm
@@ -22,10 +5,25 @@ from tqdm import tqdm
 from dataflow import get_logger
 from dataflow.core import OperatorABC, LLMServingABC
 from dataflow.utils.storage import DataFlowStorage
+from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow.prompts.diverse_kg.cskg import CSKGTripleRationalePrompt
 
 
+@OPERATOR_REGISTRY.register()
 class CSKGTripleRationaleEvaluator(OperatorABC):
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "CSKGTripleRationaleEvaluator 用于评估常识知识图谱（CSKG）三元组的合理性得分（rationale scores）。",
+                "输入为三元组列表（默认字段 triple），输出为大模型评估的合理性得分列表（默认字段 rationale_scores）。"
+            )
+        else:
+            return (
+                "CSKGTripleRationaleEvaluator evaluates the rationale scores of commonsense knowledge graph (CSKG) triples.",
+                "Input: lists of triples. Output: corresponding rationale scores evaluated by LLM."
+            )
 
     def __init__(
         self,
@@ -42,10 +40,6 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
         self.llm_serving = llm_serving
         self.prompt_manager = CSKGTripleRationalePrompt(lang)
 
-    # ============================================================
-    # JSON Parse
-    # ============================================================
-
     def _safe_parse_json(self, response: str) -> Dict[str, Any]:
 
         clean = response.replace("```json", "").replace("```", "").strip()
@@ -53,27 +47,27 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
         try:
             return json.loads(clean)
         except:
-            return {"naturalness_scores": []}
+            # hy修复：更正兜底的返回字段
+            return {"rationale_scores": []}
 
-    # ============================================================
-    # Core Evaluation
-    # ============================================================
 
     def process_batch(self, records: List[Dict[str, Any]]):
 
         results = []
 
-        for row in tqdm(records, desc="QA Naturalness Eval"):
+        # hy修复：更正进度条文案
+        for row in tqdm(records, desc="Triple Rationale Eval"):
 
-            qa_pairs = row.get("triple", [])
+            # hy修复：将错写的 qa_pairs 统一更正为 triples
+            triples = row.get("triple", [])
 
-            if isinstance(qa_pairs, str):
+            if isinstance(triples, str):
                 try:
-                    qa_pairs = json.loads(qa_pairs)
+                    triples = json.loads(triples)
                 except:
-                    qa_pairs = []
+                    triples = []
 
-            if not qa_pairs:
+            if not triples:
                 results.append({
                     "rationale_scores": []
                 })
@@ -82,7 +76,7 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
             try:
 
                 system_prompt = self.prompt_manager.build_system_prompt()
-                user_prompt = self.prompt_manager.build_prompt(qa_pairs)
+                user_prompt = self.prompt_manager.build_prompt(triples)
 
                 response = self.llm_serving.generate_from_input(
                     user_inputs=[user_prompt],
@@ -107,9 +101,6 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
 
         return results
 
-    # ============================================================
-    # Run
-    # ============================================================
 
     def run(
         self,
@@ -140,8 +131,9 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
 
         out_file = storage.write(df)
 
+        # hy修复：更正日志输出文案
         self.logger.info(
-            f"Saved QA naturalness scores to {out_file}"
+            f"Saved triple rationale scores to {out_file}"
         )
 
         return [output_key]
