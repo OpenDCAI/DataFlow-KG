@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGTripleStrengthFilter
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -38,15 +26,14 @@ class CSKGTripleRationaleFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleStrengthFilter 根据三元组强度得分筛选三元组。",
-                "输入列需包含三元组及其强度得分，输出符合得分范围的三元组。",
-                "输入: triple, triple_strength_score\n输出: filtered_triple",
+                "CSKGTripleRationaleFilter 用于根据合理性得分（rationale scores）过滤常识知识图谱（CSKG）三元组。",
+                "输入需包含三元组列表及其对应的得分列（默认 rationale_scores），输出符合指定得分范围的三元组（filtered_triple）。"
             )
-        return (
-            "KGTripleStrengthFilter filters knowledge graph triples based on strength scores.",
-            "Input columns must contain triples and their strength scores.",
-            "Output column: filtered_triple",
-        )
+        else:
+            return (
+                "CSKGTripleRationaleFilter filters commonsense knowledge graph (CSKG) triples based on rationale scores.",
+                "Input: lists of triples and their corresponding scores. Output: filtered triples within the specified score range (filtered_triple)."
+            )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str, score_key: str):
         if input_key not in df.columns:
