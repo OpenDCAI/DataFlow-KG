@@ -57,11 +57,13 @@ class CSKGRelationTripleQAGeneration(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "CSKGTripleQAGeneration 用于基于实体属性信息生成问答对。"
+                "CSKGRelationTripleQAGeneration 用于基于常识知识图谱（CSKG）中的关系三元组生成问答对。"
+                "支持单关系（single）、多关系（multi）以及基于集合（set）的三种生成模式。"
             )
         else:
             return (
-                "KGAttributeTripleMultiEntityQAGeneration generates QA pairs based on attributes of entities."
+                "CSKGRelationTripleQAGeneration generates QA pairs based on relation triples "
+                "from Commonsense Knowledge Graphs. It supports single, multi-relation, and set-based generation."
             )
 
     def process_batch(
