@@ -6,13 +6,13 @@ from dataflow.core import OperatorABC
 from typing import List, Optional
 
 @OPERATOR_REGISTRY.register()
-class CSKGTripleRationaleFilter(OperatorABC):
+class CSKGTripleAdapbilityFilter(OperatorABC):
     """
     Filter knowledge graph triples based on strength scores.
 
     Input DataFrame should have:
       - column `triple` (List[str])
-      - column `triple_strength_score` (List[float] aligned with triples)
+      - column adapbility_scores (List[float] aligned with triples)
     
     Output:
       - column `filtered_triple` containing triples with score within [min_score, max_score]
@@ -26,12 +26,12 @@ class CSKGTripleRationaleFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "CSKGTripleRationaleFilter 用于根据合理性得分（rationale scores）过滤常识知识图谱（CSKG）三元组。",
-                "输入需包含三元组列表及其对应的得分列（默认 rationale_scores），输出符合指定得分范围的三元组（filtered_triple）。"
+                "CSKGTripleAdapbilityFilter 用于根据适应性得分（adapbility scores）过滤常识知识图谱（CSKG）三元组。",
+                "输入需包含三元组列表及其对应的得分列（默认 adapbility_scores），输出符合指定得分范围的三元组（filtered_triple）。"
             )
         else:
             return (
-                "CSKGTripleRationaleFilter filters commonsense knowledge graph (CSKG) triples based on rationale scores.",
+                "CSKGTripleAdapbilityFilter filters commonsense knowledge graph (CSKG) triples based on adaptability scores.",
                 "Input: lists of triples and their corresponding scores. Output: filtered triples within the specified score range (filtered_triple)."
             )
 
@@ -45,7 +45,9 @@ class CSKGTripleRationaleFilter(OperatorABC):
         self,
         storage: DataFlowStorage,
         input_key: str = "triple",
-        score_key: str = "rationale_scores",
+        #hy-修正这里的score_key为adaptability_scores
+        # score_key: str = "rationale_scores",
+        score_key: str="adaptability_scores",
         output_key: str = "filtered_triple",
         min_score: float = 0.95,
         max_score: float = 1.0,

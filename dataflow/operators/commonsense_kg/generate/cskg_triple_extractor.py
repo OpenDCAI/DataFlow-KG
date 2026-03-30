@@ -1,19 +1,5 @@
-"""
-====================================
-DataFlow-KG: KGTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.diverse_kg.cskg import CSKGRelationtripleExtractorPrompt
-from dataflow.prompts.diverse_KG.cskg import CSKGAttributetripleExtractorPrompt
+from dataflow.prompts.diverse_kg.cskg import CSKGAttributetripleExtractorPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -38,10 +24,10 @@ from typing import Union
 @OPERATOR_REGISTRY.register()
 class CSKGTripleExtraction(OperatorABC):
     r"""
-    A processor for extracting knowledge graph triples from text.
+    A processor for extracting commonsense knowledge graph (CSKG) triples from text.
 
-    This operator takes raw text and a predefined list of valid entities as input,
-    and uses an LLM-based prompt to extract entity–relation–entity triples.
+    This operator takes raw text chunks as input and uses an LLM-based prompt 
+    to extract structured triples (either relations or attributes, depending on the configuration).
     The extracted triples are written back to the dataframe for downstream
     knowledge graph construction or reasoning tasks.
     """
@@ -55,13 +41,13 @@ class CSKGTripleExtraction(OperatorABC):
         num_q: int = 5
     ):
         """
-        Initialize the KGTripleExtraction operator.
+        Initialize the CSKGTripleExtraction operator.
 
         Args:
             llm_serving: LLM serving backend used for prompt inference.
             seed: Random seed for reproducibility.
+            triple_type: The type of triples to extract ("relation" or "attribute").
             lang: Language setting for the prompt.
-            prompt_template: Optional custom prompt template.
             num_q: Reserved parameter for future extensions.
         """
         self.rng = random.Random(seed)
@@ -92,13 +78,13 @@ class CSKGTripleExtraction(OperatorABC):
         """
         if lang == "zh":
             return (
-                "KGTripleExtraction 是一个三元组抽取算子，用于从文本中抽取知识图谱三元组。",
-                "输入为原始文本及其对应的合法实体列表，输出为结构化的三元组结果。"
+                "CSKGTripleExtraction 是一个常识知识图谱三元组抽取算子，支持从文本中抽取属性（attribute）或关系（relation）三元组。",
+                "输入为原始文本，输出为结构化的三元组（triple）结果。"
             )
         else:
             return (
-                "KGTripleExtraction extracts triples from text.",
-                "Input: raw text and a list of valid entities. Output: extracted KG triples."
+                "CSKGTripleExtraction extracts commonsense knowledge graph triples (attributes or relations) from text.",
+                "Input: raw text. Output: extracted structured KG triples."
             )
 
     def process_batch(
@@ -162,8 +148,12 @@ class CSKGTripleExtraction(OperatorABC):
 
         outputs = self.process_batch(texts)
 
+#hy修改：原本的代码是去拿 self.output_key
+# （也就是我们传进来的 "extracted_triple"），但算子内部其实写死了叫 "triple"。
+#将o.get(self.output_key, []) for o in outputs 修改成 o.get("triple", []) for o in outputs
         dataframe[self.output_key] = [
-            o.get(self.output_key, []) for o in outputs
+            # o.get(self.output_key, []) for o in outputs
+            o.get("triple", []) for o in outputs  # <- 这里必须是写死的 "triple"，不能是 self.output_key!
         ]
 
         output_file = storage.write(dataframe)

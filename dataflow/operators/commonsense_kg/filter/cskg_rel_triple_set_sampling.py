@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 import random
 import re
@@ -62,10 +48,25 @@ class CSKGRelationTripleSetSampling(OperatorABC):
         # 预定义批量相似度计算的分块大小（平衡内存和速度）
         self.batch_size = 1000
 
-    # ------------------------------------------------------------------
-    # 基础工具方法（优化内存和速度）
-    # ------------------------------------------------------------------
 
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        """
+        Return a short description of the operator.
+        """
+        if lang == "zh":
+            return (
+                "CSKGRelationTripleSetSampling 是一个高效的三元组集合采样算子，"
+                "用于将大规模离散三元组按匹配规则（如相似主体、相似客体或相同关系）聚合成相关的三元组集合，并自动过滤单元素集合。",
+                "输入为离散的三元组（triple），输出为聚合后的相关三元组集合列表（set_triple）。"
+            )
+        else:
+            return (
+                "CSKGRelationTripleSetSampling is a high-efficiency operator that groups large-scale discrete triples into related sets "
+                "based on matching rules (e.g., similar subjects/objects or identical relations), automatically filtering out single-element sets.",
+                "Input: discrete triples. Output: aggregated related triple sets (set_triple)."
+            )
+        
     def _parse_triple(self, triple_str: str) -> tuple[str, str, str]:
         """轻量解析（减少内存占用）"""
         match = self.triple_pattern.match(triple_str.strip())
@@ -100,9 +101,7 @@ class CSKGRelationTripleSetSampling(OperatorABC):
         final_sims = (lev_sims * 0.7) + (fuzzy_sims * 0.3)
         return final_sims
 
-    # ------------------------------------------------------------------
-    # 核心优化：预构建索引（O(1) 查找）
-    # ------------------------------------------------------------------
+
 
     def _build_indexes(self, parsed_triples: List[Tuple[str, str, str, str]]) -> Dict[str, Any]:
         """
@@ -154,9 +153,6 @@ class CSKGRelationTripleSetSampling(OperatorABC):
                          f"unique subjs={len(indexes['subj2triples'])}")
         return indexes
 
-    # ------------------------------------------------------------------
-    # 并行处理：单分片的相关集合生成（新增单元素集合过滤）
-    # ------------------------------------------------------------------
 
     def _process_chunk(self, args: Tuple[List[str], Dict[str, Any], int, float]) -> List[List[str]]:
         """
@@ -225,9 +221,6 @@ class CSKGRelationTripleSetSampling(OperatorABC):
 
         return chunk_related_sets
 
-    # ------------------------------------------------------------------
-    # 核心：大规模三元组的全量相关集合生成
-    # ------------------------------------------------------------------
 
     def _generate_all_related_triple_sets(
         self,
@@ -307,9 +300,6 @@ class CSKGRelationTripleSetSampling(OperatorABC):
         self.logger.info(f"Final result | total unique sets (filtered): {len(all_related_sets)}")
         return all_related_sets
 
-    # ------------------------------------------------------------------
-    # 运行入口（兼容原有接口）
-    # ------------------------------------------------------------------
 
     def run(
         self,

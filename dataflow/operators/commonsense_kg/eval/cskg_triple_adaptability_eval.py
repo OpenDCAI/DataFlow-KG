@@ -6,23 +6,23 @@ from dataflow import get_logger
 from dataflow.core import OperatorABC, LLMServingABC
 from dataflow.utils.storage import DataFlowStorage
 from dataflow.utils.registry import OPERATOR_REGISTRY
-from dataflow.prompts.diverse_kg.cskg import CSKGTripleRationalePrompt
+from dataflow.prompts.diverse_kg.cskg import CSKGTripleAdaptabilityPrompt
 
 
 @OPERATOR_REGISTRY.register()
-class CSKGTripleRationaleEvaluator(OperatorABC):
+class CSKGTripleAdapbilityEvaluator(OperatorABC):
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "CSKGTripleRationaleEvaluator 用于评估常识知识图谱（CSKG）三元组的合理性得分（rationale scores）。",
-                "输入为三元组列表（默认字段 triple），输出为大模型评估的合理性得分列表（默认字段 rationale_scores）。"
+                "CSKGTripleAdapbilityEvaluator 用于评估常识知识图谱（CSKG）三元组的适应性得分（adaptability scores）。",
+                "输入为三元组列表（默认字段 triple），输出为大模型评估的适应性得分列表（默认字段 adaptability_scores）。"
             )
         else:
             return (
-                "CSKGTripleRationaleEvaluator evaluates the rationale scores of commonsense knowledge graph (CSKG) triples.",
-                "Input: lists of triples. Output: corresponding rationale scores evaluated by LLM."
+                "CSKGTripleAdapbilityEvaluator evaluates the adaptability scores of commonsense knowledge graph (CSKG) triples.",
+                "Input: lists of triples. Output: corresponding adaptability scores evaluated by LLM."
             )
 
     def __init__(
@@ -38,7 +38,7 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
             raise TypeError("llm_serving must be LLMServingABC")
 
         self.llm_serving = llm_serving
-        self.prompt_manager = CSKGTripleRationalePrompt(lang)
+        self.prompt_manager = CSKGTripleAdaptabilityPrompt(lang)
 
     def _safe_parse_json(self, response: str) -> Dict[str, Any]:
 
@@ -47,16 +47,16 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
         try:
             return json.loads(clean)
         except:
-            # hy修复：更正兜底的返回字段
-            return {"rationale_scores": []}
+            # 修复：改为 adaptability_scores
+            return {"adaptability_scores": []}
 
 
     def process_batch(self, records: List[Dict[str, Any]]):
 
         results = []
 
-        # hy修复：更正进度条文案
-        for row in tqdm(records, desc="Triple Rationale Eval"):
+        # hy修复：修改了进度条的描述
+        for row in tqdm(records, desc="Triple Adaptability Eval"):
 
             # hy修复：将错写的 qa_pairs 统一更正为 triples
             triples = row.get("triple", [])
@@ -69,7 +69,7 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
 
             if not triples:
                 results.append({
-                    "rationale_scores": []
+                    "adaptability_scores": []
                 })
                 continue
 
@@ -85,10 +85,10 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
 
                 data = self._safe_parse_json(response)
 
-                scores = data.get("rationale_scores", [])
+                scores = data.get("adaptability_scores", [])
 
                 results.append({
-                    "rationale_scores": scores
+                    "adaptability_scores": scores
                 })
 
             except Exception as e:
@@ -96,7 +96,7 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
                 self.logger.error(f"LLM Error: {e}")
 
                 results.append({
-                    "rationale_scores": []
+                    "adaptability_scores": []
                 })
 
         return results
@@ -106,7 +106,7 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
         self,
         storage: DataFlowStorage = None,
         input_key: str = "triple",
-        output_key: str = "rationale_scores"
+        output_key: str = "adaptability_scores"
     ):
 
         if storage is None:
@@ -131,9 +131,9 @@ class CSKGTripleRationaleEvaluator(OperatorABC):
 
         out_file = storage.write(df)
 
-        # hy修复：更正日志输出文案
+        # hy修复：更正了日志输出信息
         self.logger.info(
-            f"Saved triple rationale scores to {out_file}"
+            f"Saved triple adaptability scores to {out_file}"
         )
 
         return [output_key]
