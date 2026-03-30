@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: cKGTripleConceptGeneralization
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.diverse_kg.cskg import CSKGConceptGeneralizationPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -36,13 +22,28 @@ from typing import Union
 @OPERATOR_REGISTRY.register()
 class CSKGTripleConceptGeneralization(OperatorABC):
     r"""
-    A processor for extracting knowledge graph triples from text.
+    A processor for performing concept generalization on commonsense knowledge graph (CSKG) triples.
 
-    This operator takes raw text and a predefined list of valid entities as input,
-    and uses an LLM-based prompt to extract entity–relation–entity triples.
-    The extracted triples are written back to the dataframe for downstream
-    knowledge graph construction or reasoning tasks.
+    This operator takes existing structured triples as input and uses an LLM-based prompt 
+    to generalize the concepts within those triples. The generalized triples are written back 
+    to the dataframe for downstream knowledge expansion or reasoning tasks.
     """
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        """
+        Return a short description of the operator.
+        """
+        if lang == "zh":
+            return (
+                "CSKGTripleConceptGeneralization 用于对已有的常识知识图谱（CSKG）三元组进行概念泛化。",
+                "输入为已有三元组，输出为概念泛化后的新三元组（gen_triple）。"
+            )
+        else:
+            return (
+                "CSKGTripleConceptGeneralization performs concept generalization on existing CSKG triples.",
+                "Input: existing triples. Output: generalized triples (gen_triple)."
+            )
 
     def __init__(
         self,
@@ -52,13 +53,12 @@ class CSKGTripleConceptGeneralization(OperatorABC):
         num_q: int = 5
     ):
         """
-        Initialize the KGTripleExtraction operator.
+        Initialize the CSKGTripleConceptGeneralization operator.
 
         Args:
             llm_serving: LLM serving backend used for prompt inference.
             seed: Random seed for reproducibility.
             lang: Language setting for the prompt.
-            prompt_template: Optional custom prompt template.
             num_q: Reserved parameter for future extensions.
         """
         self.rng = random.Random(seed)
