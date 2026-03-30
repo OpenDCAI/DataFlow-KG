@@ -2,11 +2,6 @@
 ====================================
 DataFlow-KG: KGQuestionDifficultyEvaluation
 ====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
 """
 
 import json
@@ -67,15 +62,13 @@ class KGRAGQuestionDifficultyEvaluation(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGQuestionDifficultyEvaluation：评估问题难度。",
-                "输入列：question (str)",
-                "输出列：question_difficulty (easy | medium | hard)",
+                "KGRAGQuestionDifficultyEvaluation 用于评估 GraphRAG 问题难度。",
+                "输入: question; 输出: question_difficulty",
             )
         else:
             return (
-                "KGQuestionDifficultyEvaluation evaluates question difficulty.",
-                "Input column: question (str)",
-                "Output column: question_difficulty (easy | medium | hard)",
+                "KGRAGQuestionDifficultyEvaluation is used to evaluate difficulty levels of GraphRAG questions.",
+                "Input: question; Output: question_difficulty",
             )
 
     # --------------------------------------------------

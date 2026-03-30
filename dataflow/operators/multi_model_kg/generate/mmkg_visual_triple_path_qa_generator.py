@@ -32,6 +32,18 @@ class MMKGPathBaseQAGeneration(OperatorABC):
         self.hop = hop
         self.visual_prompt_manager = MMKGPathBasedQAGenerationPrompt(lang=lang)
 
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "MMKGPathBaseQAGeneration 用于根据路径和图片生成多模态问答对。",
+                "输入: vis_url + hop_paths + vis_triple; 输出: QA_pairs",
+            )
+        return (
+            "MMKGPathBaseQAGeneration is used to generate multimodal QA pairs from paths and images.",
+            "Input: vis_url + hop_paths + vis_triple; Output: QA_pairs",
+        )
+
     # 安全解析JSON
     def _safe_parse_json(self, response: str) -> Dict[str, Any]:
         if not response:

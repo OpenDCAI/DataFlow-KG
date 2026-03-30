@@ -34,6 +34,18 @@ class KGReasoningPathLengthFilter(OperatorABC):
         self.min_length = min_length
         self.max_length = max_length
 
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGReasoningPathLengthFilter 用于按长度筛选图谱多跳路径。",
+                "输入: mpath + mpath_length; 输出: filtered_mpath",
+            )
+        return (
+            "KGReasoningPathLengthFilter is used to filter multi-hop reasoning paths by length.",
+            "Input: mpath + mpath_length; Output: filtered_mpath",
+        )
+
     # ----------------------------
     # Validation
     # ----------------------------
