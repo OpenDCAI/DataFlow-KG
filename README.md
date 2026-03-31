@@ -32,11 +32,9 @@ DataFlow-KG currently supports the following categories:
 - **Temporal Knowledge Graph (`temporal_kg`)**  
   Operators for time-aware knowledge extraction, temporal relation modeling, and temporal reasoning.
 
-- **Geospatial Knowledge Graph (`geospatial_kg`)**  
-  Operators for geographic entity extraction, spatial relation modeling, and geospatial knowledge graph construction.
+- **Domain-Specific Knowledge Graph (`domain_kg`)**  
+  Operators for domain-specific knowledge graph construction and applications.
 
-- **Legal Knowledge Graph (`legal_kg`)**  
-  Operators for legal text understanding, legal entity/relation extraction, and legal knowledge graph applications.
 
 ---
 
