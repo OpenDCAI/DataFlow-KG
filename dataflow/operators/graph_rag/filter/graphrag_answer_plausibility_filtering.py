@@ -3,11 +3,6 @@
 ====================================
 DataFlow-KG: KGTripleStrengthFilter
 ====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
 """
 
 import pandas as pd
@@ -38,14 +33,12 @@ class KGRAGAnswerPlausibilityFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleStrengthFilter 根据三元组强度得分筛选三元组。",
-                "输入列需包含三元组及其强度得分，输出符合得分范围的三元组。",
-                "输入: triple, triple_strength_score\n输出: filtered_triple",
+                "KGRAGAnswerPlausibilityFilter 用于按合理性得分筛选 GraphRAG 答案。",
+                "输入: answer + question_plausibility_score; 输出: filtered_answer",
             )
         return (
-            "KGTripleStrengthFilter filters knowledge graph triples based on strength scores.",
-            "Input columns must contain triples and their strength scores.",
-            "Output column: filtered_triple",
+            "KGRAGAnswerPlausibilityFilter is used to filter GraphRAG answers by plausibility scores.",
+            "Input: answer + question_plausibility_score; Output: filtered_answer",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str, score_key: str):

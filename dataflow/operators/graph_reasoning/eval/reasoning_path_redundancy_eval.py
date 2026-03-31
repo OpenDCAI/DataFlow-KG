@@ -3,8 +3,6 @@
 ====================================
 DataFlow-KG: KG Multi-Hop Path Redundancy Evaluator
 ====================================
-Author: Zhengpin Li
-Refined: 2026-03-16
 
 License:
     MIT License
@@ -35,6 +33,18 @@ class KGPathRedundancyEvaluator(OperatorABC):
 
         self.llm_serving = llm_serving
         self.prompt_manager = KGReasoningPathRedundancyPrompt(lang)
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGPathRedundancyEvaluator 用于评估多跳推理路径的冗余度。",
+                "输入: mpath + target_entity; 输出: redundancy_scores",
+            )
+        return (
+            "KGPathRedundancyEvaluator is used to evaluate redundancy scores of multi-hop reasoning paths.",
+            "Input: mpath + target_entity; Output: redundancy_scores",
+        )
 
     # ============================================================
     # JSON Parse

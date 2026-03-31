@@ -32,6 +32,18 @@ class KGReasoningPathLengthEvaluator(OperatorABC):
         super().__init__()
         self.logger = get_logger()
 
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGReasoningPathLengthEvaluator 用于统计图谱多跳路径长度。",
+                "输入: mpath; 输出: mpath_length",
+            )
+        return (
+            "KGReasoningPathLengthEvaluator is used to compute lengths of multi-hop reasoning paths.",
+            "Input: mpath; Output: mpath_length",
+        )
+
     # ----------------------------
     # Validation
     # ----------------------------

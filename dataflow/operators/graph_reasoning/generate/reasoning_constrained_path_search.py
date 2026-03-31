@@ -51,6 +51,18 @@ class KGReasoningConstrainedPathSearch(OperatorABC):
             r"<subj>\s*(.+?)\s*<obj>\s*(.+?)\s*<rel>\s*(.+?)$"
         )
 
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGReasoningConstrainedPathSearch 用于按约束搜索知识图谱多跳路径。",
+                "输入: triplet + target_entity + constraints; 输出: cons_mpath",
+            )
+        return (
+            "KGReasoningConstrainedPathSearch is used to search constrained multi-hop paths in a knowledge graph.",
+            "Input: triplet + target_entity + constraints; Output: cons_mpath",
+        )
+
     # --------------------------------------------------
     # Target normalization
     # --------------------------------------------------

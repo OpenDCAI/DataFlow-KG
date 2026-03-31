@@ -5,10 +5,6 @@ MMKG Visual Triple Extraction
 Batch Version
 修改：vis_triple 输出使用 img_dict 的 key 作为 <obj>
 ====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Created: 2026-02-23
 License: MIT
 """
 
@@ -44,6 +40,18 @@ class MMKGVisualTripleExtraction(OperatorABC):
         self.lang = lang
 
         self.visual_prompt_manager = MMKGVisualTripleExtractionPrompt(lang=lang)
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "MMKGVisualTripleExtraction 用于根据图片和候选实体抽取视觉三元组。",
+                "输入: img_dict + entity; 输出: vis_triple",
+            )
+        return (
+            "MMKGVisualTripleExtraction is used to extract visual triples from images and candidate entities.",
+            "Input: img_dict + entity; Output: vis_triple",
+        )
 
     def _safe_parse_json(self, response: str) -> Dict[str, Any]:
         if not response:

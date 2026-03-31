@@ -34,6 +34,18 @@ class MMKGRelationTuplePathGenerator(OperatorABC):
         self.max_paths = max_paths_per_group
         self.logger = get_logger()
 
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "MMKGRelationTuplePathGenerator 用于从多模态三元组中采样 k-hop 路径并补充视觉信息。",
+                "输入: triple/tuple + vis_triple + img_dict; 输出: hop_paths + vis_triple + vis_url",
+            )
+        return (
+            "MMKGRelationTuplePathGenerator is used to sample k-hop paths from multimodal triples and attach visual information.",
+            "Input: triple/tuple + vis_triple + img_dict; Output: hop_paths + vis_triple + vis_url",
+        )
+
     # =========================
     # Triple parser
     # =========================

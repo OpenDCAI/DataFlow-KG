@@ -3,11 +3,6 @@
 DataFlow-KG: KGGraphRAGSubgraphRetrieval
 ====================================
 
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
 License:
     MIT License
 """
@@ -41,6 +36,18 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
     def __init__(self, hop: int = 1):
         self.hop = hop
         self.logger = get_logger()
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGGraphRAGSubgraphRetrieval 用于围绕问题实体检索子图并生成 GraphRAG 提示词。",
+                "输入: question + entities + triplet; 输出: subgraph_prompt",
+            )
+        return (
+            "KGGraphRAGSubgraphRetrieval is used to retrieve subgraphs around question entities and build GraphRAG prompts.",
+            "Input: question + entities + triplet; Output: subgraph_prompt",
+        )
 
     # --------------------------------------------------
     # Triplet parsing

@@ -3,11 +3,6 @@
 ====================================
 DataFlow-KG: KGPathRedundancyFilter
 ====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
 """
 
 import pandas as pd
@@ -38,14 +33,12 @@ class KGReasoningPathRedundancyFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGPathRedundancyFilter 根据路径冗余度筛选多跳路径。",
-                "输入列需包含路径及其冗余得分，输出符合得分范围的路径。",
-                "输入: mpath, redundancy_scores\n输出: filtered_mpath",
+                "KGReasoningPathRedundancyFilter 用于按冗余度得分筛选图谱多跳路径。",
+                "输入: mpath + redundancy_scores; 输出: filtered_mpath",
             )
         return (
-            "KGPathRedundancyFilter filters multi-hop KG paths based on redundancy scores.",
-            "Input columns must contain paths and their redundancy scores.",
-            "Output column: filtered_mpath",
+            "KGReasoningPathRedundancyFilter is used to filter multi-hop reasoning paths by redundancy scores.",
+            "Input: mpath + redundancy_scores; Output: filtered_mpath",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str, score_key: str):
