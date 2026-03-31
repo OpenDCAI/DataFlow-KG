@@ -11,7 +11,7 @@ DataFlow-KG organizes knowledge graph capabilities into different operator packa
 
 DataFlow-KG currently supports the following categories:
 
-- **Core Knowledge Graph (`core_kg`)**  
+- **General Knowledge Graph (`general_kg`)**  
   General-purpose operators for universal KG construction, transformation, filtering, enhancement, and evaluation.
 
 - **Commonsense Knowledge Graph (`commensense_kg`)**  
