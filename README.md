@@ -42,12 +42,16 @@ DataFlow-KG currently supports the following categories:
 
 ```text
 DataFlow-KG/
-├── core_kg/
+├── general_kg/
 ├── commensense_kg/
 ├── graph_reasoning/
 ├── graph_rag/
 ├── hyper_relation_kg/
 ├── multi_model_kg/
 ├── temporal_kg/
-├── geospatial_kg/
-└── legal_kg/
+├── domain_kg/
+    ├── legal_kg/
+    ├── scholar_kg/
+    ├── medical_kg/
+    ├── financial_kg/
+    └── geospatial_kg/
