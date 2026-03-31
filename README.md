@@ -2,11 +2,9 @@
 
 ## Overview
 
-DataFlow-KG is a llm-driven knowledge graph processing library, which is an extension version of the awesome repo DataFlow.  
-It aims to provide reusable, extensible, and modular operators for knowledge graph construction, reasoning, retrieval, querying, and domain-specific applications.
+DataFlow-KG is a llm-driven knowledge graph processing library, which is an extension version of the awesome repo DataFlow. It aims to provide reusable, extensible, and modular operators for knowledge graph construction, reasoning, retrieval, querying, and domain-specific applications.
 
-DataFlow-KG organizes knowledge graph capabilities into different operator packages by graph type and application scenario.  
-Each package contains specialized operators that can be composed into larger pipelines for data processing, graph construction, graph enrichment, reasoning, retrieval, evaluation, and downstream task support.
+DataFlow-KG organizes knowledge graph capabilities into different operator packages by graph type and application scenario. Each package contains specialized operators that can be composed into larger pipelines for data processing, graph construction, graph enrichment, reasoning, retrieval, evaluation, and downstream task support.
 
 
 ## Supported Knowledge Graph Categories
