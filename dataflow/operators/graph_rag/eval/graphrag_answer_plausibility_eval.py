@@ -1,9 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGQuestionPlausibilityEvaluation
-====================================
-"""
-
 import json
 import re
 import random

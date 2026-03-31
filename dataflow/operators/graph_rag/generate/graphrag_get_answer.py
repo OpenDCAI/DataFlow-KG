@@ -1,12 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGGraphRAGGetAnswer
-====================================
-
-License:
-    MIT License
-"""
-
 import re
 import pandas as pd
 from typing import List, Union

@@ -1,9 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAnswerTokenCount
-====================================
-"""
-
 import pandas as pd
 from typing import List, Union
 from tqdm import tqdm

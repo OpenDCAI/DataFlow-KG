@@ -1,9 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGMultiHopPathFinder
-====================================
-"""
-
 import re
 from collections import defaultdict, deque
 from typing import List, Tuple

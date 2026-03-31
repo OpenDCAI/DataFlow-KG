@@ -1,13 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-MMKG Visual Triple Extraction
-Batch Version
-修改：vis_triple 输出使用 img_dict 的 key 作为 <obj>
-====================================
-License: MIT
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm

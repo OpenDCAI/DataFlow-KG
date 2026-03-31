@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG:
-MMKG QA Generation from Subgraph
-使用 MMKGSubgraphBaseQAGenerationPrompt
-====================================
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm

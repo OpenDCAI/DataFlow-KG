@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KG Multi-Hop Path Redundancy Evaluator
-====================================
-
-License:
-    MIT License
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm

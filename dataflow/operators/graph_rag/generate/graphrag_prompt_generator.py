@@ -1,12 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGGraphRAGSubgraphRetrieval
-====================================
-
-License:
-    MIT License
-"""
-
 from collections import defaultdict, deque
 from typing import List
 import pandas as pd

@@ -1,12 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGQueryEntityRelationExtraction
-====================================
-
-License:
-    MIT License
-"""
-
 import json
 import re
 import random

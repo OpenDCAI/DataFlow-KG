@@ -1,11 +1,3 @@
-"""
-====================================
-DataFlow-KG: ImgDict Direct Wiki Linking
-====================================
-
-License: MIT
-"""
-
 from typing import List, Dict, Any
 from tqdm import tqdm
 import pandas as pd

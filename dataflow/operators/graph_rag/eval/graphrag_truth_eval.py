@@ -1,12 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAnswerLLMEvaluation
-====================================
-
-License:
-    MIT License
-"""
-
 import re
 import pandas as pd
 from typing import List

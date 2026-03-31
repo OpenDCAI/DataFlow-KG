@@ -1,9 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGReasoningRelationGeneration
-====================================
-"""
-
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
 from dataflow.utils.storage import DataFlowStorage

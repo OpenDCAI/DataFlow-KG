@@ -1,12 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 import random
 import re

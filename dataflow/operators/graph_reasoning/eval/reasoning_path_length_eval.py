@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGMultiHopPathLengthEvaluator
-====================================
-"""
-
 from typing import List
 from tqdm import tqdm
 import pandas as pd
