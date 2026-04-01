@@ -53,8 +53,25 @@ class HRKGRelationTripleSubgraphQAGeneration(OperatorABC):
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
-            return ("HRKGRelationTripleSubgraphQAGeneration 从超关系子图生成数值型或集合型问答对。",)
-        return ("HRKGRelationTripleSubgraphQAGeneration generates numeric or set-based QA pairs from hyper-relational subgraphs.",)
+            return (
+                "HRKGRelationTripleSubgraphQAGeneration 用于从超关系知识图谱子图中生成数值型或集合型问答对，可用于图谱问答数据构建、指令微调数据生成与下游评测。",
+                "输入: 数据表中需要包含子图字段，通常由 input_key 指定，默认是 subgraph。"
+                "每一行输入通常是一个列表或字符串，表示由多个超关系 tuple、边或局部图结构组成的子图内容。"
+                "算子会先将每一行的子图表示格式化为文本，再根据 qa_type 选择不同的 prompt 模板：当 qa_type='num' 时生成数值型问答对，"
+                "当 qa_type='set' 时生成集合型问答对，然后调用大语言模型生成 QA_pairs。"
+                "输出: QA_pairs。该字段通常是一个列表，列表中的每个元素表示一个问答对；"
+                "若输入为空、格式化后无有效文本，或模型输出无法解析为合法 JSON，则该行输出为空列表。",
+            )
+        return (
+            "HRKGRelationTripleSubgraphQAGeneration is used to generate numeric or set-based QA pairs from hyper-relational KG subgraphs for KGQA data construction, instruction tuning data generation, and downstream evaluation.",
+            "Input: the dataframe must contain a subgraph field specified by input_key, which defaults to subgraph. "
+            "Each row is usually a list or a string representing a subgraph composed of multiple hyper-relational tuples, edges, or local graph structures. "
+            "The operator first formats each row of subgraph content into text, and then selects different prompt templates according to qa_type: "
+            "when qa_type='num', it generates numeric QA pairs; when qa_type='set', it generates set-based QA pairs. "
+            "It then calls an LLM to generate QA_pairs. "
+            "Output: QA_pairs. This field is usually a list in which each element represents a question-answer pair; "
+            "if the input is empty, no valid text can be formed after formatting, or the LLM output cannot be parsed as valid JSON, an empty list is returned for that row.",
+        )
 
     def _format_input_text(self, item: Any) -> str:
         if isinstance(item, list):

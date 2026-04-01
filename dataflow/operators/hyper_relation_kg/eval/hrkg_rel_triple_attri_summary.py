@@ -1,20 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Wanpeng Tang
-Refined: Zhengpin Li, 2026-03-16
-
-License:
-    MIT License
-"""
-
 import json
 import re
 from typing import List, Dict, Any
 from collections import defaultdict
+
 from tqdm import tqdm
 import pandas as pd
 
@@ -24,54 +12,52 @@ from dataflow.utils.storage import DataFlowStorage
 
 
 class HRKGTupleAttributeFrequencyEvaluator(OperatorABC):
-    """
-    Evaluate the frequency of attributes in KG tuples.
-
-    Input:
-        - tuple: List[str] in format:
-          "<subj> X <obj> Y <rel> Z <Time> ... <Location> ... <Value> ..."
-
-    Output:
-        - attribute_counts: Dict[str, int]
-        - attribute_frequencies: Dict[str, float]
-    """
-
     def __init__(self):
         super().__init__()
         self.logger = get_logger()
-        # 匹配属性标签：<Time>, <Location>, <Value>, <Capacity> 等
         self.attr_pattern = re.compile(r"<([A-Za-z0-9_]+)>\s*[^<]+")
 
-    # ============================================================
-    # Parse attributes
-    # ============================================================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "HRKGTupleAttributeFrequencyEvaluator 用于统计知识图谱 tuple 字段中各类属性标签的出现次数与频率分布。",
+                "输入: 包含 tuple 字段的数据，tuple 可以是字符串形式的 JSON 列表，也可以是 Python 列表；列表中的每个元素通常是形如 "
+                "\"<subj> ... <obj> ... <rel> ... <Time> ... <Location> ... <Value> ...\" 的三元组/事件字符串。"
+                "算子会从每条 tuple 中抽取尖括号属性标签，如 Time、Location、Value、Capacity 等，并在整个数据集范围内做聚合统计。"
+                "输出: attribute_counts 和 attribute_frequencies。"
+                "其中 attribute_counts 是属性标签到出现次数的映射字典，如 {\"Time\": 120, \"Location\": 85}；"
+                "attribute_frequencies 是属性标签到相对频率的映射字典，频率按“出现该属性的次数 / tuple 总数”计算。",
+            )
+        return (
+            "HRKGTupleAttributeFrequencyEvaluator is used to compute the occurrence counts and frequency distribution of attribute labels in KG tuples.",
+            "Input: a dataset containing a tuple field, where tuple can be either a JSON-encoded string list or a Python list. "
+            "Each element in the list is typically a tuple/event string in a format such as "
+            "\"<subj> ... <obj> ... <rel> ... <Time> ... <Location> ... <Value> ...\". "
+            "The operator extracts attribute tags enclosed in angle brackets, such as Time, Location, Value, Capacity, etc., "
+            "and aggregates them over the whole dataset. "
+            "Output: attribute_counts and attribute_frequencies. "
+            "attribute_counts is a dictionary mapping each attribute label to its total count, e.g. {\"Time\": 120, \"Location\": 85}; "
+            "attribute_frequencies is a dictionary mapping each attribute label to its relative frequency, "
+            "computed as attribute occurrence count divided by the total number of tuples.",
+        )
+
     def _extract_attributes(self, tuple_str: str) -> List[str]:
-        """
-        Extract attribute labels from a tuple.
-        Example:
-        "<subj> Elon Musk <obj> Announcement <rel> MadeAt <Time> May 15, 2025 <Location> Berlin"
-        -> ["Time", "Location"]
-        """
         if not isinstance(tuple_str, str):
             return []
-
         return [m.group(1) for m in self.attr_pattern.finditer(tuple_str)]
 
-    # ============================================================
-    # Batch processing
-    # ============================================================
     def process_batch(self, dataframe_subset: List[Dict[str, Any]]) -> Dict[str, Any]:
         attr_counter = defaultdict(int)
         total_tuples = 0
 
         for row in tqdm(dataframe_subset, desc="Counting Attributes"):
-
             tuples = row.get("tuple", [])
 
             if isinstance(tuples, str):
                 try:
                     tuples = json.loads(tuples)
-                except:
+                except Exception:
                     tuples = []
 
             if not isinstance(tuples, list):
@@ -83,7 +69,6 @@ class HRKGTupleAttributeFrequencyEvaluator(OperatorABC):
                 for a in attrs:
                     attr_counter[a] += 1
 
-        # 计算频率
         attr_freq = {k: v / total_tuples for k, v in attr_counter.items()} if total_tuples > 0 else {}
 
         return {
@@ -91,9 +76,6 @@ class HRKGTupleAttributeFrequencyEvaluator(OperatorABC):
             self.output_key_meta: attr_freq
         }
 
-    # ============================================================
-    # Run
-    # ============================================================
     def run(
         self,
         storage: DataFlowStorage = None,
@@ -101,7 +83,6 @@ class HRKGTupleAttributeFrequencyEvaluator(OperatorABC):
         output_key: str = "attribute_counts",
         output_key_meta: str = "attribute_frequencies",
     ) -> List[str]:
-
         self.input_key, self.output_key, self.output_key_meta = input_key, output_key, output_key_meta
         if storage is None:
             raise ValueError("Storage is required.")
@@ -109,7 +90,6 @@ class HRKGTupleAttributeFrequencyEvaluator(OperatorABC):
         df = storage.read("dataframe")
         self.logger.info(f"Starting Attribute Frequency Eval on {len(df)} records.")
 
-        # 组织记录
         records = []
         for _, r in df.iterrows():
             records.append({
@@ -118,7 +98,6 @@ class HRKGTupleAttributeFrequencyEvaluator(OperatorABC):
 
         output = self.process_batch(records)
 
-        # 保存回 storage
         out_file = pd.DataFrame([{
             output_key: output[output_key],
             output_key_meta: output[output_key_meta]

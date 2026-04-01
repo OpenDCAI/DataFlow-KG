@@ -1,18 +1,7 @@
-"""
-====================================
-DataFlow-KG: KGTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
-from dataflow.prompts.diverse_kg.tkg import TKGRelationQuadrupleExtractorPrompt,TKGAttributeQuadrupleExtractorPrompt
+from dataflow.prompts.diverse_kg.tkg import (
+    TKGRelationQuadrupleExtractorPrompt,
+    TKGAttributeQuadrupleExtractorPrompt,
+)
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -53,16 +42,6 @@ class TKGTupleExtraction(OperatorABC):
         lang: str = "en",
         num_q: int = 5
     ):
-        """
-        Initialize the KGTripleExtraction operator.
-
-        Args:
-            llm_serving: LLM serving backend used for prompt inference.
-            seed: Random seed for reproducibility.
-            lang: Language setting for the prompt.
-            prompt_template: Optional custom prompt template.
-            num_q: Reserved parameter for future extensions.
-        """
         self.rng = random.Random(seed)
         self.llm_serving = llm_serving
         self.lang = lang
@@ -76,46 +55,38 @@ class TKGTupleExtraction(OperatorABC):
         elif triple_type == "relation":
             self.prompt_template = (
                 TKGRelationQuadrupleExtractorPrompt(lang=self.lang)
-            )         
+            )
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
-        """
-        Return a short description of the operator.
-
-        Args:
-            lang: Language of the description.
-
-        Returns:
-            A tuple containing a brief description and the expected input/output.
-        """
         if lang == "zh":
             return (
-                "KGTripleExtraction 是一个三元组抽取算子，用于从文本中抽取知识图谱三元组。",
-                "输入为原始文本及其对应的合法实体列表，输出为结构化的三元组结果。"
+                "TKGTupleExtraction 用于从原始文本中抽取时序知识图谱四元组或时序属性表达，并将非结构化文本转换为可用于时序图谱构建、分析与推理的结构化结果。",
+                "输入: 数据表中需要包含文本字段，通常由 input_key 指定，默认是 raw_chunk。"
+                "每一行输入应是一段待抽取的原始文本字符串。算子会先对文本做基础质量检查与预处理，例如过滤过短、过长或噪声较多的文本，"
+                "然后根据 triple_type 选择不同的提示模板：当 triple_type='relation' 时抽取关系型时序四元组，"
+                "当 triple_type='attribute' 时抽取属性型时序四元组，随后调用大语言模型生成结构化 tuple。"
+                "输出: tuple。输出字段通常由 output_key 指定，默认是 tuple，"
+                "其值一般为一个列表，列表中的每个元素表示一条抽取得到的时序四元组或属性型时序表达。"
+                "若输入文本为空、质量不达标，或模型输出无法解析为合法 JSON，则该行输出为空列表。",
             )
-        else:
-            return (
-                "KGTripleExtraction extracts triples from text.",
-                "Input: raw text and a list of valid entities. Output: extracted KG triples."
-            )
+        return (
+            "TKGTupleExtraction is used to extract temporal knowledge graph tuples or temporal attribute expressions from raw text and convert unstructured text into structured results for temporal KG construction, analysis, and reasoning.",
+            "Input: the dataframe must contain a text field specified by input_key, which defaults to raw_chunk. "
+            "Each row should contain a piece of raw text to be processed. The operator first performs basic preprocessing and text-quality checks, "
+            "such as filtering out text that is too short, too long, or too noisy, and then selects different prompt templates according to triple_type: "
+            "when triple_type='relation', it extracts relation-based temporal quadruples; when triple_type='attribute', it extracts attribute-based temporal quadruples. "
+            "It then calls an LLM to generate structured tuples. "
+            "Output: tuple. The output field is specified by output_key, which defaults to tuple. "
+            "Its value is usually a list, where each element represents an extracted temporal quadruple or attribute-based temporal expression. "
+            "If the input text is empty, fails the quality check, or the LLM response cannot be parsed correctly as valid JSON, an empty list is returned for that row.",
+        )
 
     def process_batch(
         self,
         texts: List[str],
         sources: Optional[List[str]] = None
     ) -> List[Dict[str, Any]]:
-        """
-        Process a batch of texts for triple extraction.
-
-        Args:
-            texts: List of input text chunks.
-            entity_lists: List of valid entity lists aligned with texts.
-            sources: Optional source identifiers.
-
-        Returns:
-            A list of extraction results.
-        """
         if sources is None:
             sources = ["default_source"] * len(texts)
         elif len(sources) != len(texts):
@@ -170,16 +141,9 @@ class TKGTupleExtraction(OperatorABC):
 
         return [output_key]
 
-    # ------------------------------------------------------------------
-    # Internal helper functions (formerly ExampleConstructor)
-    # ------------------------------------------------------------------
-
     def _construct_examples(
         self, raw_data: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
-        """
-        Construct extraction results from raw inputs.
-        """
         self.logger.info("Starting triple extraction...")
         results = []
 
@@ -224,9 +188,6 @@ class TKGTupleExtraction(OperatorABC):
             return []
 
     def _preprocess_text(self, text: str) -> str:
-        """
-        Clean and validate input text before extraction.
-        """
         if not isinstance(text, str):
             return ""
 
@@ -259,9 +220,6 @@ class TKGTupleExtraction(OperatorABC):
         return special_count / len(text) if text else 0.0
 
     def _check_text_quality(self, text: str) -> bool:
-        """
-        Basic text quality checks.
-        """
         if text.count("。") < 2 and text.count(".") < 2:
             return False
 
