@@ -1,31 +1,57 @@
 # DataFlow-KG
 
-## 1、算子文件开发进度表（总计115） ✅
-| 图谱类型 | 文件夹名 | 算子个数 | 是否有未提交的算子 | 是否有未合并的算子 |
-| --- | --- | --- | --- | --- |
-| 通用图谱 | core_kg | 40 | 否 | 否 |
-| 常识图谱 | commensense_kg | 8 | 否 | 否 |
-| 图推断 | graph_reasoning | 7 | 否 | 否 |
-| 图RAG | graph_rag | 9 | 否 | 否 |
-| 超关系图谱 | hyper_relation_kg | 11 | 否 | 否 |
-| 多模态图谱 | multi_model_kg | 7 | 否 | 否 |
-| 时序图谱 | temporal_kg | 9 | 否 | 否 |
-| 地理领域图谱 | geospatial_kg | 13 | 否 | 否 |
-| 法律领域图谱 | legal_kg | 9 | 否 | 否 |
+## Overview
 
-## 2、待开发的算子文件进度表 ❓
-| 图谱类型 | 文件名夹 | 是否已有对应文件夹 | 算子个数 | 负责同学 | 
-| --- | --- | --- | --- | --- |
-| 医学领域图谱 (考虑细分子领域) | 待定 | 否 |待定 | @wanpeng|
-| 金融领域图谱 | 待定 | 否 |待定 | @jinke|
-| 学者领域图谱 | scholar_kg | 否 | 待定 | @runhao |
-| sparql图谱 | sparql_kg | 是 |待定 | @xuemeng |
+DataFlow-KG is a llm-driven knowledge graph processing library, which is an extension version of the awesome repo DataFlow. It aims to provide reusable, extensible, and modular operators for knowledge graph construction, reasoning, retrieval, querying, and domain-specific applications.
 
-## 3、DataFlow-KG算子开发负责表 📅
-| 成员 | 已合并算子个数 |已合并算子文件 | 已填写开发文档个数 |
-| --- | --- | --- | --- |
-| @runhao | 9 | tkg | 9 |
-| @wanpeng | 13 | kg_rel_triple_consistency_eval.py, kg_rel_triple_topology_eval.py, kg_triple_hallucination_eval.py, mmkg, hrkg | 0|
-| @xuemeng | 待定 | 尽快合并 @zhengpin | 0 |
-| @jinke | 1 | geokg_entity_link2database.py | 0 |
-| @zhengpin | 剩余 | -  | - | 
+DataFlow-KG organizes knowledge graph capabilities into different operator packages by graph type and application scenario. Each package contains specialized operators that can be composed into larger pipelines for data processing, graph construction, graph enrichment, reasoning, retrieval, evaluation, and downstream task support.
+
+
+## Supported Knowledge Graph Categories
+
+DataFlow-KG currently supports the following categories:
+
+- **General Knowledge Graph (`general_kg`)**  
+  General-purpose operators for universal KG construction, transformation, filtering, enhancement, and evaluation.
+
+- **Commonsense Knowledge Graph (`commensense_kg`)**  
+  Operators for commonsense knowledge extraction, normalization, and reasoning.
+
+- **Graph Reasoning (`graph_reasoning`)**  
+  Operators for graph-based inference, reasoning path construction, and reasoning-oriented graph processing.
+
+- **Graph RAG (`graph_rag`)**  
+  Operators for retrieval-augmented generation over graph-structured knowledge.
+
+- **Hyper-relational Knowledge Graph (`hyper_relation_kg`)**  
+  Operators for representing and processing hyper-relational facts with qualifiers or statement-level attributes.
+
+- **Multimodal Knowledge Graph (`multi_model_kg`)**  
+  Operators for integrating text, images, and other modalities into unified graph representations.
+
+- **Temporal Knowledge Graph (`temporal_kg`)**  
+  Operators for time-aware knowledge extraction, temporal relation modeling, and temporal reasoning.
+
+- **Domain-Specific Knowledge Graph (`domain_kg`)**  
+  Operators for domain-specific knowledge graph construction and applications.
+
+
+---
+
+## Repository Structure
+
+```text
+DataFlow-KG/
+├── general_kg/
+├── commensense_kg/
+├── graph_reasoning/
+├── graph_rag/
+├── hyper_relation_kg/
+├── multi_model_kg/
+├── temporal_kg/
+├── domain_kg/
+    ├── legal_kg/
+    ├── scholar_kg/
+    ├── medical_kg/
+    ├── financial_kg/
+    └── geospatial_kg/

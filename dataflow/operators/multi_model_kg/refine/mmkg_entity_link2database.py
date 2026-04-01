@@ -1,15 +1,3 @@
-"""
-====================================
-DataFlow-KG: ImgDict Direct Wiki Linking
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Created: 2026-03-10
-
-License: MIT
-"""
-
 from typing import List, Dict, Any
 from tqdm import tqdm
 import pandas as pd
@@ -39,6 +27,18 @@ class MMKGImgDictLink2WikiSimple(OperatorABC):
             user_agent=user_agent,
             max_retries=max_retries,
             retry_delay=retry_delay
+        )
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "MMKGImgDictLink2WikiSimple 用于将 img_dict 中的图片映射到 Wikidata 链接。",
+                "输入: img_dict + img_entity_mapping; 输出: linked_result",
+            )
+        return (
+            "MMKGImgDictLink2WikiSimple is used to link images in img_dict to Wikidata entities.",
+            "Input: img_dict + img_entity_mapping; Output: linked_result",
         )
 
     def run(

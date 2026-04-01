@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Email: 2023090910014@std.uestc.edu.cn
-Created: 2026-02-23
-
-License:
-    MIT License
-"""
-
 import json
 import requests
 import pandas as pd
@@ -82,14 +68,12 @@ class MMKGEntityLink2ImgUrl(OperatorABC):
         """Get operator description in specified language."""
         if lang == "zh":
             return (
-                "多模态知识图谱文本实体增强算子。为文本实体添加Wikipedia链接和代表性图片。\n"
-                "输入格式: entities: <列表或逗号分隔的字符串>\n"
-                "输出格式: linked_result: <List[str]，格式为 '<entity> Name <link> url [<image> img_url]'>"
+                "MMKGEntityLink2ImgUrl 用于为多模态知识图谱实体补充百科链接和图片链接。",
+                "输入: entity; 输出: linked_result",
             )
         return (
-            "Multi-Modal Knowledge Graph Text Entity Enrichment Operator.\n"
-            "Input format: entities: <list or comma-separated string>\n"
-            "Output format: linked_result: <List[str], format '<entity> Name <link> url [<image> img_url]'>"
+            "MMKGEntityLink2ImgUrl is used to enrich multimodal KG entities with wiki links and image links.",
+            "Input: entity; Output: linked_result",
         )
 
     # ==================== Entity Parsing ====================

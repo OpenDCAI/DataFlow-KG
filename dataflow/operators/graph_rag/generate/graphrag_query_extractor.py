@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGQueryEntityRelationExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import json
 import re
 import random
@@ -71,15 +57,13 @@ class KGGraphRAGQueryExtraction(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGQueryEntityRelationExtraction：从用户问题中抽取实体与关系，用于 KG-RAG。",
-                "输入列：question (str)",
-                "输出列：entities (List[str]), relations (List[str])",
+                "KGGraphRAGQueryExtraction 用于从问题中抽取 GraphRAG 检索所需的实体和关系。",
+                "输入: question; 输出: entities + relations",
             )
         else:
             return (
-                "KGQueryEntityRelationExtraction extracts entities and relations from user queries.",
-                "Input column: question (str)",
-                "Output columns: entities (List[str]), relations (List[str])",
+                "KGGraphRAGQueryExtraction is used to extract entities and relations from questions for GraphRAG retrieval.",
+                "Input: question; Output: entities + relations",
             )
 
     # --------------------------------------------------

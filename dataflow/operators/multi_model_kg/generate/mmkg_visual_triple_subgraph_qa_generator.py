@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG:
-MMKG QA Generation from Subgraph
-使用 MMKGSubgraphBaseQAGenerationPrompt
-====================================
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm
@@ -30,6 +21,18 @@ class MMKGSubgraphBaseQAGeneration(OperatorABC):
         self.vlm_serving = llm_serving
         self.lang = lang
         self.visual_prompt_manager = MMKGSubgraphBaseQAGenerationPrompt(lang=lang)
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "MMKGSubgraphBaseQAGeneration 用于根据子图和图片生成多模态问答对。",
+                "输入: vis_url + subgraph + vis_triple; 输出: QA_pairs",
+            )
+        return (
+            "MMKGSubgraphBaseQAGeneration is used to generate multimodal QA pairs from subgraphs and images.",
+            "Input: vis_url + subgraph + vis_triple; Output: QA_pairs",
+        )
 
     # 安全解析JSON
     def _safe_parse_json(self, response: str) -> Dict[str, Any]:

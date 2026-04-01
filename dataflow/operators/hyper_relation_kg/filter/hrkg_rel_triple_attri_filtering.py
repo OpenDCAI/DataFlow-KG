@@ -1,59 +1,55 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGTripleAttributeFilter
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
-
-License:
-    MIT License
-"""
+import re
+from typing import List, Dict
 
 import pandas as pd
+
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
 from dataflow.utils.storage import DataFlowStorage
 from dataflow.core import OperatorABC, LLMServingABC
 
-import re
-from typing import List, Dict
-
 
 @OPERATOR_REGISTRY.register()
 class HRKGRelationTripleAttributeFilter(OperatorABC):
-    """
-    Filter triples by the presence of a specific attribute tag.
-    
-    Example attribute tags: "<Location>", "<Time>", "<Value>"
-    """
-
     def __init__(self, llm_serving: LLMServingABC = None, lang: str = "en"):
         self.lang = lang
         self.logger = get_logger()
 
-    # =========================
-    # Triple parser (保留原逻辑)
-    # =========================
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "HRKGRelationTripleAttributeFilter 用于按照指定属性标签筛选知识图谱三元组或事件字符串，保留包含目标属性标签的 tuple。",
+                "输入: 包含 tuple 字段的数据，输入字段通常是一个列表，其中每个元素是形如 "
+                "\"<subj> ... <obj> ... <rel> ... <Location> ... <Time> ...\" 的三元组或事件字符串；"
+                "同时需要提供 attr_tag 参数，用于指定目标属性标签，例如 <Location>、<Time>、<Value> 等。"
+                "算子会逐行检查 tuple 列表，筛选出所有包含该属性标签的字符串。"
+                "输出: filtered_tuple。该字段为筛选后的列表，只保留原输入中包含指定属性标签的 tuple；"
+                "若某行输入不是列表或没有任何 tuple 命中该属性标签，则输出空列表。",
+            )
+        return (
+            "HRKGRelationTripleAttributeFilter is used to filter KG triples or tuple-like event strings by a specified attribute tag, keeping only tuples that contain the target attribute.",
+            "Input: a dataset containing a tuple field, where the input field is usually a list and each element is a triple or event-like string in a format such as "
+            "\"<subj> ... <obj> ... <rel> ... <Location> ... <Time> ...\". "
+            "An additional attr_tag parameter is required to specify the target attribute tag, such as <Location>, <Time>, <Value>, etc. "
+            "The operator scans each row of the tuple list and retains only the strings that contain the specified attribute tag. "
+            "Output: filtered_tuple. This field is a filtered list that keeps only the tuples containing the target attribute tag from the original input; "
+            "if a row is not a list or no tuple matches the given attribute tag, an empty list is returned.",
+        )
+
     def _parse_triple(self, triple_str: str) -> Dict:
         triple_str = triple_str.strip()
 
-        # 找 <subj>
         subj_match = re.search(r"<subj>\s*(.+?)\s*(?=<obj>)", triple_str)
         if not subj_match:
             raise ValueError(f"No <subj> found in triple: {triple_str}")
         subj = subj_match.group(1).strip()
 
-        # 找 <obj>
         obj_match = re.search(r"<obj>\s*(.+?)\s*(?=<rel>)", triple_str)
         if not obj_match:
             raise ValueError(f"No <obj> found in triple: {triple_str}")
         obj = obj_match.group(1).strip()
 
-        # 找 <rel> 到字符串末尾
         rel_match = re.search(r"<rel>\s*(.+)$", triple_str)
         if not rel_match:
             raise ValueError(f"No <rel> found in triple: {triple_str}")
@@ -66,26 +62,14 @@ class HRKGRelationTripleAttributeFilter(OperatorABC):
             "raw": triple_str,
         }
 
-    # =========================
-    # 根据属性筛选 triples
-    # =========================
     def _filter_triples_by_attr(self, triples: List[str], attr_tag: str) -> List[str]:
-        """
-        Filter triples that contain a specific attribute tag.
-        """
         return [t for t in triples if attr_tag in t]
 
-    # =========================
-    # DataFrame 验证
-    # =========================
     def _validate_dataframe(self, dataframe: pd.DataFrame, input_key: str):
         if input_key not in dataframe.columns:
             raise ValueError(f"Input column '{input_key}' not found in dataframe")
         self.input_key = input_key
 
-    # =========================
-    # Run
-    # =========================
     def run(
         self,
         storage: DataFlowStorage,

@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 import pandas as pd
 import random
 import re
@@ -38,6 +24,18 @@ class MMKGEntityBasedSubgraphSampling(OperatorABC):
         self.lang = lang
         self.num_q = num_q
         self.logger = get_logger()
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "MMKGEntityBasedSubgraphSampling 用于围绕实体采样多模态子图并补充视觉信息。",
+                "输入: triple + vis_triple + img_dict; 输出: subgraph + vis_triple + vis_url",
+            )
+        return (
+            "MMKGEntityBasedSubgraphSampling is used to sample multimodal subgraphs around entities and attach visual information.",
+            "Input: triple + vis_triple + img_dict; Output: subgraph + vis_triple + vis_url",
+        )
 
     # ------------------------------------------------
     # triple parser

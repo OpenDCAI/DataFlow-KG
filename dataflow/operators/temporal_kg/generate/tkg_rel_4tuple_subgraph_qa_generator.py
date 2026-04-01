@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGRelationTripleSubgraphQAGeneration
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.diverse_kg.tkg import (
     TKGTupleTimePointQAGenerationPrompt,
     TKGTupleEventOrderQAGenerationPrompt,
@@ -32,19 +18,16 @@ import re
 
 from dataflow.core.prompt import prompt_restrict, DIYPromptABC
 
+
 @prompt_restrict(
     TKGTupleTimePointQAGenerationPrompt,
     TKGTupleEventOrderQAGenerationPrompt,
     TKGTupleTimeOrderQAGenerationPrompt,
     TKGTupleTimeIntervalQAGenerationPrompt
-    )
+)
 @OPERATOR_REGISTRY.register()
 class TKGTupleSubgraphQAGeneration(OperatorABC):
-    r"""Processor for generating numeric or set-based QA pairs from KG triples.
-
-    This processor takes multiple triples from a knowledge graph and generates
-    QA pairs, either numeric ('num') or set-based ('set'), using an LLM.
-    """
+    r"""Processor for generating temporal QA pairs from KG subgraphs."""
 
     def __init__(
         self,
@@ -54,15 +37,6 @@ class TKGTupleSubgraphQAGeneration(OperatorABC):
         qa_type: str = "time_point",
         num_q: int = 5
     ):
-        """Initialize the processor.
-
-        Args:
-            llm_serving: LLM interface for generating QA pairs.
-            seed: Random seed.
-            lang: Language setting.
-            qa_type: Type of QA ('num' or 'set').
-            num_q: Number of QA pairs to generate.
-        """
         self.rng = random.Random(seed)
         self.llm_serving = llm_serving
         self.lang = lang
@@ -82,37 +56,29 @@ class TKGTupleSubgraphQAGeneration(OperatorABC):
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
-        """Return a description of the processor.
-
-        Args:
-            lang: Language for description ('en' or 'zh').
-
-        Returns:
-            tuple: description strings and example input/output
-        """
         if lang == "zh":
             return (
-                "KGRelationTripleSubgraphQAGeneration 从知识图谱三元组生成多实体问答对。",
-                "处理流程：输入三元组 → 通过 LLM 构建数值或集合型 QA → 输出结构化问答",
-                "输入：List[str]，每个元素为三元组字符串\n输出：List[Dict]，每个元素包含原始三元组和生成的 QA 对"
+                "TKGTupleSubgraphQAGeneration 用于从时序知识图谱子图中生成时间相关问答对，可用于时序问答数据构建、指令微调和下游评测。",
+                "输入: 数据表中需要包含一个用于生成问答的字段，通常由 input_key 指定，默认是 subgraph。"
+                "每一行输入通常是一个字符串、tuple 列表或子图表示，内容可包含时序知识图谱中的实体、关系、事件顺序、时间顺序或时间区间信息。"
+                "算子会根据 qa_type 选择不同的 prompt 模板：当 qa_type='time_point' 时生成时间点问答，"
+                "当 qa_type='event_order' 时生成事件顺序问答，当 qa_type='time_order' 时生成时间先后问答，"
+                "当 qa_type='time_interval' 时生成时间区间问答。随后调用大语言模型生成 QA_pairs。"
+                "输出: QA_pairs。该字段通常是一个列表，列表中的每个元素表示一个问答对；"
+                "若模型输出无法解析为合法 JSON，或未能正确抽取 QA_pairs，则该行输出为空列表。",
             )
-        else:
-            return (
-                "KGRelationTripleSubgraphQAGeneration generates multi-entity QA pairs from KG triples.",
-                "Processing steps: input triples → generate numeric or set-based QA via LLM → return structured QA pairs",
-                "Input format: List[str], each element is a triple string\nOutput format: List[Dict], each element contains 'source_text' and 'QA_pairs'"
-            )
+        return (
+            "TKGTupleSubgraphQAGeneration is used to generate time-related QA pairs from temporal knowledge graph subgraphs for temporal QA data construction, instruction tuning, and downstream evaluation.",
+            "Input: the dataframe must contain a field used for QA generation, specified by input_key, which defaults to subgraph. "
+            "Each row is usually a string, a tuple list, or a subgraph representation that may contain entities, relations, event ordering information, temporal ordering information, or time interval information in a temporal KG. "
+            "The operator selects different prompt templates according to qa_type: when qa_type='time_point', it generates time-point QA pairs; "
+            "when qa_type='event_order', it generates event-order QA pairs; when qa_type='time_order', it generates temporal-order QA pairs; "
+            "when qa_type='time_interval', it generates time-interval QA pairs. It then calls an LLM to generate QA_pairs. "
+            "Output: QA_pairs. This field is usually a list in which each element represents a question-answer pair; "
+            "if the LLM output cannot be parsed as valid JSON or QA_pairs cannot be extracted correctly, an empty list is returned for that row.",
+        )
 
     def process_batch(self, texts: List[str], sources: Optional[List[str]] = None) -> List[Dict[str, Any]]:
-        """Process a batch of triples into QA pairs.
-
-        Args:
-            texts: List of triple strings.
-            sources: Optional list of source identifiers.
-
-        Returns:
-            List of dicts containing 'source_text' and 'QA_pairs'.
-        """
         if sources is None:
             sources = ["default_source"] * len(texts)
         elif len(sources) != len(texts):
@@ -124,17 +90,14 @@ class TKGTupleSubgraphQAGeneration(OperatorABC):
         self.logger.info("Starting KG triple QA generation...")
 
         for data in tqdm(raw_data, desc="Generating QA pairs"):
-            # Prepare prompt
             user_inputs = [self.prompt_template.build_prompt(data["text"])]
             sys_prompt = self.prompt_template.build_system_prompt()
 
-            # Generate QA from LLM
             responses = self.llm_serving.generate_from_input(user_inputs=user_inputs, system_prompt=sys_prompt)
 
-            # Parse QA pairs from response
             try:
                 cleaned_responses = json.loads(re.search(r"\{.*\}", responses[0], re.DOTALL).group())["QA_pairs"]
-            except Exception as e:
+            except Exception:
                 self.logger.warning(f"Failed to parse LLM response: {responses[0]}")
                 cleaned_responses = []
 
@@ -146,7 +109,6 @@ class TKGTupleSubgraphQAGeneration(OperatorABC):
         return results
 
     def _validate_dataframe(self, dataframe: pd.DataFrame):
-        """Ensure required input column exists and output column does not conflict."""
         required_keys = [self.input_key]
         forbidden_keys = [self.output_key]
 
@@ -164,16 +126,6 @@ class TKGTupleSubgraphQAGeneration(OperatorABC):
         input_key: str = "subgraph",
         output_key: str = "QA_pairs"
     ):
-        """Run the processor on a dataframe stored in DataFlowStorage.
-
-        Args:
-            storage: DataFlowStorage object with the dataframe.
-            input_key: Column name for input triples.
-            output_key: Column name to store generated QA pairs.
-
-        Returns:
-            List containing the output_key.
-        """
         self.input_key, self.output_key = input_key, output_key
         dataframe = storage.read("dataframe")
         self._validate_dataframe(dataframe)

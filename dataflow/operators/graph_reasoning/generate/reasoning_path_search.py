@@ -1,9 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGMultiHopPathFinder
-====================================
-"""
-
 import re
 from collections import defaultdict, deque
 from typing import List, Tuple
@@ -35,6 +29,18 @@ class KGReasoningPathSearch(OperatorABC):
         self.logger = get_logger()
         self.rel_pattern = re.compile(
             r"<subj>\s*(.+?)\s*<obj>\s*(.+?)\s*<rel>\s*(.+?)$"
+        )
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGReasoningPathSearch 用于搜索目标实体对之间的多跳路径。",
+                "输入: triplet + target_entity; 输出: mpath",
+            )
+        return (
+            "KGReasoningPathSearch is used to search multi-hop paths between target entity pairs.",
+            "Input: triplet + target_entity; Output: mpath",
         )
 
     # ----------------------------

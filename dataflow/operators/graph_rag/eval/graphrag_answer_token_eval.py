@@ -1,14 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAnswerTokenCount
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
-"""
-
 import pandas as pd
 from typing import List, Union
 from tqdm import tqdm
@@ -46,15 +35,13 @@ class KGRAGAnswerTokenCount(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGAnswerTokenCount：统计答案的 token 数量。",
-                "输入列：answer (str 或 List[str])",
-                "输出列：answer_token_count (int 或 List[int])",
+                "KGRAGAnswerTokenCount 用于统计 GraphRAG 答案的 token 数量。",
+                "输入: answer; 输出: answer_token_count",
             )
         else:
             return (
-                "KGAnswerTokenCount counts token numbers for answers.",
-                "Input column: answer (str or List[str])",
-                "Output column: answer_token_count (int or List[int])",
+                "KGRAGAnswerTokenCount is used to count tokens in GraphRAG answers.",
+                "Input: answer; Output: answer_token_count",
             )
 
     # --------------------------------------------------

@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGGraphRAGGetAnswer
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-02-02
-
-License:
-    MIT License
-"""
-
 import re
 import pandas as pd
 from typing import List, Union
@@ -44,6 +30,18 @@ class KGGraphRAGGetAnswer(OperatorABC):
         self.llm_serving = llm_serving
         self.lang = lang
         self.logger = get_logger()
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGGraphRAGGetAnswer 用于基于 GraphRAG 子图提示生成答案。",
+                "输入: question + subgraph_prompt; 输出: answer",
+            )
+        return (
+            "KGGraphRAGGetAnswer is used to generate answers from GraphRAG subgraph prompts.",
+            "Input: question + subgraph_prompt; Output: answer",
+        )
 
     # --------------------------------------------------
     # 验证 DataFrame

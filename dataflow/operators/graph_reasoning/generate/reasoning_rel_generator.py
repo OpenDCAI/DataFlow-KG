@@ -1,9 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGReasoningRelationGeneration
-====================================
-"""
-
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
 from dataflow.utils.storage import DataFlowStorage
@@ -44,6 +38,18 @@ class KGReasoningRelationGeneration(OperatorABC):
         self.logger = get_logger()
         self.rel_pattern = re.compile(r"<subj>\s*(.+?)\s*<obj>\s*(.+?)\s*<rel>\s*(.+)$")
         self.prompt = KGReasoningRelationInferencePrompt(lang=self.lang)
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGReasoningRelationGeneration 用于基于多跳路径推断实体关系。",
+                "输入: target_entity + mpath; 输出: inferred_triplets",
+            )
+        return (
+            "KGReasoningRelationGeneration is used to infer entity relations from multi-hop paths.",
+            "Input: target_entity + mpath; Output: inferred_triplets",
+        )
 
     # ----------------------------
     # DataFrame validation

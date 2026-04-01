@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGAnswerLLMEvaluation
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-02-02
-
-License:
-    MIT License
-"""
-
 import re
 import pandas as pd
 from typing import List
@@ -44,6 +30,18 @@ class KGGraphRAGAnswerLLMEvaluation(OperatorABC):
         self.llm_serving = llm_serving
         self.lang = lang
         self.logger = get_logger()
+
+    @staticmethod
+    def get_desc(lang: str = "en") -> tuple:
+        if lang == "zh":
+            return (
+                "KGGraphRAGAnswerLLMEvaluation 用于评估 GraphRAG 答案与标准答案是否一致。",
+                "输入: answer + truth; 输出: is_correct",
+            )
+        return (
+            "KGGraphRAGAnswerLLMEvaluation is used to evaluate whether GraphRAG answers match ground-truth answers.",
+            "Input: answer + truth; Output: is_correct",
+        )
 
     # --------------------------------------------------
     # 验证 DataFrame

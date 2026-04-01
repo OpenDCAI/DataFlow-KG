@@ -1,35 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: KGTripleStrengthFilter
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-"""
-
 import pandas as pd
+from typing import List, Optional
+
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
 from dataflow.utils.storage import DataFlowStorage
 from dataflow.core import OperatorABC
-from typing import List, Optional
+
 
 @OPERATOR_REGISTRY.register()
 class HRKGTripleCompletenessFilter(OperatorABC):
-    """
-    Filter knowledge graph triples based on strength scores.
-
-    Input DataFrame should have:
-      - column `triple` (List[str])
-      - column `triple_strength_score` (List[float] aligned with triples)
-    
-    Output:
-      - column `filtered_triple` containing triples with score within [min_score, max_score]
-    """
-
     def __init__(self, merge_to_input: bool = False):
         self.logger = get_logger()
         self.merge_to_input = merge_to_input
@@ -38,14 +17,26 @@ class HRKGTripleCompletenessFilter(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGTripleStrengthFilter 根据三元组强度得分筛选三元组。",
-                "输入列需包含三元组及其强度得分，输出符合得分范围的三元组。",
-                "输入: triple, triple_strength_score\n输出: filtered_triple",
+                "HRKGTripleCompletenessFilter 用于根据三元组对应的评分列表筛选知识图谱三元组，保留分数落在指定区间内的 tuple。",
+                "输入: 数据表中需包含一个三元组列表字段和一个与之位置对齐的分数列表字段。"
+                "其中 input_key 对应三元组列表，通常为 tuple 字段，每个元素是一条三元组或事件字符串；"
+                "score_key 对应评分列表，通常为 consistency_scores 或其他逐条评分结果，其长度应与三元组列表一致。"
+                "算子会按位置一一对齐三元组和分数，仅保留分数满足 min_score <= score <= max_score 的三元组。"
+                "输出: filtered_tuple 或覆盖原输入列。"
+                "当 merge_to_input=False 时，输出写入 output_key 指定的新字段，通常为 filtered_tuple；"
+                "当 merge_to_input=True 时，直接用筛选结果覆盖原 input_key 字段。"
+                "若某行中的三元组列或评分列不是列表，则该行输出为空列表。",
             )
         return (
-            "KGTripleStrengthFilter filters knowledge graph triples based on strength scores.",
-            "Input columns must contain triples and their strength scores.",
-            "Output column: filtered_triple",
+            "HRKGTripleCompletenessFilter is used to filter KG triples based on an aligned list of scores, keeping only tuples whose scores fall within a specified range.",
+            "Input: the dataframe must contain one column storing a list of triples and another column storing an aligned list of scores. "
+            "The input_key usually corresponds to a tuple field, where each element is a triple string or an event-like tuple expression; "
+            "the score_key corresponds to a score list, typically consistency_scores or another per-tuple evaluation result, and its length is expected to be aligned with the triple list. "
+            "The operator matches triples and scores by position and keeps only the triples satisfying min_score <= score <= max_score. "
+            "Output: filtered_tuple or overwrite the original input column. "
+            "When merge_to_input=False, the filtered result is written to a new column specified by output_key, usually filtered_tuple; "
+            "when merge_to_input=True, the filtered result overwrites the original input_key column. "
+            "If either the triple column or the score column in a row is not a list, an empty list is returned for that row.",
         )
 
     def _validate_dataframe(self, df: pd.DataFrame, input_key: str, score_key: str):
@@ -63,16 +54,6 @@ class HRKGTripleCompletenessFilter(OperatorABC):
         min_score: float = 0.95,
         max_score: float = 1.0,
     ):
-        """
-        Filter triples based on strength score.
-
-        Args:
-            input_key: column name for triple list
-            score_key: column name for triple strength score list
-            output_key: column name for filtered triples
-            min_score: minimum allowed score
-            max_score: maximum allowed score
-        """
         df = storage.read("dataframe")
         self._validate_dataframe(df, input_key, score_key)
         self.logger.info(f"Filtering triples with score in [{min_score}, {max_score}]")

@@ -1,14 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGQuestionPlausibilityEvaluation
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-16
-"""
-
 import json
 import re
 import random
@@ -68,15 +57,13 @@ class KGRAGQuestionPlausibilityEvaluation(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "KGQuestionPlausibilityEvaluation：根据问题与回答评估问题的合理性。",
-                "输入列：question (str), answer (str)",
-                "输出列：question_plausibility_score (float)",
+                "KGRAGQuestionPlausibilityEvaluation 用于评估 GraphRAG 问答对的合理性得分。",
+                "输入: question + answer; 输出: question_plausibility_score",
             )
         else:
             return (
-                "KGQuestionPlausibilityEvaluation evaluates the plausibility of questions.",
-                "Input columns: question (str), answer (str)",
-                "Output column: question_plausibility_score (float)",
+                "KGRAGQuestionPlausibilityEvaluation is used to evaluate plausibility scores for GraphRAG question-answer pairs.",
+                "Input: question + answer; Output: question_plausibility_score",
             )
 
     # --------------------------------------------------

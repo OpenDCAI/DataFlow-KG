@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.diverse_kg.hrkg import HRKGHyperRelationExtractorPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
@@ -51,16 +37,6 @@ class HRKGTripleExtraction(OperatorABC):
         lang: str = "en",
         num_q: int = 5
     ):
-        """
-        Initialize the KGTripleExtraction operator.
-
-        Args:
-            llm_serving: LLM serving backend used for prompt inference.
-            seed: Random seed for reproducibility.
-            lang: Language setting for the prompt.
-            prompt_template: Optional custom prompt template.
-            num_q: Reserved parameter for future extensions.
-        """
         self.rng = random.Random(seed)
         self.llm_serving = llm_serving
         self.lang = lang
@@ -68,47 +44,36 @@ class HRKGTripleExtraction(OperatorABC):
         self.logger = get_logger()
 
         self.prompt_template = (
-                HRKGHyperRelationExtractorPrompt(lang=self.lang)
-            )         
+            HRKGHyperRelationExtractorPrompt(lang=self.lang)
+        )
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
-        """
-        Return a short description of the operator.
-
-        Args:
-            lang: Language of the description.
-
-        Returns:
-            A tuple containing a brief description and the expected input/output.
-        """
         if lang == "zh":
             return (
-                "KGTripleExtraction 是一个三元组抽取算子，用于从文本中抽取知识图谱三元组。",
-                "输入为原始文本及其对应的合法实体列表，输出为结构化的三元组结果。"
+                "HRKGTripleExtraction 用于从原始文本中抽取超关系知识图谱三元组或事件型 tuple，并将非结构化文本转换为可用于图谱构建与推理的结构化结果。",
+                "输入: 数据表中需要包含文本字段，通常由 input_key 指定，默认是 raw_chunk。"
+                "每一行输入应是一段待抽取的原始文本字符串，算子会先对文本做基础质量检查与预处理，例如去除过短、过长或噪声较多的文本，"
+                "随后调用大语言模型与预定义提示模板，从文本中抽取知识图谱 tuple。"
+                "输出: tuple。输出字段通常由 output_key 指定，默认是 tuple，"
+                "其值一般为一个列表，列表中的每个元素表示一条抽取得到的三元组或超关系事件结果。"
+                "若输入文本为空、质量不达标，或模型输出无法正确解析为 JSON，则该行输出为空列表。",
             )
-        else:
-            return (
-                "KGTripleExtraction extracts triples from text.",
-                "Input: raw text and a list of valid entities. Output: extracted KG triples."
-            )
+        return (
+            "HRKGTripleExtraction is used to extract hyper-relational KG triples or event-like tuples from raw text and convert unstructured text into structured results for knowledge graph construction and reasoning.",
+            "Input: the dataframe must contain a text field specified by input_key, which defaults to raw_chunk. "
+            "Each row should contain a piece of raw text to be processed. The operator first performs basic preprocessing and text-quality checks, "
+            "such as filtering out text that is too short, too long, or too noisy, and then calls an LLM with a predefined prompt template to extract KG tuples from the text. "
+            "Output: tuple. The output field is specified by output_key, which defaults to tuple. "
+            "Its value is usually a list, where each element represents an extracted triple or hyper-relational event-like tuple. "
+            "If the input text is empty, fails the quality check, or the LLM response cannot be parsed correctly as JSON, an empty list is returned for that row.",
+        )
 
     def process_batch(
         self,
         texts: List[str],
         sources: Optional[List[str]] = None
     ) -> List[Dict[str, Any]]:
-        """
-        Process a batch of texts for triple extraction.
-
-        Args:
-            texts: List of input text chunks.
-            entity_lists: List of valid entity lists aligned with texts.
-            sources: Optional source identifiers.
-
-        Returns:
-            A list of extraction results.
-        """
         if sources is None:
             sources = ["default_source"] * len(texts)
         elif len(sources) != len(texts):
@@ -163,16 +128,9 @@ class HRKGTripleExtraction(OperatorABC):
 
         return [output_key]
 
-    # ------------------------------------------------------------------
-    # Internal helper functions (formerly ExampleConstructor)
-    # ------------------------------------------------------------------
-
     def _construct_examples(
         self, raw_data: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
-        """
-        Construct extraction results from raw inputs.
-        """
         self.logger.info("Starting triple extraction...")
         results = []
 
@@ -182,7 +140,7 @@ class HRKGTripleExtraction(OperatorABC):
                 results.append(
                     {
                         "source_text": "",
-                        "hyper_triplet": [],
+                        "tuple": [],
                     }
                 )
                 continue
@@ -217,9 +175,6 @@ class HRKGTripleExtraction(OperatorABC):
             return []
 
     def _preprocess_text(self, text: str) -> str:
-        """
-        Clean and validate input text before extraction.
-        """
         if not isinstance(text, str):
             return ""
 
@@ -252,9 +207,6 @@ class HRKGTripleExtraction(OperatorABC):
         return special_count / len(text) if text else 0.0
 
     def _check_text_quality(self, text: str) -> bool:
-        """
-        Basic text quality checks.
-        """
         if text.count("。") < 2 and text.count(".") < 2:
             return False
 
