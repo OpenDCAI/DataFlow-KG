@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "open-dataflow"
+name = "dataflow-kg"
 authors = [
     {name = "Hao Liang", email = "hao.liang@stu.pku.edu.cn"},
     {name = "Xiaochen Ma", email = "xiaochen.ma.cs@gmail.com"},
@@ -37,7 +37,7 @@ Documentation = "https://open-dataflow.github.io/DataFlow-Doc/"
 "Bug Reports" = "https://github.com/Open-DataFlow/DataFlow/issues"
 
 [project.scripts]
-dataflow = "dataflow.cli:main"
+dfkg = "dataflow.cli:main"
 
 [tool.setuptools]
 include-package-data = true
@@ -59,7 +59,7 @@ mineru = ["mineru[all]", "numpy>=1.24,<2.0.0", "sglang[all]>=0.4.8", "pypdf", "r
 myscale = ["clickhouse-driver"]
 sglang =["sglang[all]"]
 litellm = ["litellm>=1.70.0,<2.0.0"]
-audio = ['librosa', 'soundfile']
+audio = ['librosa']
 vectorsql = ["sqlite-vec", "sqlite-lembed", "sentence_transformers"]
 # 当前pdf2model环境不支持muxi
 pdf2model =[
