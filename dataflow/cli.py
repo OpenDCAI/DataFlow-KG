@@ -37,7 +37,7 @@ PYPI_API_URL = "https://pypi.org/pypi/open-dataflow/json"
 def version_and_check_for_updates() -> None:
     width = os.get_terminal_size().columns
     print(Fore.BLUE + "=" * width + Style.RESET_ALL)
-    print(f"open-dataflow codebase version: {__version__}")
+    print(f"open-dataflow-kg codebase version: {__version__}")
 
     try:
         r = requests.get(PYPI_API_URL, timeout=5)
@@ -48,7 +48,7 @@ def version_and_check_for_updates() -> None:
         print(f"\tPyPI  version : {remote}")
         if remote != __version__:
             print(Fore.YELLOW + f"New version available: {remote}."
-                                "  Run 'pip install -U open-dataflow' to upgrade."
+                                "  Run 'pip install -U open-dataflow-kg' to upgrade."
                   + Style.RESET_ALL)
         else:
             print(Fore.GREEN + f"You are using the latest version: {__version__}" + Style.RESET_ALL)
@@ -403,8 +403,8 @@ def handle_eval_command(args):
 def build_arg_parser() -> argparse.ArgumentParser:
     """构建参数解析器"""
     parser = argparse.ArgumentParser(
-        prog="dataflow",
-        description=f"DataFlow Command-Line Interface  (v{__version__})",
+        prog="dfkg",
+        description=f"DataFlow-KG Command-Line Interface  (v{__version__})",
     )
     parser.add_argument("-v", "--version", action="store_true", help="Show version and exit")
 

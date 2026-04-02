@@ -6,7 +6,6 @@ torchvision
 torchaudio
 tqdm
 transformers<4.54.0
-math_verify
 word2number
 accelerate
 rapidfuzz
@@ -64,10 +63,8 @@ requests
 termcolor
 uvicorn
 sseclient-py
-
-# speech
 librosa
-soundfile
+
 
 # map visualize
 # matplotlib - removed as no longer needed
@@ -77,3 +74,6 @@ google-cloud-aiplatform>=1.55
 google-cloud-bigquery
 google-genai
 gcsfs
+
+networkx
+pyvis
