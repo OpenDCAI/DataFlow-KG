@@ -856,12 +856,9 @@ Return JSON ONLY.
 
 
 @PROMPT_REGISTRY.register()
-class FinKGRelationChainInferencePrompt(PromptABC):
+class FinKGInvestmentAnalysisPrompt(PromptABC):
     """
-    金融KG多跳关系链推理 Prompt。
-
-    输入：目标实体对 + 相关四元组（k-hop 邻域） + 本体关系列表
-    输出：推断的关系四元组 + 实体类别
+    基于金融知识图谱上下文生成投资分析结论。
     """
 
     def __init__(self, lang: str = "en"):
@@ -869,248 +866,509 @@ class FinKGRelationChainInferencePrompt(PromptABC):
         self.system_text = None
 
     def build_system_prompt(self, ontology: dict):
-
         relation_list = []
         for group in ontology.get("relation_type", {}).values():
             relation_list.extend(group)
         relation_str = ", ".join(relation_list)
 
         if self.lang == "en":
-
             self.system_text = textwrap.dedent(f"""
-You are an expert in Financial KG multi-hop relation reasoning.
+You are a financial knowledge graph investment analysis expert.
 
 You are given:
-1. A target entity pair
-2. Related relation quadruples (k-hop neighborhood)
-3. Financial ontology relation list
+1. A target investable entity
+2. Evidence tuples extracted from a Financial KG
+3. Optional recent external market news context
 
-Quadruple format:
-<subj> Entity <obj> Entity <rel> Relation <time> TimeValue
-
-
-=== AVAILABLE RELATIONS ===
-
+Available Financial KG relations:
 {relation_str}
 
+Task:
+- Assess whether the target entity appears structurally attractive or risky from an investment-research perspective
+- Focus on ownership/control structure, financing dependencies, guarantee links,
+  regulatory pressure, counterparty exposure, and event-sensitive signals
+- Use the Financial KG for structural evidence and the recent market news for timely catalysts
+- Do NOT give direct buy/sell advice
+- Do NOT invent facts beyond the tuples and the provided news context
 
-=== TASK ===
+Output rules:
+- analysis_summary: one concise paragraph
+- bullish_signals: positive or stabilizing evidence-backed signals
+- bearish_signals: negative or adverse evidence-backed signals
+- watch_items: unresolved items worth monitoring
+- key_paths: supporting evidence paths built ONLY by copying exact tuple strings from the input evidence and joining them with " || "
+- confidence: one of high / medium / low
 
-Infer new relation quadruple(s) between the target entity pair.
-
-Rules:
-- Use only evidence-supported reasoning from provided tuples
-- Do NOT invent entities
-- Inferred relations MUST come from the ontology list above
-- If evidence is insufficient, output empty lists
-
-
-=== REASONING EXAMPLES (guidance, NOT fixed rules) ===
-
-The examples below use relations from the ontology to illustrate multi-hop patterns.
-
-Example A — Ownership penetration:
-A owns B
-B owns C
-=> A controls C
-
-Example B — Guarantee chain propagation:
-A guarantor_of B
-B guarantor_of C
-=> A guarantor_of C
-
-Example C — Related-party detection:
-A subsidiary_of X
-B subsidiary_of X
-=> A affects B
-
-Example D — Cross-relation impact:
-A lends_to B
-B defaults_on C
-=> A affects C
-
-
-=== TIME RULE ===
-
-Infer the most reasonable time from evidence.
-If uncertain, use NA.
-
-
-=== ENTITY CLASS RULES ===
-
-For each inferred tuple, output the entity classes.
-- Classes must be ontology leaf types
-- Order must match entity order in the tuple
-
-
-=== OUTPUT FORMAT ===
+Path constraints:
+- Every path item must be composed of one or more exact evidence tuples
+- NEVER paraphrase tuple content inside key_paths
+- NEVER reverse tuple direction
+- If no valid path can be formed, return an empty list for key_paths
 
 Return JSON ONLY:
-
 {{
-  "tuple": [
-    "<subj> Entity <obj> Entity <rel> Relation <time> TimeValue"
-  ],
-  "entity_class": [
-    ["HeadEntityClass", "TailEntityClass"]
-  ]
+  "analysis_summary": "string",
+  "bullish_signals": ["signal 1"],
+  "bearish_signals": ["signal 1"],
+  "watch_items": ["item 1"],
+  "key_paths": ["tuple1 || tuple2"],
+  "confidence": "medium"
 }}
-
-Do NOT output explanations.
 """)
-
         else:
-
             self.system_text = textwrap.dedent(f"""
-你是一名金融知识图谱多跳关系推理专家。
+你是一名金融知识图谱投资分析专家。
 
 你将获得：
-1. 目标实体对
-2. 相关关系四元组（k-hop 邻域）
-3. 金融本体关系列表
+1. 目标投资分析实体
+2. 来自金融知识图谱的证据四元组
+3. 可选的近期外部市场新闻上下文
 
-四元组格式：
-<subj> 实体 <obj> 实体 <rel> 关系 <time> 时间值
-
-
-=== 可用关系 ===
-
+可用金融关系如下：
 {relation_str}
 
+任务要求：
+- 从投资研究视角评估目标实体是否具备结构性吸引力或潜在风险
+- 重点关注股权/控制结构、融资依赖、担保链、监管压力、交易对手暴露、事件敏感信号
+- 以金融知识图谱提供结构性证据，以近期市场新闻提供时效性催化信息
+- 不要直接给出买入/卖出建议
+- 不得虚构超出四元组和新闻上下文范围的事实
 
-=== 任务 ===
+输出规则：
+- analysis_summary：一段简洁总结
+- bullish_signals：有利或稳定性信号
+- bearish_signals：不利或负面信号
+- watch_items：值得持续跟踪的问题
+- key_paths：支撑分析的关键路径，只能由输入证据中的原始四元组逐字复制并用 " || " 连接
+- confidence：high / medium / low 之一
 
-推断目标实体对之间的新关系四元组。
-
-规则：
-- 推断必须有输入四元组证据支持
-- 不得虚构实体
-- 推断的关系必须来自上方本体关系列表
-- 若证据不足，输出空列表
-
-
-=== 推理示例（仅作引导，不是固定规则） ===
-
-以下示例使用本体中的关系来展示多跳推理模式。
-
-示例A — 股权穿透：
-A owns B
-B owns C
-=> A controls C
-
-示例B — 担保链传导：
-A guarantor_of B
-B guarantor_of C
-=> A guarantor_of C
-
-示例C — 关联方识别：
-A subsidiary_of X
-B subsidiary_of X
-=> A affects B
-
-示例D — 跨关系影响传导：
-A lends_to B
-B defaults_on C
-=> A affects C
-
-
-=== 时间规则 ===
-
-尽量根据证据给出合理时间。
-无法判断时使用 NA。
-
-
-=== 实体类别规则 ===
-
-每个推断四元组必须输出实体类别。
-- 类别必须是本体最小类别（leaf type）
-- 顺序必须与四元组中的实体顺序一致
-
-
-=== 输出格式 ===
+路径约束：
+- 每个 path 必须由一个或多个输入证据四元组原文组成
+- 在 key_paths 中严禁改写或总结四元组内容
+- 严禁颠倒四元组方向
+- 如果无法形成合法路径，则 key_paths 返回空列表
 
 仅输出 JSON：
-
 {{
-  "tuple": [
-    "<subj> 实体 <obj> 实体 <rel> 关系 <time> 时间值"
-  ],
-  "entity_class": [
-    ["头实体类别", "尾实体类别"]
-  ]
+  "analysis_summary": "字符串",
+  "bullish_signals": ["信号1"],
+  "bearish_signals": ["信号1"],
+  "watch_items": ["事项1"],
+  "key_paths": ["四元组1 || 四元组2"],
+  "confidence": "medium"
 }}
-
-不要输出解释文本。
 """)
 
         return self.system_text
 
     def build_prompt(
         self,
-        entity1: str,
-        entity2: str,
-        tuples: list
+        target_entity: str,
+        tuple_text: str,
+        market_news_context: str = "",
     ):
-        tuple_text = "\n".join(tuples)
+        if self.lang == "en":
+            return textwrap.dedent(f"""
+Assess the target entity from an investment perspective using the Financial KG evidence.
+
+Target entity:
+{target_entity or "NA"}
+
+Evidence tuples:
+{tuple_text}
+
+Recent market news context:
+{market_news_context or "NA"}
+
+Return JSON ONLY.
+""")
+
+        return textwrap.dedent(f"""
+请基于金融知识图谱证据，从投资分析角度评估目标实体。
+
+目标实体：
+{target_entity or "NA"}
+
+证据四元组：
+{tuple_text}
+
+近期市场新闻上下文：
+{market_news_context or "NA"}
+
+仅输出 JSON。
+""")
+
+
+@PROMPT_REGISTRY.register()
+class FinKGEventQueryExtractionPrompt(PromptABC):
+    """
+    从金融事件文本中抽取事件摘要和锚定实体。
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = None
+
+    def build_system_prompt(self, ontology: dict):
+        entity_leaf_list = []
+        for group in ontology.get("entity_type", {}).values():
+            entity_leaf_list.extend(group)
+        entity_str = ", ".join(entity_leaf_list)
 
         if self.lang == "en":
+            self.system_text = textwrap.dedent(f"""
+You are an expert in understanding financial event text for knowledge-graph tracing.
 
-            return textwrap.dedent(f"""
-Infer relation quadruple(s) between the target entities using the related tuples.
+Read the event text and extract:
+1. target_event: a short normalized event summary
+2. anchor_entities: explicit entities mentioned in the text that are useful for tracing impact paths
 
-Target Entity 1:
-{entity1}
+Available entity leaf types:
+{entity_str}
 
-Target Entity 2:
-{entity2}
+Rules:
+- Extract only entities explicitly mentioned in the text
+- Prefer institutions, instruments, regulators, agreements, and named events
+- Do NOT invent entities not grounded in the text
+- Do NOT output generic type labels such as CorporateBond or RegulatoryAction
+- Do NOT output pure years or dates as entities unless they are part of a named event
+- target_event should be a short phrase, not a full sentence
+- anchor_entities should be a JSON array of strings
 
-Related quadruples:
-{tuple_text}
-
-Requirements:
-- Infer only relations between the target entity pair
-- Infer only if evidence is sufficient
-- Output JSON only
-
-Output JSON ONLY:
-
+Return JSON ONLY:
 {{
-  "tuple": [
-    "<subj> Entity <obj> Entity <rel> Relation <time> TimeValue"
-  ],
-  "entity_class": [
-    ["HeadEntityClass", "TailEntityClass"]
-  ]
+  "target_event": "short event summary",
+  "anchor_entities": ["entity 1", "entity 2"]
 }}
 """)
-
         else:
+            self.system_text = textwrap.dedent(f"""
+你是一名金融事件文本理解专家。
 
-            return textwrap.dedent(f"""
-请基于相关四元组，推断目标实体对之间的新关系四元组。
+请阅读事件文本，并抽取：
+1. target_event：简短规范化事件摘要
+2. anchor_entities：文本中显式出现、适合用于图谱回溯的锚定实体
 
-目标实体1：
-{entity1}
+可用实体叶子类型：
+{entity_str}
 
-目标实体2：
-{entity2}
-
-相关四元组：
-{tuple_text}
-
-要求：
-- 只推断目标实体对之间的关系
-- 证据不足时不输出推断
-- 严格输出 JSON
+规则：
+- 只能抽取文本中明确出现的实体
+- 优先抽机构、金融工具、监管方、协议、命名事件
+- 不得虚构文本中不存在的实体
+- 不要输出 CorporateBond、RegulatoryAction 这类泛化类型标签
+- 不要把纯年份或日期当作实体，除非它是命名事件的一部分
+- target_event 应是简短短语，不要写完整句子
+- anchor_entities 必须是字符串数组
 
 仅输出 JSON：
-
 {{
-  "tuple": [
-    "<subj> 实体 <obj> 实体 <rel> 关系 <time> 时间值"
-  ],
-  "entity_class": [
-    ["头实体类别", "尾实体类别"]
-  ]
+  "target_event": "简短事件摘要",
+  "anchor_entities": ["实体1", "实体2"]
 }}
 """)
+
+        return self.system_text
+
+    def build_prompt(self, raw_event_text: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""
+Extract the target event and anchor entities from the following financial event text.
+
+Event text:
+{raw_event_text}
+
+Return JSON ONLY.
+""")
+
+        return textwrap.dedent(f"""
+请从以下金融事件文本中抽取目标事件和锚定实体。
+
+事件文本：
+{raw_event_text}
+
+仅输出 JSON。
+""")
+
+
+@PROMPT_REGISTRY.register()
+class FinKGEventImpactTracingPrompt(PromptABC):
+    """
+    基于金融知识图谱上下文追踪事件影响路径。
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = None
+
+    def build_system_prompt(self, ontology: dict):
+        relation_list = []
+        for group in ontology.get("relation_type", {}).values():
+            relation_list.extend(group)
+        relation_str = ", ".join(relation_list)
+
+        if self.lang == "en":
+            self.system_text = textwrap.dedent(f"""
+You are a financial knowledge graph event impact tracing expert.
+
+You are given:
+1. A target financial event or event query
+2. Optional anchor entities extracted from user input
+3. Optional original event text from the user
+4. Evidence tuples from a Financial KG
+
+Available Financial KG relations:
+{relation_str}
+
+Task:
+- Trace which entities are most likely impacted by the event
+- Emphasize propagation through ownership, guarantee, financing, default,
+  regulatory, and occurrence relations
+- Use ONLY the provided tuples as evidence
+- Do NOT invent entities or impact paths
+
+Output rules:
+- analysis_summary: concise event impact summary
+- impacted_entities: entities directly or indirectly affected
+- impact_types: short labels such as regulatory, credit, funding, governance, contagion
+- impact_paths: propagation paths built ONLY by copying exact tuple strings from the input evidence and joining them with " || "
+- confidence: one of high / medium / low
+
+Path constraints:
+- Every path item must be composed of one or more exact evidence tuples
+- NEVER paraphrase tuple content inside impact_paths
+- NEVER reverse tuple direction
+- If no valid path can be formed, return an empty list for impact_paths
+
+Return JSON ONLY:
+{{
+  "analysis_summary": "string",
+  "impacted_entities": ["entity 1"],
+  "impact_types": ["regulatory"],
+  "impact_paths": ["tuple1 || tuple2"],
+  "confidence": "medium"
+}}
+""")
+        else:
+            self.system_text = textwrap.dedent(f"""
+你是一名金融知识图谱事件影响追踪专家。
+
+你将获得：
+1. 目标金融事件或事件问题
+2. 可选的锚定实体
+3. 可选的原始事件文本
+4. 来自金融知识图谱的证据四元组
+
+可用金融关系如下：
+{relation_str}
+
+任务要求：
+- 追踪哪些实体最可能受到该事件影响
+- 重点关注股权、担保、融资、违约、监管、事件关系带来的影响传导
+- 只能依据提供的四元组进行判断
+- 不得虚构实体或影响路径
+
+输出规则：
+- analysis_summary：事件影响总结
+- impacted_entities：直接或间接受影响的实体
+- impact_types：简短标签，如 regulatory、credit、funding、governance、contagion
+- impact_paths：展示影响传导的路径字符串，只能由输入证据中的原始四元组逐字复制并用 " || " 连接
+- confidence：high / medium / low 之一
+
+路径约束：
+- 每个 path 必须由一个或多个输入证据四元组原文组成
+- 在 impact_paths 中严禁改写或总结四元组内容
+- 严禁颠倒四元组方向
+- 如果无法形成合法路径，则 impact_paths 返回空列表
+
+仅输出 JSON：
+{{
+  "analysis_summary": "字符串",
+  "impacted_entities": ["实体1"],
+  "impact_types": ["regulatory"],
+  "impact_paths": ["四元组1 || 四元组2"],
+  "confidence": "medium"
+}}
+""")
+
+        return self.system_text
+
+    def build_prompt(
+        self,
+        target_event: str,
+        target_entity: str,
+        tuple_text: str,
+        raw_event_text: str = "",
+    ):
+        if self.lang == "en":
+            return textwrap.dedent(f"""
+Trace the event impact using the Financial KG evidence.
+
+Target event:
+{target_event or "NA"}
+
+Anchor entity:
+{target_entity or "NA"}
+
+Original event text:
+{raw_event_text or "NA"}
+
+Evidence tuples:
+{tuple_text}
+
+Return JSON ONLY.
+""")
+
+        return textwrap.dedent(f"""
+请基于金融知识图谱证据，追踪该事件的影响路径。
+
+目标事件：
+{target_event or "NA"}
+
+锚定实体：
+{target_entity or "NA"}
+
+原始事件文本：
+{raw_event_text or "NA"}
+
+证据四元组：
+{tuple_text}
+
+仅输出 JSON。
+""")
+
+
+@PROMPT_REGISTRY.register()
+class FinKGEntityRiskAssessmentPrompt(PromptABC):
+    """
+    基于金融知识图谱上下文进行实体风险预估。
+    """
+
+    def __init__(self, lang: str = "en"):
+        self.lang = lang
+        self.system_text = None
+
+    def build_system_prompt(self, ontology: dict):
+        relation_list = []
+        for group in ontology.get("relation_type", {}).values():
+            relation_list.extend(group)
+        relation_str = ", ".join(relation_list)
+
+        if self.lang == "en":
+            self.system_text = textwrap.dedent(f"""
+You are a financial knowledge graph risk assessment expert.
+
+You are given:
+1. A target entity
+2. Evidence tuples from a Financial KG
+
+Available Financial KG relations:
+{relation_str}
+
+Task:
+- Estimate the target entity's overall risk profile
+- Consider guarantee chains, default links, financing/counterparty dependencies,
+  regulatory actions, ownership/control concentration, and contagion paths
+- Treat the analysis objective itself as an implicit built-in query:
+  infer how risk can propagate to, concentrate on, or structurally affect the target entity
+- Use ONLY the provided tuples as evidence
+- Do NOT invent risks unsupported by the tuples
+
+Output rules:
+- analysis_summary: concise risk assessment
+- risk_types: short labels such as credit_risk, regulatory_risk, contagion_risk
+- risk_entities: entities through which risk is transmitted, concentrated, or surfaced
+- risk_paths: key risk propagation paths built ONLY by copying exact tuple strings from the input evidence and joining them with " || "
+- risk_score: an integer from 0 to 100, where higher means higher estimated overall risk
+
+Path constraints:
+- Every path item must be composed of one or more exact evidence tuples
+- NEVER paraphrase tuple content inside risk_paths
+- NEVER reverse tuple direction
+- If no valid path can be formed, return an empty list for risk_paths
+
+Return JSON ONLY:
+{{
+  "analysis_summary": "string",
+  "risk_types": ["credit_risk"],
+  "risk_entities": ["entity 1"],
+  "risk_paths": ["tuple1 || tuple2"],
+  "risk_score": 72
+}}
+""")
+        else:
+            self.system_text = textwrap.dedent(f"""
+你是一名金融知识图谱风险预估专家。
+
+你将获得：
+1. 目标实体
+2. 来自金融知识图谱的证据四元组
+
+可用金融关系如下：
+{relation_str}
+
+任务要求：
+- 评估目标实体的整体风险画像
+- 重点考虑担保链、违约链、融资/交易对手依赖、监管动作、股权/控制集中度、风险传染路径
+- 将分析目标视为内置问题：
+  推断风险如何通过现有关系传导至目标实体、在目标实体上集中，或结构性影响目标实体
+- 只能依据提供的四元组进行分析
+- 不得虚构没有证据支持的风险
+
+输出规则：
+- analysis_summary：简洁风险预估总结
+- risk_types：简短标签，如 credit_risk、regulatory_risk、contagion_risk
+- risk_entities：体现风险传导、集中或显化的关键实体
+- risk_paths：展示关键风险传导路径，只能由输入证据中的原始四元组逐字复制并用 " || " 连接
+- risk_score：0 到 100 的整数，分数越高表示整体预估风险越高
+
+路径约束：
+- 每个 path 必须由一个或多个输入证据四元组原文组成
+- 在 risk_paths 中严禁改写或总结四元组内容
+- 严禁颠倒四元组方向
+- 如果无法形成合法路径，则 risk_paths 返回空列表
+
+仅输出 JSON：
+{{
+  "analysis_summary": "字符串",
+  "risk_types": ["credit_risk"],
+  "risk_entities": ["实体1"],
+  "risk_paths": ["四元组1 || 四元组2"],
+  "risk_score": 72
+}}
+""")
+
+        return self.system_text
+
+    def build_prompt(
+        self,
+        target_entity: str,
+        tuple_text: str,
+    ):
+        if self.lang == "en":
+            return textwrap.dedent(f"""
+Estimate the target entity's risk profile using the Financial KG evidence.
+
+Target entity:
+{target_entity or "NA"}
+
+Evidence tuples:
+{tuple_text}
+
+Return JSON ONLY.
+""")
+
+        return textwrap.dedent(f"""
+请基于金融知识图谱证据，对目标实体进行风险预估。
+
+目标实体：
+{target_entity or "NA"}
+
+证据四元组：
+{tuple_text}
+
+仅输出 JSON。
+""")
+
+
+FinKGEntityRiskExposureAnalysisPrompt = FinKGEntityRiskAssessmentPrompt
