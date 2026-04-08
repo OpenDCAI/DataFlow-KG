@@ -143,7 +143,7 @@ class TKGTuplePathQAGeneration(OperatorABC):
         texts = dataframe[self.input_key].tolist()
         outputs = self.process_batch(texts)
 
-        dataframe[self.output_key] = [o["QA_pairs"] for o in outputs]
+        dataframe[self.output_key] = [o[self.output_key_meta] for o in outputs]
         output_file = storage.write(dataframe)
         self.logger.info(f"Results saved to {output_file}")
 

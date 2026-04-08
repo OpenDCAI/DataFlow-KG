@@ -61,7 +61,7 @@ class TKGTupleDisambiguation(OperatorABC):
         if lang == "zh":
             return (
                 "TKGTupleDisambiguation 用于对合并后的时序知识图谱歧义 tuple 进行自动消岐，识别并解析属性型或关系型候选结果，输出最终解析后的无歧义 tuple。",
-                "输入: 数据表中需要包含一个合并结果字段，通常由 input_key 指定，默认是 merged_quads。"
+                "输入: 数据表中需要包含一个合并结果字段，通常由 input_key 指定，默认是 merged_tuples。"
                 "该字段中的每一行通常是一个字典，其中 input_key_meta 指定具体需要处理的歧义候选列表键，默认是 ambiguous。"
                 "列表中的每个元素一般是一条存在歧义的 tuple 字符串，可能是属性型表达（如含有 <attribute> 和 <value> 标签），"
                 "也可能是关系型表达（如含有 <rel> 标签）。"
@@ -73,7 +73,7 @@ class TKGTupleDisambiguation(OperatorABC):
         else:
             return (
                 "TKGTupleDisambiguation is used to automatically resolve ambiguous tuples in merged temporal knowledge graph results, identifying attribute-type or relation-type candidates and producing final disambiguated tuples.",
-                "Input: the dataframe must contain a merged-result field specified by input_key, which defaults to merged_quads. "
+                "Input: the dataframe must contain a merged-result field specified by input_key, which defaults to merged_tuples. "
                 "Each row in this field is usually a dictionary, where input_key_meta specifies the key of the ambiguous candidate list to process, defaulting to ambiguous. "
                 "Each element in that list is typically an ambiguous tuple string, which may be an attribute-style expression (e.g. containing <attribute> and <value> tags) "
                 "or a relation-style expression (e.g. containing a <rel> tag). "
@@ -132,7 +132,7 @@ class TKGTupleDisambiguation(OperatorABC):
     def run(
         self,
         storage: DataFlowStorage = None,
-        input_key: str = "merged_quads",
+        input_key: str = "merged_tuples",
         input_key_meta: str = "ambiguous",
         output_key: str = "resolved",
     ):
