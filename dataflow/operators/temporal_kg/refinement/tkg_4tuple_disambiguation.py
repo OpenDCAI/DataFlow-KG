@@ -17,6 +17,9 @@ from dataflow.prompts.diverse_kg.tkg import (
 from dataflow.prompts.core_kg.rel_triple_refinement import (
     KGEntityRelationTripleDisambiguationPrompt,
 )
+from dataflow.prompts.core_kg.attri_triple import (
+    KGAttributeTripleDisambiguationPrompt,
+)
 
 
 @prompt_restrict(

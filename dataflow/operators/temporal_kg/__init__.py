@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     # graphrag
     from .generate.tkg_4tuple_extractor import TKGTupleExtraction
-    from .generate.tkg_attri_4tuple_qa_generator import TKGAttriuteQAGeneration
+    from .generate.tkg_attri_4tuple_qa_generator import TKGAttributeQAGeneration
     from .generate.tkg_rel_4tuple_subgraph_qa_generator import TKGTupleSubgraphQAGeneration
     from .generate.tkg_rel_4tuple_path_qa_generator import TKGTuplePathQAGeneration
     from .generate.tkg_rel_4tuple_conversation_generator import TKGRelationTripletDialogueQAGeneration

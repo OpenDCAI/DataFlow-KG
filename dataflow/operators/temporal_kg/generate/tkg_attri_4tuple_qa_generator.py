@@ -26,7 +26,7 @@ from dataflow.core.prompt import prompt_restrict, DIYPromptABC
     TKGAttributeTimeIntervalQAGenerationPrompt
 )
 @OPERATOR_REGISTRY.register()
-class TKGAttriuteQAGeneration(OperatorABC):
+class TKGAttributeQAGeneration(OperatorABC):
     r"""Processor for generating temporal QA pairs from KG tuples."""
 
     def __init__(
@@ -58,7 +58,7 @@ class TKGAttriuteQAGeneration(OperatorABC):
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "TKGAttriuteQAGeneration 用于从时序知识图谱的属性型子图或相关 tuple 中生成时间相关问答对，可用于时序问答数据构建、指令微调数据生成与下游评测。",
+                "TKGAttributeQAGeneration 用于从时序知识图谱的属性型子图或相关 tuple 中生成时间相关问答对，可用于时序问答数据构建、指令微调数据生成与下游评测。",
                 "输入: 数据表中需要包含一个用于生成问答的数据字段，通常由 input_key 指定，默认是 subgraph。"
                 "每一行输入通常是一个字符串或子图表示，内容可包含属性型时序四元组、事件顺序信息、时间顺序信息或时间区间信息。"
                 "算子会根据 qa_type 选择不同的 prompt 模板：当 qa_type='time_point' 时生成时间点问答，"
@@ -68,7 +68,7 @@ class TKGAttriuteQAGeneration(OperatorABC):
                 "若模型输出无法解析为合法 JSON，或未能正确提取 QA_pairs，则该行输出为空列表。",
             )
         return (
-            "TKGAttriuteQAGeneration is used to generate time-related QA pairs from attribute-oriented temporal KG subgraphs or related tuples for temporal QA data construction, instruction tuning data generation, and downstream evaluation.",
+            "TKGAttributeQAGeneration is used to generate time-related QA pairs from attribute-oriented temporal KG subgraphs or related tuples for temporal QA data construction, instruction tuning data generation, and downstream evaluation.",
             "Input: the dataframe must contain a field used for QA generation, specified by input_key, which defaults to subgraph. "
             "Each row is usually a string or a subgraph representation that may contain attribute-based temporal quadruples, event ordering information, temporal ordering information, or time interval information. "
             "The operator selects different prompt templates according to qa_type: when qa_type='time_point', it generates time-point QA pairs; "

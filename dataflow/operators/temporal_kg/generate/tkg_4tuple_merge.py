@@ -154,7 +154,7 @@ class TKGTupleMerger(OperatorABC):
         input_key_kg1: str = "triples_kg1",
         input_key_kg2: str = "triples_kg2",
         input_key_alignment: str = "entity_alignment",
-        output_key: str = "merged_quads"
+        output_key: str = "merged_tuples"
     ):
         df = storage.read("dataframe")
         quads_kg1 = df[input_key_kg1].tolist()[0]
