@@ -637,13 +637,21 @@ class FileStorage(DataFlowStorage):
     
 from threading import Lock, RLock
 import math
-from dataflow.utils.db_pool.myscale_pool import ClickHouseConnectionPool
+try:
+    from dataflow.utils.db_pool.myscale_pool import ClickHouseConnectionPool
+except ModuleNotFoundError:
+    ClickHouseConnectionPool = None
 
 # 推荐在模块级别创建全局池
 myscale_pool = None
 
 def get_myscale_pool(db_config):
     global myscale_pool
+    if ClickHouseConnectionPool is None:
+        raise ImportError(
+            "MyScaleDBStorage requires `dataflow.utils.db_pool.myscale_pool`, "
+            "but it is not available in this environment."
+        )
     if myscale_pool is None:
         myscale_pool = ClickHouseConnectionPool(
             host=db_config['host'],

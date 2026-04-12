@@ -1,6 +1,7 @@
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
+import os
 
 from dataflow.utils.storage import DataFlowStorage
 from dataflow.core import OperatorABC
@@ -74,7 +75,7 @@ class KGRelationTripleVisualization(OperatorABC):
     def _visualize_kg_with_pyvis(
         self,
         triple_lists: List[List[str]],
-        output_html: str = "/data/zhengpinli/DataFlow/dataflow/operators/knowledge_graph/eval/kg_visualization.html",
+        output_html: str = "",
         notebook: bool = False,
     ):
         """
@@ -86,6 +87,12 @@ class KGRelationTripleVisualization(OperatorABC):
             self.logger.warning("Empty graph: no triples to visualize.")
             return None
 
+        if not output_html:
+            output_html = os.path.abspath("kg_visualization.html")
+        output_dir = os.path.dirname(output_html)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+
         edges = []
         entity_counter = Counter()
 
@@ -96,7 +103,7 @@ class KGRelationTripleVisualization(OperatorABC):
                 self.logger.warning(f"Failed to parse triple: {t}")
                 continue
 
-            relation, subj, obj = match.groups()
+            subj, obj, relation = match.groups()
             edges.append((subj, obj, relation))
             entity_counter[subj] += 1
             entity_counter[obj] += 1
@@ -159,6 +166,7 @@ class KGRelationTripleVisualization(OperatorABC):
         storage: DataFlowStorage,
         input_key: str = "triple",
         output_key: str = "kg_visualization",
+        output_html: str = "",
     ):
         """
         Execute knowledge graph visualization.
@@ -170,4 +178,7 @@ class KGRelationTripleVisualization(OperatorABC):
         self._validate_dataframe(dataframe)
 
         triple_lists = dataframe[self.input_key].tolist()
-        self._visualize_kg_with_pyvis(triple_lists)
+        self._visualize_kg_with_pyvis(triple_lists, output_html=output_html)
+        dataframe[self.output_key] = output_html if output_html else os.path.abspath("kg_visualization.html")
+        storage.write(dataframe)
+        return [output_key]

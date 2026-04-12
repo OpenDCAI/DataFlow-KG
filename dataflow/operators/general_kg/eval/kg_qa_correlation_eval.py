@@ -64,7 +64,7 @@ class KGQACorrelationEvaluator(OperatorABC):
 
         results = []
 
-        for row in tqdm(records, desc="QA Conciseness Eval"):
+        for row in tqdm(records, desc="QA Correlation Eval"):
 
             qa_pairs = row.get("QA_pairs", [])
 
@@ -142,7 +142,7 @@ class KGQACorrelationEvaluator(OperatorABC):
         out_file = storage.write(df)
 
         self.logger.info(
-            f"Saved QA conciseness scores to {out_file}"
+            f"Saved QA correlation scores to {out_file}"
         )
 
         return ["correlation_scores"]
