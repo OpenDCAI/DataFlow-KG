@@ -207,9 +207,9 @@ class KGEntityValidityPrompt(PromptABC):
                 OUTPUT FORMAT (STRICT)
                 ====================================================
 
-                You must return a pure JSON object and keep the original spelling/case of the input terms.
+                You must return a pure JSON array and keep the original spelling/case of the input terms.
                 Format example:
-                ["deep learning, Moore's law, search-based approach"]
+                ["deep learning", "Moore's law", "search-based approach"]
             """)
         else:
             return textwrap.dedent("""\
@@ -283,9 +283,9 @@ class KGEntityValidityPrompt(PromptABC):
                 ====================================================
                 输出格式（严格）
                 ====================================================
-                必须返回一个纯净JSON对象，保留输入词汇的原始拼写/大小写。
+                必须返回一个纯净JSON数组，保留输入词汇的原始拼写/大小写。
                 格式示例：
-                【"深度学习，摩尔定律，搜索式方法"】
+                ["深度学习", "摩尔定律", "搜索式方法"]
             """)
 
     def build_prompt(self, candidate_entities: str):

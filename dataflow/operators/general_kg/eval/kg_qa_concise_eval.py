@@ -76,7 +76,7 @@ class KGQAConcisenessEvaluator(OperatorABC):
 
             if not qa_pairs:
                 results.append({
-                    "conciseness_scores": []
+                    self.output_key: []
                 })
                 continue
 
@@ -95,7 +95,7 @@ class KGQAConcisenessEvaluator(OperatorABC):
                 scores = data.get("conciseness_scores", [])
 
                 results.append({
-                    "conciseness_scores": scores
+                    self.output_key: scores
                 })
 
             except Exception as e:
@@ -103,7 +103,7 @@ class KGQAConcisenessEvaluator(OperatorABC):
                 self.logger.error(f"LLM Error: {e}")
 
                 results.append({
-                    "conciseness_scores": []
+                    self.output_key: []
                 })
 
         return results
@@ -122,6 +122,7 @@ class KGQAConcisenessEvaluator(OperatorABC):
         if storage is None:
             raise ValueError("Storage required.")
 
+        self.output_key = output_key
         df = storage.read("dataframe")
 
         records = []
@@ -145,4 +146,4 @@ class KGQAConcisenessEvaluator(OperatorABC):
             f"Saved QA conciseness scores to {out_file}"
         )
 
-        return ["conciseness_scores"]
+        return [output_key]
