@@ -64,7 +64,7 @@ class KGQANaturalEvaluator(OperatorABC):
 
         results = []
 
-        for row in tqdm(records, desc="QA Conciseness Eval"):
+        for row in tqdm(records, desc="QA natural Eval"):
 
             qa_pairs = row.get("QA_pairs", [])
 
@@ -142,7 +142,7 @@ class KGQANaturalEvaluator(OperatorABC):
         out_file = storage.write(df)
 
         self.logger.info(
-            f"Saved QA conciseness scores to {out_file}"
+            f"Saved QA naturalness scores to {out_file}"
         )
 
         return ["naturalness_scores"]
