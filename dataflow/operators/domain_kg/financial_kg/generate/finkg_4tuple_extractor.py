@@ -12,11 +12,11 @@ from dataflow.prompts.diverse_kg.finkg import FinKGRelationExtractorPrompt
 from dataflow.prompts.diverse_kg.finkg import FinKGAttributeExtractorPrompt
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
+from dataflow.operators.domain_kg.utils.finkg_get_ontology import load_finkg_ontology
 
-from dataflow.utils.storage import DataFlowStorage, FileStorage
+from dataflow.utils.storage import DataFlowStorage
 from dataflow.core import OperatorABC
 from dataflow.core import LLMServingABC
-import random
 from typing import Any, Dict, List, Optional
 import json
 from tqdm import tqdm
@@ -48,10 +48,9 @@ class FinKGTupleExtraction(OperatorABC):
         lang: str = "en",
         num_q: int = 5
     ):
-        self.rng = random.Random(seed)
+        _ = seed, num_q
         self.llm_serving = llm_serving
         self.lang = lang
-        self.num_q = num_q
         self.logger = get_logger()
 
         if triple_type == "attribute":
@@ -82,23 +81,9 @@ class FinKGTupleExtraction(OperatorABC):
     def process_batch(
         self,
         texts: List[str],
-        ontology_lists,
-        sources: Optional[List[str]] = None
+        ontology: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
-        if sources is None:
-            sources = ["default_source"] * len(texts)
-        elif len(sources) != len(texts):
-            raise ValueError("Length of sources must match length of texts")
-
-        raw_data = [
-            {
-                "text": text,
-                "source": source
-            }
-            for text, source in zip(texts, sources)
-        ]
-
-        return self._construct_examples(raw_data, ontology_lists)
+        return self._construct_examples(texts, ontology)
 
     def run(
         self,
@@ -109,41 +94,22 @@ class FinKGTupleExtraction(OperatorABC):
         output_key: str = "tuple",
         output_key_meta: str = "entity_class"
     ):
-        self.input_key = input_key
-        self.input_key_meta = input_key_meta
-        self.output_key = output_key
-        self.output_key_meta = output_key_meta
-
         dataframe = storage.read("dataframe")
 
-        texts = dataframe[self.input_key].tolist()
+        texts = dataframe[input_key].tolist()
+        ontology = load_finkg_ontology(
+            ontology_lists=ontology_lists,
+            input_key_meta=input_key_meta,
+        )
 
-        if ontology_lists is None:
-            storage_meta = FileStorage(
-                first_entry_file_name="",
-                cache_type="json"
-            )
-            ontology_lists = storage_meta.read(
-                file_path=f"./.cache/api/{input_key_meta}.json",
-                output_type="dataframe"
-            )
-            row = ontology_lists.iloc[0]
-            ontology_dict = {
-                "entity_type": row["entity_type"],
-                "relation_type": row["relation_type"],
-                "attribute_type": row.get("attribute_type", {})
-            }
-        else:
-            ontology_dict = ontology_lists
+        outputs = self.process_batch(texts, ontology)
 
-        outputs = self.process_batch(texts, ontology_dict)
-
-        dataframe[self.output_key] = [
-            o.get(self.output_key, []) for o in outputs
+        dataframe[output_key] = [
+            o.get("tuple", []) for o in outputs
         ]
 
-        dataframe[self.output_key_meta] = [
-            o.get(self.output_key_meta, []) for o in outputs
+        dataframe[output_key_meta] = [
+            o.get("entity_class", []) for o in outputs
         ]
 
         output_file = storage.write(dataframe)
@@ -156,13 +122,13 @@ class FinKGTupleExtraction(OperatorABC):
     # ------------------------------------------------------------------
 
     def _construct_examples(
-        self, raw_data: List[Dict[str, Any]], ontology_lists
+        self, texts: List[str], ontology: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         self.logger.info("Starting quadruple extraction...")
         results = []
 
-        for data in tqdm(raw_data, desc="Extract quadruples"):
-            processed_text = self._preprocess_text(data.get("text", ""))
+        for text in tqdm(texts, desc="Extract quadruples"):
+            processed_text = self._preprocess_text(text)
             if not processed_text:
                 results.append(
                     {
@@ -176,7 +142,7 @@ class FinKGTupleExtraction(OperatorABC):
             user_inputs = [
                 self.prompt_template.build_prompt(processed_text)
             ]
-            system_prompt = self.prompt_template.build_system_prompt(ontology_lists)
+            system_prompt = self.prompt_template.build_system_prompt(ontology)
 
             responses = self.llm_serving.generate_from_input(
                 user_inputs=user_inputs,
