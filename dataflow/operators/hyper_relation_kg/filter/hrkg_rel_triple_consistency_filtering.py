@@ -49,7 +49,7 @@ class HRKGTripleConsistenceFilter(OperatorABC):
         self,
         storage: DataFlowStorage,
         input_key: str = "tuple",
-        score_key: str = "completeness_scores",
+        score_key: str = "consistency_scores",
         output_key: str = "filtered_tuple",
         min_score: float = 0.95,
         max_score: float = 1.0,
