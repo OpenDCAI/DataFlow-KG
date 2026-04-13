@@ -18,10 +18,12 @@ from tqdm import tqdm
 @OPERATOR_REGISTRY.register()
 class KGEntityValidity(OperatorABC):
     """
-    KGEntityValidity validates extracted entities for knowledge graph construction.
+    KGEntityValidity filters valid entities from candidate entity strings.
 
-    The operator uses a large language model to determine whether entities
-    are semantically valid and suitable for inclusion in a knowledge graph.
+    Each input row is expected to contain a candidate entity string, typically
+    a comma-separated list produced by upstream extraction. The operator uses
+    a large language model to keep only entities that are semantically valid
+    and suitable for inclusion in a knowledge graph.
     """
 
     def __init__(
@@ -51,15 +53,15 @@ class KGEntityValidity(OperatorABC):
         """
         if lang == "zh":
             return (
-                "KGEntityValidity 用于判断知识图谱候选实体的有效性。",
-                "该算子使用大语言模型评估实体在语义上是否合理、是否适合作为知识图谱节点。",
-                "输入为候选实体，输出为实体有效性判断结果。",
+                "KGEntityValidity 用于从候选实体字符串中筛选有效知识图谱实体。",
+                "该算子按行读取候选实体集合字符串，并使用大语言模型保留语义完整且适合作为知识图谱节点的实体。",
+                "输入为候选实体集合字符串，输出为筛选后的有效实体列表。",
             )
         else:
             return (
-                "KGEntityValidity validates candidate entities for knowledge graphs.",
-                "It uses a large language model to assess whether entities are semantically valid and meaningful.",
-                "Input consists of candidate entities, and output provides validity judgments.",
+                "KGEntityValidity filters valid entities from candidate entity strings.",
+                "It reads one candidate entity string per row and uses a large language model to keep entities that are semantically meaningful for a knowledge graph.",
+                "Input is a candidate entity string and output is the filtered list of valid entities.",
             )
 
     def process_batch(
@@ -68,7 +70,7 @@ class KGEntityValidity(OperatorABC):
         sources: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """
-        Validate entities in batch using the LLM.
+        Filter valid entities from candidate entity strings in batch.
         """
         if sources is None:
             sources = ["default_source"] * len(texts)
@@ -96,7 +98,6 @@ class KGEntityValidity(OperatorABC):
 
             results.append(
                 {
-                    "source_text": text,
                     self.output_key: parsed_output,
                 }
             )
@@ -121,7 +122,7 @@ class KGEntityValidity(OperatorABC):
         output_key: str = "valid",
     ):
         """
-        Run entity validity checking on a DataFlow dataframe.
+        Run entity filtering on a DataFlow dataframe.
         """
         self.input_key = input_key
         self.output_key = output_key
