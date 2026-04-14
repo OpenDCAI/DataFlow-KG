@@ -8,11 +8,39 @@ License:
     MIT License
 """
 
+from typing import Any, Dict, Optional
+
 import pandas as pd
-from dataflow.utils.registry import OPERATOR_REGISTRY
+
 from dataflow import get_logger
-from dataflow.utils.storage import DataFlowStorage
 from dataflow.core import OperatorABC
+from dataflow.utils.registry import OPERATOR_REGISTRY
+from dataflow.utils.storage import DataFlowStorage, FileStorage
+
+
+def load_finkg_ontology(
+    ontology_lists: Optional[Any] = None,
+    input_key_meta: str = "finkg_ontology",
+) -> Dict[str, Any]:
+    if ontology_lists is not None:
+        ontology = ontology_lists[0] if isinstance(ontology_lists, list) else ontology_lists
+        return {
+            "entity_type": ontology.get("entity_type", {}),
+            "relation_type": ontology.get("relation_type", {}),
+            "attribute_type": ontology.get("attribute_type", {}),
+        }
+
+    storage_meta = FileStorage(first_entry_file_name="", cache_type="json")
+    ontology_df = storage_meta.read(
+        file_path=f"./.cache/api/{input_key_meta}.json",
+        output_type="dataframe",
+    )
+    row = ontology_df.iloc[0]
+    return {
+        "entity_type": row["entity_type"],
+        "relation_type": row["relation_type"],
+        "attribute_type": row.get("attribute_type", {}),
+    }
 
 
 @OPERATOR_REGISTRY.register()

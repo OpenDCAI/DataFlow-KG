@@ -11,17 +11,18 @@ License:
 import re
 from typing import Any, Dict, List, Optional
 
-from dataflow.core import OperatorABC
-from dataflow.utils.registry import OPERATOR_REGISTRY
-from dataflow.utils.storage import DataFlowStorage, FileStorage
 from dataflow import get_logger
+from dataflow.core import OperatorABC
+from dataflow.operators.domain_kg.utils.finkg_get_ontology import load_finkg_ontology
+from dataflow.utils.registry import OPERATOR_REGISTRY
+from dataflow.utils.storage import DataFlowStorage
 
 
 @OPERATOR_REGISTRY.register()
 class FinKGTupleFilter(OperatorABC):
 
     def __init__(self, ontology_list: List[Dict[str, Any]] = None):
-        self.ontology_list = ontology_list
+        self.ontology = ontology_list[0] if isinstance(ontology_list, list) else ontology_list
         self.logger = get_logger()
 
     @staticmethod
@@ -46,23 +47,11 @@ class FinKGTupleFilter(OperatorABC):
         input_key_meta: str = "finkg_ontology",
         target_ontology: str = "Corporation"
     ):
-
         dataframe = storage.read("dataframe")
-
-        if ontology_lists is None:
-            storage_meta = FileStorage(first_entry_file_name="", cache_type="json")
-            ontology_df = storage_meta.read(
-                file_path=f"./.cache/api/{input_key_meta}.json",
-                output_type="dataframe"
-            )
-            row = ontology_df.iloc[0]
-            ontology_lists = [{
-                "entity_type": row["entity_type"],
-                "relation_type": row["relation_type"],
-                "attribute_type": row.get("attribute_type", {})
-            }]
-
-        self.ontology_list = ontology_lists
+        self.ontology = load_finkg_ontology(
+            ontology_lists=ontology_lists,
+            input_key_meta=input_key_meta,
+        )
 
         tuples_list = dataframe[input_key_tuple].tolist()
         class_list = dataframe[input_key_class].tolist()
@@ -87,20 +76,18 @@ class FinKGTupleFilter(OperatorABC):
 
     def _get_target_type(self, target: str) -> Dict[str, Any]:
 
-        if not self.ontology_list:
-            raise ValueError("ontology_list must not be empty")
+        if not self.ontology:
+            raise ValueError("ontology must not be empty")
 
-        ontology = self.ontology_list[0]
-
-        for _, attrs in ontology.get("attribute_type", {}).items():
+        for _, attrs in self.ontology.get("attribute_type", {}).items():
             if target in attrs:
                 return {"type": "attribute_type"}
 
-        for _, rels in ontology.get("relation_type", {}).items():
+        for _, rels in self.ontology.get("relation_type", {}).items():
             if target in rels:
                 return {"type": "relation_type"}
 
-        for _, ents in ontology.get("entity_type", {}).items():
+        for _, ents in self.ontology.get("entity_type", {}).items():
             if target in ents:
                 return {"type": "entity_type"}
 

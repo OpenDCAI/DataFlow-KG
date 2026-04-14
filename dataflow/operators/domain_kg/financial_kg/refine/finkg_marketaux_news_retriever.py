@@ -51,62 +51,48 @@ class FinKGMarketauxNewsRetriever(OperatorABC):
         if lang == "zh":
             return (
                 "FinKGMarketauxNewsRetriever 用于从 Marketaux 外部新闻库检索目标实体的最新金融新闻。",
-                "输入: target_entity，可选 symbol/country; 输出: marketaux_symbol + marketaux_news + marketaux_news_context + marketaux_avg_sentiment",
+                "输入: target_entity；输出: marketaux_news_context。",
             )
         return (
             "FinKGMarketauxNewsRetriever is used to fetch recent financial news for a target entity from Marketaux.",
-            "Input: target_entity with optional symbol/country; Output: marketaux_symbol + marketaux_news + marketaux_news_context + marketaux_avg_sentiment",
+            "Input: target_entity. Output: marketaux_news_context.",
         )
 
     def run(
         self,
         storage: DataFlowStorage = None,
-        input_target_key: str = "target_entity",
-        input_symbol_key: Optional[str] = "symbol",
-        input_country_key: Optional[str] = "country",
-        output_symbol_key: str = "marketaux_symbol",
-        output_name_key: str = "marketaux_entity_name",
-        output_news_key: str = "marketaux_news",
-        output_context_key: str = "marketaux_news_context",
-        output_sentiment_key: str = "marketaux_avg_sentiment",
-        output_count_key: str = "marketaux_news_count",
-        lookback_days: Optional[int] = None,
-        limit: Optional[int] = None,
-        language: Optional[str] = None,
+        input_key: str = "target_entity",
+        output_key: str = "marketaux_news_context",
     ) -> List[str]:
-        self.input_target_key = input_target_key
-        self.input_symbol_key = input_symbol_key
-        self.input_country_key = input_country_key
-        self.output_symbol_key = output_symbol_key
-        self.output_name_key = output_name_key
-        self.output_news_key = output_news_key
-        self.output_context_key = output_context_key
-        self.output_sentiment_key = output_sentiment_key
-        self.output_count_key = output_count_key
-        self.lookback_days = lookback_days or self.default_lookback_days
-        self.limit = limit or self.default_limit
-        self.language = language or self.default_language
+        self.input_key = input_key
+        self.output_key = output_key
 
         dataframe = storage.read("dataframe")
-        self._validate_dataframe(dataframe)
+        self._validate_dataframe(
+            dataframe=dataframe,
+            input_target_key=self.input_key,
+            output_key=self.output_key,
+        )
 
         if not self.api_token:
             raise ValueError(
                 "Missing Marketaux API token. Set MARKETAUX_API_TOKEN or pass api_token in __init__."
             )
 
-        symbols = dataframe[self.input_symbol_key].tolist() if self.input_symbol_key and self.input_symbol_key in dataframe.columns else [None] * len(dataframe)
-        countries = dataframe[self.input_country_key].tolist() if self.input_country_key and self.input_country_key in dataframe.columns else [self.default_country] * len(dataframe)
+        if "symbol" in dataframe.columns:
+            symbols = dataframe["symbol"].tolist()
+        else:
+            symbols = [None] * len(dataframe)
 
-        resolved_symbols = []
-        resolved_names = []
-        news_rows = []
+        if "country" in dataframe.columns:
+            countries = dataframe["country"].tolist()
+        else:
+            countries = [self.default_country] * len(dataframe)
+
         news_contexts = []
-        avg_sentiments = []
-        news_counts = []
 
         for target_entity, symbol_value, country_value in tqdm(
-            zip(dataframe[self.input_target_key].tolist(), symbols, countries),
+            zip(dataframe[self.input_key].tolist(), symbols, countries),
             total=len(dataframe),
             desc="Retrieve Marketaux news",
         ):
@@ -130,46 +116,26 @@ class FinKGMarketauxNewsRetriever(OperatorABC):
                 resolved_symbol=resolved.get("symbol", ""),
             )
 
-            resolved_symbols.append(resolved.get("symbol", ""))
-            resolved_names.append(resolved.get("name", target_entity))
-            news_rows.append(simplified)
             news_contexts.append(self._build_news_context(simplified))
-            avg_sentiments.append(self._average_sentiment(simplified))
-            news_counts.append(len(simplified))
 
-        dataframe[self.output_symbol_key] = resolved_symbols
-        dataframe[self.output_name_key] = resolved_names
-        dataframe[self.output_news_key] = news_rows
-        dataframe[self.output_context_key] = news_contexts
-        dataframe[self.output_sentiment_key] = avg_sentiments
-        dataframe[self.output_count_key] = news_counts
+        dataframe[self.output_key] = news_contexts
 
         output_file = storage.write(dataframe)
         self.logger.info(f"Marketaux news retrieval results saved to {output_file}")
 
-        return [
-            self.output_symbol_key,
-            self.output_name_key,
-            self.output_news_key,
-            self.output_context_key,
-            self.output_sentiment_key,
-            self.output_count_key,
-        ]
+        return [self.output_key]
 
-    def _validate_dataframe(self, dataframe: pd.DataFrame) -> None:
-        if self.input_target_key not in dataframe.columns:
-            raise ValueError(f"Missing required column: {self.input_target_key}")
+    def _validate_dataframe(
+        self,
+        dataframe: pd.DataFrame,
+        input_target_key: str,
+        output_key: str,
+    ) -> None:
+        if input_target_key not in dataframe.columns:
+            raise ValueError(f"Missing required column: {input_target_key}")
 
-        for column in [
-            self.output_symbol_key,
-            self.output_name_key,
-            self.output_news_key,
-            self.output_context_key,
-            self.output_sentiment_key,
-            self.output_count_key,
-        ]:
-            if column in dataframe.columns:
-                raise ValueError(f"Output column already exists: {column}")
+        if output_key in dataframe.columns:
+            raise ValueError(f"Output column already exists: {output_key}")
 
     def _normalize_text(self, value: Any) -> str:
         if value is None:
@@ -239,10 +205,13 @@ class FinKGMarketauxNewsRetriever(OperatorABC):
         target_entity: str,
         symbol: str,
         country: str,
+        lookback_days: Optional[int] = None,
+        limit: Optional[int] = None,
+        language: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        lookback_days = getattr(self, "lookback_days", self.default_lookback_days)
-        limit = getattr(self, "limit", self.default_limit)
-        language = getattr(self, "language", self.default_language)
+        lookback_days = lookback_days or self.default_lookback_days
+        limit = limit or self.default_limit
+        language = language or self.default_language
         published_after = (
             datetime.now(timezone.utc) - timedelta(days=lookback_days)
         ).strftime("%Y-%m-%dT%H:%M")

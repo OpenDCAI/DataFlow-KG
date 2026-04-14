@@ -6,11 +6,12 @@ import pandas as pd
 from tqdm import tqdm
 
 from dataflow import get_logger
+from dataflow.operators.domain_kg.utils.finkg_get_ontology import load_finkg_ontology
 from dataflow.core import LLMServingABC, OperatorABC
 from dataflow.core.prompt import prompt_restrict
 from dataflow.prompts.diverse_kg.finkg import FinKGEntityRiskAssessmentPrompt
 from dataflow.utils.registry import OPERATOR_REGISTRY
-from dataflow.utils.storage import DataFlowStorage, FileStorage
+from dataflow.utils.storage import DataFlowStorage
 
 class FinKGEntityRiskAssessmentLLM:
 
@@ -166,7 +167,6 @@ class FinKGEntityRiskAssessmentLLM:
                     risk_entities=parsed.get("risk_entities", []),
                     risk_paths=parsed.get("risk_paths", []),
                 )
-            parsed["risk_evidence_tuple"] = relevant_tuples
             results.append(parsed)
 
         return results
@@ -246,7 +246,7 @@ class FinKGEntityRiskAssessmentLLM:
             self.logger.warning(f"Failed to parse risk exposure response: {exc}")
             return result
 
-        result["risk_assessment"] = self._safe_string(data.get("analysis_summary"))
+        result["risk_answer"] = self._safe_string(data.get("analysis_summary"))
         result["risk_types"] = self._safe_string_list(data.get("risk_types"))
         result["risk_entities"] = self._safe_string_list(
             data.get("risk_entities") or data.get("exposure_entities")
@@ -411,12 +411,11 @@ class FinKGEntityRiskAssessmentLLM:
 
     def _empty_result(self) -> Dict[str, Any]:
         return {
-            "risk_assessment": "",
+            "risk_answer": "",
             "risk_types": [],
             "risk_entities": [],
             "risk_paths": [],
             "risk_score": 0,
-            "risk_evidence_tuple": [],
         }
 
 
@@ -432,8 +431,6 @@ class FinKGEntityRiskAssessment(OperatorABC):
         max_context_tuples: int = 24,
     ):
         self.logger = get_logger()
-        self.lang = lang
-        self.llm_serving = llm_serving
         self.analyzer = FinKGEntityRiskAssessmentLLM(
             llm_serving=llm_serving,
             lang=lang,
@@ -446,29 +443,29 @@ class FinKGEntityRiskAssessment(OperatorABC):
         if lang == "zh":
             return (
                 "FinKGEntityRiskAssessment 用于基于金融知识图谱进行实体风险预估。",
-                "输入: target_entity + tuple + ontology; 输出: risk_assessment + risk_types + risk_entities + risk_paths + risk_score",
+                "输入: tuple + target_entity；输出: risk_answer + risk_score。",
             )
         return (
             "FinKGEntityRiskAssessment is used to estimate entity risk with Financial KG.",
-            "Input: target_entity + tuple + ontology; Output: risk_assessment + risk_types + risk_entities + risk_paths + risk_score",
+            "Input: tuple + target_entity. Output: risk_answer + risk_score.",
         )
 
     def _validate_dataframe(self, dataframe: pd.DataFrame):
-        if self.input_key_tuple not in dataframe.columns:
-            raise ValueError(f"Missing required column: {self.input_key_tuple}")
-        if self.input_target_key not in dataframe.columns:
-            raise ValueError(f"Missing required column: {self.input_target_key}")
+        required_keys = [self.input_key, "target_entity"]
+        forbidden_keys = [self.output_key, self.output_key_score]
 
-        for column in [
-            self.output_summary_key,
-            self.output_type_key,
-            self.output_entity_key,
-            self.output_path_key,
-            self.output_confidence_key,
-            self.output_evidence_key,
-        ]:
-            if column in dataframe.columns:
-                raise ValueError(f"Output column already exists: {column}")
+        if len(set(forbidden_keys)) != len(forbidden_keys):
+            raise ValueError("output_key and output_key_score must be different")
+
+        missing = [key for key in required_keys if key not in dataframe.columns]
+        conflict = [key for key in forbidden_keys if key in dataframe.columns]
+
+        if missing:
+            raise ValueError(f"Missing required column(s): {missing}")
+        if conflict:
+            raise ValueError(
+                f"The following column(s) already exist and would be overwritten: {conflict}"
+            )
 
     def process_batch(
         self,
@@ -491,46 +488,20 @@ class FinKGEntityRiskAssessment(OperatorABC):
     def run(
         self,
         storage: DataFlowStorage = None,
-        ontology_lists: Optional[Dict[str, Any]] = None,
-        input_key_tuple: str = "tuple",
-        input_target_key: str = "target_entity",
-        input_key_meta: str = "finkg_ontology",
-        output_summary_key: str = "risk_assessment",
-        output_type_key: str = "risk_types",
-        output_entity_key: str = "risk_entities",
-        output_path_key: str = "risk_paths",
-        output_confidence_key: str = "risk_score",
-        output_evidence_key: str = "risk_evidence_tuple",
+        input_key: str = "tuple",
+        output_key: str = "risk_answer",
+        output_key_score: str = "risk_score",
     ) -> List[str]:
-        self.input_key_tuple = input_key_tuple
-        self.input_target_key = input_target_key
-        self.output_summary_key = output_summary_key
-        self.output_type_key = output_type_key
-        self.output_entity_key = output_entity_key
-        self.output_path_key = output_path_key
-        self.output_confidence_key = output_confidence_key
-        self.output_evidence_key = output_evidence_key
+        self.input_key = input_key
+        self.output_key = output_key
+        self.output_key_score = output_key_score
 
         dataframe = storage.read("dataframe")
         self._validate_dataframe(dataframe)
 
-        tuples_list = dataframe[self.input_key_tuple].tolist()
-        target_entities = dataframe[self.input_target_key].tolist()
-
-        if ontology_lists is None:
-            storage_meta = FileStorage(first_entry_file_name="", cache_type="json")
-            ontology_df = storage_meta.read(
-                file_path=f"./.cache/api/{input_key_meta}.json",
-                output_type="dataframe",
-            )
-            row = ontology_df.iloc[0]
-            ontology = {
-                "entity_type": row["entity_type"],
-                "relation_type": row["relation_type"],
-                "attribute_type": row.get("attribute_type", {}),
-            }
-        else:
-            ontology = ontology_lists
+        tuples_list = dataframe[self.input_key].tolist()
+        target_entities = dataframe["target_entity"].tolist()
+        ontology = load_finkg_ontology()
 
         outputs = self.process_batch(
             tuples_list=tuples_list,
@@ -538,36 +509,17 @@ class FinKGEntityRiskAssessment(OperatorABC):
             target_entities=target_entities,
         )
 
-        dataframe[self.output_summary_key] = [
-            item.get("risk_assessment", "") for item in outputs
+        dataframe[self.output_key] = [
+            item.get("risk_answer", "") for item in outputs
         ]
-        dataframe[self.output_type_key] = [
-            item.get("risk_types", []) for item in outputs
-        ]
-        dataframe[self.output_entity_key] = [
-            item.get("risk_entities", []) for item in outputs
-        ]
-        dataframe[self.output_path_key] = [
-            item.get("risk_paths", []) for item in outputs
-        ]
-        dataframe[self.output_confidence_key] = [
+        dataframe[self.output_key_score] = [
             item.get("risk_score", 0) for item in outputs
-        ]
-        dataframe[self.output_evidence_key] = [
-            item.get("risk_evidence_tuple", []) for item in outputs
         ]
 
         output_file = storage.write(dataframe)
         self.logger.info(f"Risk assessment results saved to {output_file}")
 
-        return [
-            self.output_summary_key,
-            self.output_type_key,
-            self.output_entity_key,
-            self.output_path_key,
-            self.output_confidence_key,
-            self.output_evidence_key,
-        ]
+        return [self.output_key, self.output_key_score]
 
 
 FinKGEntityRiskExposureAnalysis = FinKGEntityRiskAssessment

@@ -6,13 +6,12 @@ import pandas as pd
 from tqdm import tqdm
 
 from dataflow import get_logger
+from dataflow.operators.domain_kg.utils.finkg_get_ontology import load_finkg_ontology
 from dataflow.core import LLMServingABC, OperatorABC
 from dataflow.core.prompt import prompt_restrict
 from dataflow.prompts.diverse_kg.finkg import FinKGInvestmentAnalysisPrompt
 from dataflow.utils.registry import OPERATOR_REGISTRY
-from dataflow.utils.storage import DataFlowStorage, FileStorage
-
-from .finkg_marketaux_news_retriever import FinKGMarketauxNewsRetriever
+from dataflow.utils.storage import DataFlowStorage
 
 
 class FinKGInvestmentAnalysisLLM:
@@ -137,11 +136,6 @@ class FinKGInvestmentAnalysisLLM:
                 system_prompt=system_prompt,
             )
             parsed = self._parse_response(responses[0] if responses else "")
-            parsed["investment_key_paths"] = self._sanitize_paths(
-                paths=parsed.get("investment_key_paths", []),
-                evidence_tuples=relevant_tuples,
-            )
-            parsed["investment_evidence_tuple"] = relevant_tuples
             results.append(parsed)
 
         return results
@@ -204,59 +198,15 @@ class FinKGInvestmentAnalysisLLM:
             self.logger.warning(f"Failed to parse investment analysis response: {exc}")
             return result
 
-        result["investment_analysis"] = self._safe_string(data.get("analysis_summary"))
-        result["bullish_signals"] = self._safe_string_list(data.get("bullish_signals"))
-        result["bearish_signals"] = self._safe_string_list(data.get("bearish_signals"))
-        result["watch_items"] = self._safe_string_list(data.get("watch_items"))
-        result["investment_key_paths"] = self._safe_string_list(data.get("key_paths"))
-        result["investment_confidence"] = self._safe_confidence(data.get("confidence"))
+        result["investment_answer"] = self._safe_string(data.get("analysis_summary"))
         return result
 
     def _safe_string(self, value: Any) -> str:
         return value.strip() if isinstance(value, str) else ""
 
-    def _safe_string_list(self, value: Any) -> List[str]:
-        if not isinstance(value, list):
-            return []
-        return [item.strip() for item in value if isinstance(item, str) and item.strip()]
-
-    def _safe_confidence(self, value: Any) -> str:
-        if not isinstance(value, str):
-            return "low"
-        value = value.strip().lower()
-        return value if value in {"high", "medium", "low"} else "low"
-
-    def _sanitize_paths(
-        self,
-        paths: List[str],
-        evidence_tuples: List[str],
-    ) -> List[str]:
-        if not isinstance(paths, list) or not evidence_tuples:
-            return []
-
-        evidence_set = {item.strip() for item in evidence_tuples if isinstance(item, str)}
-        sanitized = []
-
-        for path in paths:
-            if not isinstance(path, str):
-                continue
-            segments = [segment.strip() for segment in path.split("||") if segment.strip()]
-            if not segments:
-                continue
-            if all(segment in evidence_set for segment in segments):
-                sanitized.append(" || ".join(segments))
-
-        return self._dedupe_keep_order(sanitized)
-
     def _empty_result(self) -> Dict[str, Any]:
         return {
-            "investment_analysis": "",
-            "bullish_signals": [],
-            "bearish_signals": [],
-            "watch_items": [],
-            "investment_key_paths": [],
-            "investment_confidence": "low",
-            "investment_evidence_tuple": [],
+            "investment_answer": "",
         }
 
 
@@ -272,9 +222,6 @@ class FinKGInvestmentAnalysis(OperatorABC):
         max_context_tuples: int = 20,
     ):
         self.logger = get_logger()
-        self.lang = lang
-        self.llm_serving = llm_serving
-        self.marketaux_retriever = FinKGMarketauxNewsRetriever()
         self.analyzer = FinKGInvestmentAnalysisLLM(
             llm_serving=llm_serving,
             lang=lang,
@@ -287,41 +234,34 @@ class FinKGInvestmentAnalysis(OperatorABC):
         if lang == "zh":
             return (
                 "FinKGInvestmentAnalysis 用于基于金融知识图谱进行投资分析。",
-                "输入: target_entity + tuple，可选 symbol/country/marketaux_news_context + ontology; 输出: investment_analysis + bullish_signals + bearish_signals + watch_items",
+                "输入: tuple + target_entity + marketaux_news_context；输出: investment_answer。",
             )
         return (
             "FinKGInvestmentAnalysis is used to perform investment analysis with Financial KG.",
-            "Input: target_entity + tuple with optional symbol/country/marketaux_news_context + ontology; Output: investment_analysis + bullish_signals + bearish_signals + watch_items",
+            "Input: tuple + target_entity + marketaux_news_context. Output: investment_answer.",
         )
 
     def _validate_dataframe(self, dataframe: pd.DataFrame):
-        if self.input_key_tuple not in dataframe.columns:
-            raise ValueError(f"Missing required column: {self.input_key_tuple}")
-        if self.input_target_key not in dataframe.columns:
-            raise ValueError(f"Missing required column: {self.input_target_key}")
+        required_keys = [self.input_key, "target_entity", "marketaux_news_context"]
+        forbidden_keys = [self.output_key]
 
-        for column in [
-            self.output_summary_key,
-            self.output_bullish_key,
-            self.output_bearish_key,
-            self.output_watch_key,
-            self.output_path_key,
-            self.output_confidence_key,
-            self.output_evidence_key,
-        ]:
-            if column in dataframe.columns:
-                raise ValueError(f"Output column already exists: {column}")
+        missing = [key for key in required_keys if key not in dataframe.columns]
+        conflict = [key for key in forbidden_keys if key in dataframe.columns]
+
+        if missing:
+            raise ValueError(f"Missing required column(s): {missing}")
+        if conflict:
+            raise ValueError(
+                f"The following column(s) already exist and would be overwritten: {conflict}"
+            )
 
     def process_batch(
         self,
         tuples_list: List[List[str]],
         ontology: Dict[str, Any],
         target_entities: List[Any],
-        market_news_contexts: Optional[List[Any]] = None,
+        market_news_contexts: List[Any],
     ) -> List[Dict[str, Any]]:
-        if market_news_contexts is None:
-            market_news_contexts = [""] * len(tuples_list)
-
         raw_data = [
             {
                 "tuple": tuples,
@@ -335,114 +275,22 @@ class FinKGInvestmentAnalysis(OperatorABC):
 
         return self.analyzer.llm_query(raw_data=raw_data, ontology=ontology)
 
-    def _build_marketaux_news_contexts(
-        self,
-        target_entities: List[Any],
-        symbols: Optional[List[Any]] = None,
-        countries: Optional[List[Any]] = None,
-    ) -> List[str]:
-        if not self.marketaux_retriever.api_token:
-            return [""] * len(target_entities)
-
-        if symbols is None:
-            symbols = [""] * len(target_entities)
-        if countries is None:
-            countries = [""] * len(target_entities)
-
-        contexts = []
-        for target_entity, symbol, country in zip(target_entities, symbols, countries):
-            target_name = self.marketaux_retriever._normalize_text(target_entity)
-            symbol_text = self.marketaux_retriever._normalize_text(symbol)
-            country_text = self.marketaux_retriever._normalize_text(country) or self.marketaux_retriever.default_country
-
-            if not target_name:
-                contexts.append("")
-                continue
-
-            resolved = self.marketaux_retriever._resolve_symbol(
-                target_entity=target_name,
-                symbol_hint=symbol_text,
-                country=country_text,
-            )
-            articles = self.marketaux_retriever._fetch_news(
-                target_entity=target_name,
-                symbol=resolved.get("symbol", ""),
-                country=country_text,
-            )
-            simplified = self.marketaux_retriever._simplify_articles(
-                articles=articles,
-                target_entity=target_name,
-                resolved_symbol=resolved.get("symbol", ""),
-            )
-            contexts.append(self.marketaux_retriever._build_news_context(simplified))
-
-        return contexts
-
     def run(
         self,
         storage: DataFlowStorage = None,
-        ontology_lists: Optional[Dict[str, Any]] = None,
-        input_key_tuple: str = "tuple",
-        input_target_key: str = "target_entity",
-        input_symbol_key: Optional[str] = "symbol",
-        input_country_key: Optional[str] = "country",
-        input_news_key: Optional[str] = "marketaux_news_context",
-        auto_fetch_marketaux_news: bool = True,
-        input_key_meta: str = "finkg_ontology",
-        output_summary_key: str = "investment_analysis",
-        output_bullish_key: str = "bullish_signals",
-        output_bearish_key: str = "bearish_signals",
-        output_watch_key: str = "watch_items",
-        output_path_key: str = "investment_key_paths",
-        output_confidence_key: str = "investment_confidence",
-        output_evidence_key: str = "investment_evidence_tuple",
+        input_key: str = "tuple",
+        output_key: str = "investment_answer",
     ) -> List[str]:
-        self.input_key_tuple = input_key_tuple
-        self.input_target_key = input_target_key
-        self.output_summary_key = output_summary_key
-        self.output_bullish_key = output_bullish_key
-        self.output_bearish_key = output_bearish_key
-        self.output_watch_key = output_watch_key
-        self.output_path_key = output_path_key
-        self.output_confidence_key = output_confidence_key
-        self.output_evidence_key = output_evidence_key
+        self.input_key = input_key
+        self.output_key = output_key
 
         dataframe = storage.read("dataframe")
         self._validate_dataframe(dataframe)
 
-        tuples_list = dataframe[self.input_key_tuple].tolist()
-        target_entities = dataframe[self.input_target_key].tolist()
-
-        market_news_contexts = None
-        if input_news_key and input_news_key in dataframe.columns:
-            market_news_contexts = dataframe[input_news_key].tolist()
-        elif auto_fetch_marketaux_news:
-            symbols = None
-            countries = None
-            if input_symbol_key and input_symbol_key in dataframe.columns:
-                symbols = dataframe[input_symbol_key].tolist()
-            if input_country_key and input_country_key in dataframe.columns:
-                countries = dataframe[input_country_key].tolist()
-            market_news_contexts = self._build_marketaux_news_contexts(
-                target_entities=target_entities,
-                symbols=symbols,
-                countries=countries,
-            )
-
-        if ontology_lists is None:
-            storage_meta = FileStorage(first_entry_file_name="", cache_type="json")
-            ontology_df = storage_meta.read(
-                file_path=f"./.cache/api/{input_key_meta}.json",
-                output_type="dataframe",
-            )
-            row = ontology_df.iloc[0]
-            ontology = {
-                "entity_type": row["entity_type"],
-                "relation_type": row["relation_type"],
-                "attribute_type": row.get("attribute_type", {}),
-            }
-        else:
-            ontology = ontology_lists
+        tuples_list = dataframe[self.input_key].tolist()
+        target_entities = dataframe["target_entity"].tolist()
+        market_news_contexts = dataframe["marketaux_news_context"].tolist()
+        ontology = load_finkg_ontology()
 
         outputs = self.process_batch(
             tuples_list=tuples_list,
@@ -451,37 +299,11 @@ class FinKGInvestmentAnalysis(OperatorABC):
             market_news_contexts=market_news_contexts,
         )
 
-        dataframe[self.output_summary_key] = [
-            item.get("investment_analysis", "") for item in outputs
-        ]
-        dataframe[self.output_bullish_key] = [
-            item.get("bullish_signals", []) for item in outputs
-        ]
-        dataframe[self.output_bearish_key] = [
-            item.get("bearish_signals", []) for item in outputs
-        ]
-        dataframe[self.output_watch_key] = [
-            item.get("watch_items", []) for item in outputs
-        ]
-        dataframe[self.output_path_key] = [
-            item.get("investment_key_paths", []) for item in outputs
-        ]
-        dataframe[self.output_confidence_key] = [
-            item.get("investment_confidence", "low") for item in outputs
-        ]
-        dataframe[self.output_evidence_key] = [
-            item.get("investment_evidence_tuple", []) for item in outputs
+        dataframe[self.output_key] = [
+            item.get("investment_answer", "") for item in outputs
         ]
 
         output_file = storage.write(dataframe)
         self.logger.info(f"Investment analysis results saved to {output_file}")
 
-        return [
-            self.output_summary_key,
-            self.output_bullish_key,
-            self.output_bearish_key,
-            self.output_watch_key,
-            self.output_path_key,
-            self.output_confidence_key,
-            self.output_evidence_key,
-        ]
+        return [self.output_key]
