@@ -54,7 +54,7 @@ class HRKGTripleCompletenessEvaluator(OperatorABC):
     def process_batch(self, records: List[Dict[str, Any]]):
         results = []
 
-        for row in tqdm(records, desc="QA Conciseness Eval"):
+        for row in tqdm(records, desc="QA Completeness Eval"):
             tuples = row.get("tuples", [])
 
             if isinstance(tuples, str):
@@ -120,7 +120,7 @@ class HRKGTripleCompletenessEvaluator(OperatorABC):
         out_file = storage.write(df)
 
         self.logger.info(
-            f"Saved QA conciseness scores to {out_file}"
+            f"Saved QA completeness scores to {out_file}"
         )
 
         return ["completeness_scores"]
