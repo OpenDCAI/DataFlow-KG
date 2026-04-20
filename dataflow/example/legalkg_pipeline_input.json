@@ -1,0 +1,10 @@
+[
+  {
+    "source": "initial_test/legalkg/theft_case",
+    "raw_chunk": "On March 12, 2024, Zhang San secretly took Li Si's iPhone from a seat in a shopping mall in Chaoyang District, Beijing. The phone was appraised at RMB 6000. Zhang San was arrested soon after leaving the mall, confessed the theft, and the stolen phone was returned to the victim."
+  },
+  {
+    "source": "initial_test/legalkg/fraud_case",
+    "raw_chunk": "Between September and October 2023, Wang Wu falsely claimed that he could purchase concert tickets at a discount through WeChat. He collected a total of RMB 18000 from three victims including Zhao Liu, but never delivered the tickets and spent the money on personal consumption. After the case was filed, Wang Wu repaid the losses and obtained forgiveness from the victims."
+  }
+]

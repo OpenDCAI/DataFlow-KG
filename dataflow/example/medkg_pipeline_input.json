@@ -1,0 +1,12 @@
+[
+  {
+    "source": "initial_test/medkg/metformin_diabetes",
+    "raw_chunk": "Metformin is commonly prescribed for patients with type 2 diabetes. The drug reduces hepatic glucose production and improves insulin sensitivity in peripheral tissues. Improved insulin sensitivity lowers blood glucose levels and helps prevent diabetes-related vascular complications.",
+    "query": "How does Metformin help lower blood glucose in type 2 diabetes?"
+  },
+  {
+    "source": "initial_test/medkg/aspirin_thrombosis",
+    "raw_chunk": "Aspirin inhibits cyclooxygenase-1 in platelets and reduces thromboxane A2 synthesis. Lower thromboxane A2 levels decrease platelet aggregation. Reduced platelet aggregation can lower the risk of arterial thrombosis in patients with cardiovascular disease.",
+    "query": "What mechanism links Aspirin to reduced arterial thrombosis risk?"
+  }
+]
