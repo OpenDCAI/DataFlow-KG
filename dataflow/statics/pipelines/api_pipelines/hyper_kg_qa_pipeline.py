@@ -14,7 +14,7 @@ from dataflow.operators.hyper_relation_kg import (
 class HyperKGQA_APIPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/hyper_kg_qa_pipeline_input.json",
+            first_entry_file_name="../example_data/HyperRelationKGPipeline/input.json",
             cache_path="./cache_local",
             file_name_prefix="hyper_kg_qa_pipeline",
             cache_type="json",

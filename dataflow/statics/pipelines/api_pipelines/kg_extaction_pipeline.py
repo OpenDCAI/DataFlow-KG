@@ -20,7 +20,7 @@ from dataflow.operators.general_kg.filter.kg_tuple_validation import (
 class KGExtractionPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/kg_extraction_pipeline_input.json",
+            first_entry_file_name="../example_data/KGExtractionPipeline.json",
             cache_path="./cache_kg_extraction",
             file_name_prefix="kg_extraction_pipeline",
             cache_type="jsonl",

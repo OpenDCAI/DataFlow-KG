@@ -5,8 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dataflow-kg"
 authors = [
-    {name = "Hao Liang", email = "hao.liang@stu.pku.edu.cn"},
-    {name = "Xiaochen Ma", email = "xiaochen.ma.cs@gmail.com"},
+    {name = "Zhengpin Li", email = "zpli@pku.edu.cn"},
 ]
 description = "Modern Data Centric AI system for Large Language Models"
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -26,13 +25,13 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 keywords = [
-    "AI",
-    "artificial intelligence",
+    "Artificial Intelligence",
+    "Knowledge Graph",
 ]
 dynamic = ["version", "dependencies"]
 
 [project.urls]
-Github = "https://github.com/Open-DataFlow/DataFlow"
+Github = "https://github.com/Open-DataFlow/DataFlow-KG"
 Documentation = "https://open-dataflow.github.io/DataFlow-Doc/"
 "Bug Reports" = "https://github.com/Open-DataFlow/DataFlow/issues"
 

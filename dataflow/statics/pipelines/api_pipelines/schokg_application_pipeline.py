@@ -14,7 +14,7 @@ from dataflow.operators.domain_kg.scholar_kg.generate.schokg_query_reasoning imp
 class ScholarKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/schokg_pipeline_input.json",
+            first_entry_file_name="../example_data/ScholarKGPipeline/nput.json",
             cache_path="./cache_schokg",
             file_name_prefix="scholar_kg_pipeline",
             cache_type="jsonl",

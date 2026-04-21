@@ -14,7 +14,7 @@ from dataflow.operators.domain_kg.medical_kg.generate.medkg_triple_drug_action_m
 class MedicalKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/medkg_pipeline_input.json",
+            first_entry_file_name="../example_data/MedicalKGPipeline/input.json",
             cache_path="./cache_medkg",
             file_name_prefix="medical_kg_pipeline",
             cache_type="jsonl",

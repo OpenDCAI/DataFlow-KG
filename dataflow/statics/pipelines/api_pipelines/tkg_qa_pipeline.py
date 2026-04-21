@@ -16,7 +16,7 @@ from dataflow.operators.temporal_kg import TKGTupleTimeFilter
 class TKGQA_APIPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/tkg_qa_pipeline_input.json",
+            first_entry_file_name="../example_data/TemporalKGPipeline/input.json",
             cache_path="./cache_local",
             file_name_prefix="tkg_qa_pipeline",
             cache_type="json",

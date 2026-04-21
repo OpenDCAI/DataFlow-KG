@@ -21,7 +21,7 @@ from dataflow.operators.domain_kg.legal_kg.generate.legalkg_case_judgement_gener
 class LegalKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/legalkg_pipeline_input.json",
+            first_entry_file_name="../example_data/LegalKGPipeline/input.json",
             cache_path="./cache_legalkg",
             file_name_prefix="legal_kg_pipeline",
             cache_type="jsonl",

@@ -29,7 +29,7 @@ class KGEvaluationVisualizationPipeline:
                     pipeline_dir,
                     "..",
                     "example_data",
-                    "kg_evaluation_visualization_pipeline",
+                    "KGEvaluationPipeline",
                     "input.json",
                 )
             )
