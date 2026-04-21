@@ -10,21 +10,29 @@ from dataflow.serving import APILLMServing_request
 
 
 class KGEvaluationVisualizationPipeline:
-    """文档类型图谱评测与可视化流水线"""
+    """通用知识图谱评测与可视化流水线"""
 
     def __init__(
         self,
         input_file: str = "",
         cache_path: str = "./cache_kg_eval",
-        api_url: str = "http://172.96.141.132:3001/v1/chat/completions",
+        api_url: str = "https://api.openai.com/v1/chat/completions",
         model_name: str = "gpt-4o-mini",
         api_key_env: str = "DF_API_KEY",
         max_workers: int = 10,
         lang: str = "en",
     ):
         if not input_file:
-            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-            input_file = os.path.join(repo_root, "dataflow", "data_for_operator_testing", "knowledge_extraction.json")
+            pipeline_dir = os.path.dirname(os.path.abspath(__file__))
+            input_file = os.path.abspath(
+                os.path.join(
+                    pipeline_dir,
+                    "..",
+                    "example_data",
+                    "kg_evaluation_visualization_pipeline",
+                    "input.json",
+                )
+            )
 
         # -------- Storage --------
         self.storage = FileStorage(
