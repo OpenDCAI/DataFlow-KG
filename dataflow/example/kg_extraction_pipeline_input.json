@@ -1,0 +1,10 @@
+[
+  {
+    "source": "initial_test/kg_extraction/company_lab_story",
+    "raw_chunk": "Nova Robotics was founded by engineer Maya Chen in Seattle in 2018. The company partnered with GreenGrid Labs to build warehouse robots that reduce energy consumption. In 2023, Nova Robotics deployed its AtlasBot system at Harbor Logistics, where the robots sorted packages and collected operational data for predictive maintenance."
+  },
+  {
+    "source": "initial_test/kg_extraction/research_project_story",
+    "raw_chunk": "Dr. Elena Ruiz leads the OceanSense project at Pacific University. OceanSense uses satellite imagery and autonomous buoys to monitor coral reef bleaching in Hawaii. The project shares climate datasets with BlueEarth Foundation so that local conservation teams can plan reef restoration work."
+  }
+]

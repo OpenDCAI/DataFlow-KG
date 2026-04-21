@@ -1,0 +1,12 @@
+[
+  {
+    "source": "initial_test/schokg/transformer_attention",
+    "raw_chunk": "The paper Attention Is All You Need introduced the Transformer architecture in 2017. Ashish Vaswani and his coauthors proposed self-attention as a core mechanism for sequence modeling. The Transformer influenced later large language models such as BERT and GPT by enabling efficient parallel training on text corpora.",
+    "query": "Which mechanism from Attention Is All You Need influenced BERT and GPT?"
+  },
+  {
+    "source": "initial_test/schokg/graph_neural_networks",
+    "raw_chunk": "Graph Convolutional Networks were popularized by Thomas Kipf and Max Welling for semi-supervised node classification. The method propagates information across graph edges and learns node representations from local neighborhoods. Graph neural networks are now widely used in citation networks, molecule property prediction, and recommendation systems.",
+    "query": "Why are Graph Convolutional Networks useful for node classification?"
+  }
+]
