@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: KGTripleExtraction
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-01-27
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.diverse_kg.legalkg import LegalKGRelationExtractorPrompt
 from dataflow.prompts.diverse_kg.legalkg import LegalKGAttributeExtractorPrompt
 import pandas as pd

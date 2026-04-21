@@ -1,20 +1,3 @@
-"""
-====================================
-DataFlow-KG: QA Conciseness Evaluator
-====================================
-
-Author: Wanpeng Tang
-Affiliation: UESTC
-Email: 2023090910014@std.uestc.edu.cn
-Created: 2026-02-23
-
-Author: Zhengpin
-Refined: 2026-03-16
-
-License:
-    MIT License
-"""
-
 import json
 from typing import List, Dict, Any
 from tqdm import tqdm

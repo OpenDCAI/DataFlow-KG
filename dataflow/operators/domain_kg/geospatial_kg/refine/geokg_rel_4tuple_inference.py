@@ -1,17 +1,3 @@
-"""
-====================================
-DataFlow-KG: GeoKGRelationInference
-====================================
-
-Author: Zhengpin Li
-Affiliation: Peking University
-Email: zpli@pku.edu.cn
-Created: 2026-03-14
-
-License:
-    MIT License
-"""
-
 from dataflow.prompts.diverse_kg.geokg import GeoKGRelationInferencePrompt
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger

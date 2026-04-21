@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG: LegalKGGetBasicOntology
-====================================
-
-Author: Zhengpin Li
-Description: General Legal Knowledge Graph Ontology
-Supports criminal, civil, administrative cases
-Bilingual: zh / en
-"""
-
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger

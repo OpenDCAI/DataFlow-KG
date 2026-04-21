@@ -1,26 +1,3 @@
-"""
-====================================
-DataFlow-KG: GeoKGEntityLink2Database
-====================================
-
-Author: Jinke Wu
-Created: 2026-03-17
-
-Description:
-    Links geographic entities extracted from tuples to GeoNames,
-    a free geographical database covering all countries.
-
-    Supported input tuple formats (GeoKG conventions):
-      - Relation:  <subj> E1 <obj> E2 <rel> R <time> T
-      - Attribute: <subj> E <attribute> A <value> V <time> T
-
-    Output format per entity:
-      <entity> Name <link> https://www.geonames.org/{geonameId}
-
-License:
-    MIT License
-"""
-
 import ast
 import json
 import re

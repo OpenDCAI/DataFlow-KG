@@ -1,16 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-====================================
-DataFlow-KG:
-====================================
-
-Author: Wanpeng Tang
-Refined: Zhengpin Li, 2026-03-16
-
-License:
-    MIT License
-"""
-
 import json
 import re
 from typing import List, Dict, Any
