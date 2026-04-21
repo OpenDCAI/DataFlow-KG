@@ -17,6 +17,18 @@ from dataflow.serving import APILLMServing_request, APIVLMServing_openai
 from dataflow.utils.storage import FileStorage
 
 
+def _default_example_file(folder: str, file_name: str) -> str:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.abspath(os.path.join(script_dir, "..", "example_data", folder, file_name)),
+        os.path.abspath(os.path.join(script_dir, "..", "..", "..", "example", folder, file_name)),
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            return path
+    return candidates[0]
+
+
 class MultimodalKGPipeline(PipelineABC):
     """Multimodal KG pipeline: text triples + visual triples -> subgraphs -> QA pairs."""
 
@@ -107,23 +119,25 @@ class MultimodalKGPipeline(PipelineABC):
 
 
 if __name__ == "__main__":
-    input_file = os.environ.get("DF_MMKG_INPUT_FILE", "")
-    if not input_file:
-        raise ValueError(
-            "Set DF_MMKG_INPUT_FILE to a JSON file containing `raw_chunk` and `img_dict`."
-        )
+    input_file = os.environ.get(
+        "DF_MMKG_INPUT_FILE",
+        _default_example_file("MultimodalKGPipeline", "input.json"),
+    )
 
     llm_serving = APILLMServing_request(
-        api_url="https://api.openai.com/v1/chat/completions",
+        api_url=os.environ.get(
+            "DF_API_URL",
+            "https://api.openai.com/v1/chat/completions",
+        ),
         key_name_of_api_key="DF_API_KEY",
-        model_name="gpt-4o-mini",
+        model_name=os.environ.get("DF_LLM_MODEL", "gpt-4o-mini"),
         max_workers=6,
         temperature=0.0,
     )
     vlm_serving = APIVLMServing_openai(
-        api_url="https://api.openai.com/v1",
+        api_url=os.environ.get("DF_VLM_API_URL", "https://api.openai.com/v1"),
         key_name_of_api_key="DF_API_KEY",
-        model_name="o4-mini",
+        model_name=os.environ.get("DF_VLM_MODEL", "o4-mini"),
         max_workers=4,
         temperature=0.0,
     )

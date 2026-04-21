@@ -1,3 +1,5 @@
+import os
+
 from dataflow.core import LLMServingABC
 from dataflow.operators.domain_kg.geospatial_kg import (
     GeoKGEventConsistenceEvaluator,
@@ -9,7 +11,20 @@ from dataflow.operators.domain_kg.geospatial_kg import (
     GeoKGEventTupleTimeFilter,
 )
 from dataflow.pipeline import PipelineABC
+from dataflow.serving import APILLMServing_request
 from dataflow.utils.storage import FileStorage
+
+
+def _default_example_file(folder: str, file_name: str) -> str:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.abspath(os.path.join(script_dir, "..", "example_data", folder, file_name)),
+        os.path.abspath(os.path.join(script_dir, "..", "..", "..", "example", folder, file_name)),
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            return path
+    return candidates[0]
 
 
 class GeoKGSpatiotemporalEventPipeline(PipelineABC):
@@ -140,3 +155,32 @@ class GeoKGSpatiotemporalEventPipeline(PipelineABC):
                 if self.llm_serving_counter[self.active_llm_serving] == 0:
                     self.active_llm_serving.cleanup()
                     self.active_llm_serving = None
+
+
+if __name__ == "__main__":
+    input_file = os.environ.get(
+        "DF_GEOKG_INPUT_FILE",
+        _default_example_file("GeoKGSpatiotemporalEventPipeline", "input.json"),
+    )
+
+    llm_serving = APILLMServing_request(
+        api_url=os.environ.get(
+            "DF_API_URL",
+            "https://api.openai.com/v1/chat/completions",
+        ),
+        key_name_of_api_key="DF_API_KEY",
+        model_name=os.environ.get("DF_LLM_MODEL", "gpt-4o-mini"),
+        max_workers=8,
+        temperature=0.0,
+    )
+
+    pipeline = GeoKGSpatiotemporalEventPipeline(
+        first_entry_file_name=input_file,
+        llm_serving=llm_serving,
+        cache_path="./cache_geokg_event",
+        query_time_start="2024-01-01",
+        query_time_end="2024-12-31",
+        location_name="China",
+        lang="en",
+    )
+    pipeline.forward()

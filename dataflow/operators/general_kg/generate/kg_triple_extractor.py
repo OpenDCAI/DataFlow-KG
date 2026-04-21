@@ -1,5 +1,5 @@
 from dataflow.prompts.core_kg.rel_triple_generate import KGRelationTripleExtractionPrompt
-from dataflow.prompts.core_kg.attri_triple import TKGAttributeQuadrupleExtractorPrompt
+from dataflow.prompts.core_kg.attri_triple import KGAttributeTripleExtractionPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger
@@ -19,7 +19,7 @@ from typing import Union
 
 @prompt_restrict(
     KGRelationTripleExtractionPrompt,
-    TKGAttributeQuadrupleExtractorPrompt
+    KGAttributeTripleExtractionPrompt
 )
 @OPERATOR_REGISTRY.register()
 class KGTripleExtraction(OperatorABC):
@@ -58,7 +58,7 @@ class KGTripleExtraction(OperatorABC):
 
         if triple_type == "attribute":
             self.prompt_template = (
-                TKGAttributeQuadrupleExtractorPrompt(lang=self.lang)
+                KGAttributeTripleExtractionPrompt(lang=self.lang)
             )
         elif triple_type == "relation":
             self.prompt_template = (

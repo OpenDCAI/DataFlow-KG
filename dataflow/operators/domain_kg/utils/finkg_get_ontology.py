@@ -8,6 +8,7 @@ License:
     MIT License
 """
 
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pandas as pd
@@ -30,16 +31,25 @@ def load_finkg_ontology(
             "attribute_type": ontology.get("attribute_type", {}),
         }
 
-    storage_meta = FileStorage(first_entry_file_name="", cache_type="json")
-    ontology_df = storage_meta.read(
-        file_path=f"./.cache/api/{input_key_meta}.json",
-        output_type="dataframe",
-    )
-    row = ontology_df.iloc[0]
+    ontology_path = Path(f"./.cache/api/{input_key_meta}.json")
+    if ontology_path.exists():
+        storage_meta = FileStorage(first_entry_file_name="", cache_type="json")
+        ontology_df = storage_meta.read(
+            file_path=str(ontology_path),
+            output_type="dataframe",
+        )
+        row = ontology_df.iloc[0]
+        return {
+            "entity_type": row["entity_type"],
+            "relation_type": row["relation_type"],
+            "attribute_type": row.get("attribute_type", {}),
+        }
+
+    ontology_loader = FinKGGetBasicOntology()
     return {
-        "entity_type": row["entity_type"],
-        "relation_type": row["relation_type"],
-        "attribute_type": row.get("attribute_type", {}),
+        "entity_type": ontology_loader.load_entity_types(),
+        "relation_type": ontology_loader.load_relation_types(),
+        "attribute_type": ontology_loader.load_attribute_types(),
     }
 
 

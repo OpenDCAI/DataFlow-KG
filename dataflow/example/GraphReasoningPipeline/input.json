@@ -1,0 +1,15 @@
+[
+  {
+    "triplet": [
+      "<subj> Henry <obj> The Maple Leaves <rel> forms",
+      "<subj> The Maple Leaves <obj> Paris <rel> performs_in",
+      "<subj> The Maple Leaves <obj> Berlin <rel> performs_in",
+      "<subj> Lucy <obj> Clean Earth <rel> joins",
+      "<subj> Henry <obj> Lucy <rel> is_inspired_by"
+    ],
+    "target_entity": [
+      ["Henry, Berlin"],
+      ["Henry, Clean Earth"]
+    ]
+  }
+]
