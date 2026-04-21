@@ -1,0 +1,29 @@
+[
+  {
+    "source": "example_data/kg_evaluation_visualization_pipeline/musician_story",
+    "raw_chunk": "Henry, a musician from Canada, trained under conductor Maria Rodriguez. He later formed the band The Maple Leaves with his sister Lucy. The Maple Leaves released the album Polar Lights in 2020 and toured in Paris, Berlin, and Rome.",
+    "triple": [
+      "<subj> Henry <obj> Canada <rel> comes_from",
+      "<subj> Henry <obj> Maria Rodriguez <rel> trained_under",
+      "<subj> Henry <obj> The Maple Leaves <rel> formed",
+      "<subj> Lucy <obj> The Maple Leaves <rel> joined",
+      "<subj> The Maple Leaves <obj> Polar Lights <rel> released",
+      "<subj> The Maple Leaves <obj> Paris <rel> toured_in",
+      "<subj> The Maple Leaves <obj> Berlin <rel> toured_in",
+      "<subj> The Maple Leaves <obj> Rome <rel> toured_in"
+    ]
+  },
+  {
+    "source": "example_data/kg_evaluation_visualization_pipeline/research_story",
+    "raw_chunk": "Dr. Elena Ruiz leads the OceanSense project at Pacific University. OceanSense uses satellite imagery and autonomous buoys to monitor coral reef bleaching in Hawaii. The project shares climate datasets with BlueEarth Foundation.",
+    "triple": [
+      "<subj> Dr. Elena Ruiz <obj> OceanSense <rel> leads",
+      "<subj> OceanSense <obj> Pacific University <rel> based_at",
+      "<subj> OceanSense <obj> satellite imagery <rel> uses",
+      "<subj> OceanSense <obj> autonomous buoys <rel> uses",
+      "<subj> OceanSense <obj> coral reef bleaching <rel> monitors",
+      "<subj> coral reef bleaching <obj> Hawaii <rel> occurs_in",
+      "<subj> OceanSense <obj> BlueEarth Foundation <rel> shares_datasets_with"
+    ]
+  }
+]
