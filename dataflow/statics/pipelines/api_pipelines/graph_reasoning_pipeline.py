@@ -12,6 +12,18 @@ from dataflow.serving import APILLMServing_request
 from dataflow.utils.storage import FileStorage
 
 
+def _default_example_file(folder: str, file_name: str) -> str:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.abspath(os.path.join(script_dir, "..", "example_data", folder, file_name)),
+        os.path.abspath(os.path.join(script_dir, "..", "..", "..", "example", folder, file_name)),
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            return path
+    return candidates[0]
+
+
 class GraphReasoningPipeline(PipelineABC):
     """Graph reasoning pipeline: target pairs -> multi-hop paths -> inferred relations."""
 
@@ -77,20 +89,18 @@ class GraphReasoningPipeline(PipelineABC):
 
 
 if __name__ == "__main__":
-    repo_root = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")
-    )
-    input_file = os.path.join(
-        repo_root,
-        "dataflow",
-        "data_for_operator_testing",
-        "graphreasoning.json",
+    input_file = os.environ.get(
+        "DF_GRAPH_REASONING_INPUT_FILE",
+        _default_example_file("GraphReasoningPipeline", "input.json"),
     )
 
     llm_serving = APILLMServing_request(
-        api_url="https://api.openai.com/v1/chat/completions",
+        api_url=os.environ.get(
+            "DF_API_URL",
+            "https://api.openai.com/v1/chat/completions",
+        ),
         key_name_of_api_key="DF_API_KEY",
-        model_name="gpt-4o-mini",
+        model_name=os.environ.get("DF_LLM_MODEL", "gpt-4o-mini"),
         max_workers=8,
         temperature=0.0,
     )

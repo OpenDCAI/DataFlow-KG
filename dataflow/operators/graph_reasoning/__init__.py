@@ -2,9 +2,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # reasoning
-    from .reasoning_path_search import KGReasoningPathSearch
-    from .reasoning_constrained_path_search import KGConstrainedPathSearch
-    from .reasoning_rel_generator import KGReasoningRelationGeneration
+    from .generate.reasoning_path_search import KGReasoningPathSearch
+    from .generate.reasoning_constrained_path_search import KGConstrainedPathSearch
+    from .generate.reasoning_rel_generator import KGReasoningRelationGeneration
 
     from .eval.reasoning_path_length_eval import KGReasoningPathLengthEvaluator
     from .eval.reasoning_path_redundancy_eval import KGPathRedundancyEvaluator
