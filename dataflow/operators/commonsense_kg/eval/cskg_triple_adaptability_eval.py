@@ -10,14 +10,18 @@ from dataflow.prompts.diverse_kg.cskg import CSKGTripleAdaptabilityPrompt
 
 
 @OPERATOR_REGISTRY.register()
-class CSKGTripleAdapbilityEvaluator(OperatorABC):
+# 修复：类名原拼写 "CSKGTripleAdapbilityEvaluator" 少了一个 't'，
+# 修正为 "CSKGTripleAdaptabilityEvaluator"（与文件名拼写一致）。
+class CSKGTripleAdaptabilityEvaluator(OperatorABC):
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                "CSKGTripleAdapbilityEvaluator 用于评估常识知识图谱（CSKG）三元组的适应性得分（adaptability scores）。",
+                # 修复：描述中原拼写 "CSKGTripleAdapbilityEvaluator" 修正为 "CSKGTripleAdaptabilityEvaluator"
+                "CSKGTripleAdaptabilityEvaluator 用于评估常识知识图谱（CSKG）三元组的适应性得分（adaptability scores）。",
                 "输入为三元组列表（默认字段 triple），输出为大模型评估的适应性得分列表（默认字段 adaptability_scores）。"
+
             )
         else:
             return (

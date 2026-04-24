@@ -86,7 +86,10 @@ class TKGQA_APIPipeline:
 
         self.qa_natural_eval_step5.run(
             storage=self.storage.step(),
-            input_key="2_QA_pairs",
+            # 修复：原 `input_key="2_QA_pairs"` 与上游 step4 的输出键不匹配。
+            # step4 写入的是 `output_key_meta="QA_pairs"`，所以 column 名为 "QA_pairs"。
+            # 修正为 `input_key="QA_pairs"`。
+            input_key="QA_pairs",
             output_key="naturalness_scores",
         )
 
