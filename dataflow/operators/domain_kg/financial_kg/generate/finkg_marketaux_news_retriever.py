@@ -17,7 +17,10 @@ from dataflow.utils.storage import DataFlowStorage
 class FinKGMarketauxNewsRetriever(OperatorABC):
 
     BASE_URL = "https://api.marketaux.com/v1"
-    DEFAULT_API_TOKEN = "1Ty34059fO9mG3qmh77T50bEpBmMtNGqJQMxs0SF"
+
+    # 修复：原 `DEFAULT_API_TOKEN` 是硬编码的真实 API Token，已泄露到源码中。
+    # 移除默认值，强制要求通过环境变量 `MARKETAUX_API_TOKEN` 或构造函数参数传入。
+    # 若未提供，抛出有意义的错误而非使用一个无效/泄露的凭证。
 
     def __init__(
         self,
@@ -32,10 +35,17 @@ class FinKGMarketauxNewsRetriever(OperatorABC):
         group_similar: bool = True,
     ):
         self.logger = get_logger()
-        self.api_token = api_token or os.environ.get(
-            "MARKETAUX_API_TOKEN",
-            self.DEFAULT_API_TOKEN,
-        )
+        env_token = os.environ.get("MARKETAUX_API_TOKEN")
+        if api_token:
+            self.api_token = api_token
+        elif env_token:
+            self.api_token = env_token
+        else:
+            raise ValueError(
+                "MarketAux API token is required. "
+                "Set the `MARKETAUX_API_TOKEN` environment variable "
+                "or pass `api_token` to the constructor."
+            )
         self.request_timeout = request_timeout
         self.default_limit = max(1, int(default_limit))
         self.default_lookback_days = max(1, int(default_lookback_days))

@@ -80,12 +80,14 @@ class SchoKGGetOntology(OperatorABC):
 
         entity_types = self.load_entity_types()
         relation_types = self.load_relation_types()
-        attribute_tyepes = self.load_attribute_types()
+        # 修复：原拼写错误 `attribute_tyepes`，应修正为 `attribute_types`。
+        # 变量名与 `load_attribute_types()` 方法名保持一致，便于维护。
+        attribute_types = self.load_attribute_types()
 
         dataframe = pd.DataFrame({
             "entity_type": [entity_types],
             "relation_type": [relation_types],
-            "attribute_type": [attribute_tyepes]
+            "attribute_type": [attribute_types]
         })
 
         output_file = storage.write(dataframe, file_path="./.cache/schokg/ontology.json", use_current_step=False)

@@ -159,7 +159,8 @@ class CSKGTripleExtraction(OperatorABC):
         output_file = storage.write(dataframe)
         self.logger.info(f"Results saved to {output_file}")
 
-        return [output_key]
+        # 对应上面改的，这函数签名里 output_key 是参数名，但 self.output_key 才是实际存储的值。第 162 行返回 [output_key] 会报 NameError，正确的是 return [self.output_key]？
+        return [self.output_key]
 
     # ------------------------------------------------------------------
     # Internal helper functions (formerly ExampleConstructor)
