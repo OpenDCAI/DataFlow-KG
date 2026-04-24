@@ -94,7 +94,6 @@ class LegalKGJudgementPrediction(OperatorABC):
             parsed = self._safe_parse_json(response[0])
 
             if parsed is None:
-                # S23 修复：原代码引用未定义变量 `raw_output`，应改为 `response[0]`。
                 self.logger.error(f"Parse error. Raw output:\n{response[0]}")
                 judgement, reason = None, None
             else:

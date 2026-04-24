@@ -1,9 +1,6 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    # S24 修复：原导入路径 `./generate.legalkg_get_ontology` 不存在。
-    # `LegalKGGetBasicOntology` 实际位于 `utils/legalkg_get_ontology.py`，
-    # 修正导入路径。同步修正 filter 中的不存在路径。
     from dataflow.operators.domain_kg.utils.legalkg_get_ontology import LegalKGGetBasicOntology
     from .generate.legalkg_triple_extractor import LegalKGTupleExtraction
     from .generate.legalkg_case_judgement_generator import LegalKGJudgementPrediction

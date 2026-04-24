@@ -18,10 +18,6 @@ class FinKGMarketauxNewsRetriever(OperatorABC):
 
     BASE_URL = "https://api.marketaux.com/v1"
 
-    # 修复：原 `DEFAULT_API_TOKEN` 是硬编码的真实 API Token，已泄露到源码中。
-    # 移除默认值，强制要求通过环境变量 `MARKETAUX_API_TOKEN` 或构造函数参数传入。
-    # 若未提供，抛出有意义的错误而非使用一个无效/泄露的凭证。
-
     def __init__(
         self,
         api_token: Optional[str] = None,

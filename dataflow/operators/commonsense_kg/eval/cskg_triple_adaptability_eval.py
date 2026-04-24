@@ -10,15 +10,12 @@ from dataflow.prompts.diverse_kg.cskg import CSKGTripleAdaptabilityPrompt
 
 
 @OPERATOR_REGISTRY.register()
-# 修复：类名原拼写 "CSKGTripleAdapbilityEvaluator" 少了一个 't'，
-# 修正为 "CSKGTripleAdaptabilityEvaluator"（与文件名拼写一致）。
 class CSKGTripleAdaptabilityEvaluator(OperatorABC):
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:
         if lang == "zh":
             return (
-                # 修复：描述中原拼写 "CSKGTripleAdapbilityEvaluator" 修正为 "CSKGTripleAdaptabilityEvaluator"
                 "CSKGTripleAdaptabilityEvaluator 用于评估常识知识图谱（CSKG）三元组的适应性得分（adaptability scores）。",
                 "输入为三元组列表（默认字段 triple），输出为大模型评估的适应性得分列表（默认字段 adaptability_scores）。"
 
@@ -51,7 +48,6 @@ class CSKGTripleAdaptabilityEvaluator(OperatorABC):
         try:
             return json.loads(clean)
         except:
-            # 修复：改为 adaptability_scores
             return {"adaptability_scores": []}
 
 
@@ -59,10 +55,8 @@ class CSKGTripleAdaptabilityEvaluator(OperatorABC):
 
         results = []
 
-        # hy修复：修改了进度条的描述
         for row in tqdm(records, desc="Triple Adaptability Eval"):
 
-            # hy修复：将错写的 qa_pairs 统一更正为 triples
             triples = row.get("triple", [])
 
             if isinstance(triples, str):
@@ -135,7 +129,6 @@ class CSKGTripleAdaptabilityEvaluator(OperatorABC):
 
         out_file = storage.write(df)
 
-        # hy修复：更正了日志输出信息
         self.logger.info(
             f"Saved triple adaptability scores to {out_file}"
         )

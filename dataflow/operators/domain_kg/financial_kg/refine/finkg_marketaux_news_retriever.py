@@ -17,7 +17,6 @@ from dataflow.utils.storage import DataFlowStorage
 class FinKGMarketauxNewsRetriever(OperatorABC):
 
     BASE_URL = "https://api.marketaux.com/v1"
-    # 修复（同 generate 版本）：移除硬编码 API Token，强制通过环境变量或构造函数参数传入。
 
     def __init__(
         self,

@@ -14,7 +14,6 @@ from dataflow.operators.domain_kg.scholar_kg.generate.schokg_query_reasoning imp
 class ScholarKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            # 修复：原文件名 "nput.json" 是拼写错误，修正为 "input.json"
             first_entry_file_name="../example_data/ScholarKGPipeline/input.json",
             cache_path="./cache_schokg",
             file_name_prefix="scholar_kg_pipeline",
