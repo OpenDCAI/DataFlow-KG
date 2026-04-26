@@ -148,18 +148,14 @@ class CSKGTripleExtraction(OperatorABC):
 
         outputs = self.process_batch(texts)
 
-#hy修改：原本的代码是去拿 self.output_key
-# （也就是我们传进来的 "extracted_triple"），但算子内部其实写死了叫 "triple"。
-#将o.get(self.output_key, []) for o in outputs 修改成 o.get("triple", []) for o in outputs
+
         dataframe[self.output_key] = [
-            # o.get(self.output_key, []) for o in outputs
-            o.get("triple", []) for o in outputs  # <- 这里必须是写死的 "triple"，不能是 self.output_key!
+            o.get("triple", []) for o in outputs 
         ]
 
         output_file = storage.write(dataframe)
         self.logger.info(f"Results saved to {output_file}")
 
-        # 对应上面改的，这函数签名里 output_key 是参数名，但 self.output_key 才是实际存储的值。第 162 行返回 [output_key] 会报 NameError，正确的是 return [self.output_key]？
         return [self.output_key]
 
     # ------------------------------------------------------------------

@@ -1,8 +1,6 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    # 修复：原拼写 "cskg_triple_adapbility_eval" 少了一个 't'，
-    # 实际文件名为 `cskg_triple_adaptability_eval.py`。
     from .eval.cskg_triple_adaptability_eval import CSKGTripleAdaptabilityEvaluator
     from .eval.cskg_triple_rationale_eval import CSKGTripleRationaleEvaluator
 

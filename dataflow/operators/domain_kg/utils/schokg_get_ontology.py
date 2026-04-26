@@ -80,8 +80,6 @@ class SchoKGGetOntology(OperatorABC):
 
         entity_types = self.load_entity_types()
         relation_types = self.load_relation_types()
-        # 修复：原拼写错误 `attribute_tyepes`，应修正为 `attribute_types`。
-        # 变量名与 `load_attribute_types()` 方法名保持一致，便于维护。
         attribute_types = self.load_attribute_types()
 
         dataframe = pd.DataFrame({

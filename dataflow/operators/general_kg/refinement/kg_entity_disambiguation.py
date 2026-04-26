@@ -190,9 +190,6 @@ class KGEntityDisambiguation(OperatorABC):
         entity_list = dataframe[self.input_key_meta].tolist()
 
         outputs = self.process_batch(texts, entity_list)
-        # 修复：process_batch 返回的字典键固定为 "disambiguated_entity"，
-        # 原代码使用 `o[self.output_key]` 会导致自定义 output_key 时 KeyError。
-        # 修正为直接使用 "disambiguated_entity"。
         dataframe[self.output_key] = [o["disambiguated_entity"] for o in outputs]
 
         output_file = storage.write(dataframe)
