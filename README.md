@@ -87,11 +87,11 @@ dfkg -v
 If the installation is correct and DataFlow-KG is the latest release, you will see something like:
 
 ```log
-open-dataflow-kg codebase version: 0.0.2
+open-dataflow-kg codebase version: 0.9.0
         Checking for updates...
-        Local version:  0.0.2
-        PyPI newest version:  0.0.2
-        You are using the latest version: 0.0.2.
+        Local version:  0.9.0
+        PyPI newest version:  0.9.0
+        You are using the latest version: 0.9.0.
 ```
 
 In addition, the `dfkg env` command can be used to inspect the current hardware and software environment, which is useful for bug reporting:
