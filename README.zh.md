@@ -24,7 +24,7 @@
 
 ## 1. 🤖 项目概览
 
-DataFlow-KG 是一个构建在 DataFlow 生态之上的、由大语言模型驱动的知识图谱处理库。它旨在为知识图谱构建、推理、检索、查询以及领域应用提供可复用、可扩展、模块化的算子。
+DataFlow-KG 是一个构建在 [DataFlow](https://github.com/OpenDCAI/DataFlow) 生态之上的、由大语言模型驱动的知识图谱处理库。它旨在为知识图谱构建、推理、检索、查询以及领域应用提供可复用、可扩展、模块化的算子。[DataFlow](https://github.com/OpenDCAI/DataFlow) 原项目为数据中心的 LLM 工作流提供了一个非常干净、优雅且高度可扩展的基础框架。
 
 不同于把 KG 工作流写成分散的脚本，DataFlow-KG 按图谱类型和应用场景组织算子包。这些算子可以进一步组合成更大的 pipeline，包括但不限于：
 

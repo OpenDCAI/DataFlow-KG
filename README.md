@@ -24,7 +24,7 @@
 
 ## 1. 🤖 Overview
 
-DataFlow-KG is an LLM-driven knowledge graph processing library built on top of the DataFlow ecosystem. It is designed to provide reusable, extensible, and modular operators for knowledge graph construction, reasoning, retrieval, querying, and domain-specific applications.
+DataFlow-KG is an LLM-driven knowledge graph processing library built on top of the [DataFlow](https://github.com/OpenDCAI/DataFlow) ecosystem. It is designed to provide reusable, extensible, and modular operators for knowledge graph construction, reasoning, retrieval, querying, and domain-specific applications. The original [DataFlow](https://github.com/OpenDCAI/DataFlow) project provides a clean, elegant, and highly extensible foundation for building practical data-centric LLM workflows.
 
 Rather than treating KG workflows as isolated scripts, DataFlow-KG organizes graph capabilities into operator packages by graph type and application scenario. These operators can be composed into larger pipelines, including but not limited to:
 
