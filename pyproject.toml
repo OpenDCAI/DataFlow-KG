@@ -33,7 +33,7 @@ dynamic = ["version", "dependencies"]
 [project.urls]
 Github = "https://github.com/Open-DataFlow/DataFlow-KG"
 Documentation = "https://open-dataflow.github.io/DataFlow-Doc/"
-"Bug Reports" = "https://github.com/Open-DataFlow/DataFlow/issues"
+"Bug Reports" = "https://github.com/Open-DataFlow/DataFlow-KG/issues"
 
 [project.scripts]
 dfkg = "dataflow.cli:main"

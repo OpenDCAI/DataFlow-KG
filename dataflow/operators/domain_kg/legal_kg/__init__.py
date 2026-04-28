@@ -1,12 +1,14 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from dataflow.operators.domain_kg.utils.legalkg_get_ontology import LegalKGGetBasicOntology
+    # generate
     from .generate.legalkg_triple_extractor import LegalKGTupleExtraction
     from .generate.legalkg_case_judgement_generator import LegalKGJudgementPrediction
 
+    # filter
     from .filter.legalkg_case_similarity_filtering import LegalKGCaseSimilarityFilter
 
+    # eval
     from .eval.legalkg_case_similarity_eval import LegalKGCaseSummarySimilarity
 
 else:
