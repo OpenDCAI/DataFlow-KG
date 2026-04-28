@@ -174,7 +174,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
     # Validation
     # --------------------------------------------------
     def _validate_dataframe(self, df: pd.DataFrame):
-        required = ["question", "entities", "triplet"]
+        required = ["question", "entities", "triple"]
         for col in required:
             if col not in df.columns:
                 raise ValueError(f"Missing required column: {col}")
@@ -216,7 +216,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
                 entities_list = [[] for _ in questions]
 
             # 3. 提取三元组
-            triplets = row.get("triplet", [])
+            triplets = row.get("triple", [])
             if triplets is None or not isinstance(triplets, list):
                 triplets = []
 

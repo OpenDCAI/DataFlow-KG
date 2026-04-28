@@ -4,7 +4,7 @@
       "On which date was Polar Lights released?",
       "Who trained Henry?"
     ],
-    "triplet": [
+    "triple": [
       "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by",
       "<subj> Henry <obj> The Maple Leaves <rel> forms",
       "<subj> The Maple Leaves <obj> Polar Lights <rel> releases",

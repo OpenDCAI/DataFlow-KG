@@ -67,6 +67,8 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
 
                   "<subj> Entity <obj> Entity <rel> Relation <AttributeName1> ValueName1 <AttributeName2> ValueName2"
 
+                  Replace AttributeName with specific relation attributes
+
                 - Do NOT add explanations or extra text
             """)
         else:
@@ -117,9 +119,11 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                 === 输出格式 ===
                 - 仅输出 JSON 对象
                 - 键为 "tuple"
-                - 每条为字符串，格式严格为：
+                - 每条为字符串，格式为：
 
                   "<subj> 实体 <obj> 实体 <rel> 关系 <AttributeName1> 属性值1"
+
+                  其中AttributeName1用具体的关系属性代替
 
                 - 不输出任何解释性文本
             """)
