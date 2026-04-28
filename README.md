@@ -1,6 +1,10 @@
 # DataFlow-KG
 
 <p align="center">
+  <img src="static/dataflow-KG%20framework.png" alt="DataFlow-KG framework" width="100%">
+</p>
+
+<p align="center">
   <b>DataFlow-KG</b>: An LLM-Driven Knowledge Graph Processing Library
 </p>
 
@@ -10,7 +14,8 @@
 
 <p align="center">
   <a href="https://github.com/OpenDCAI/DataFlow-KG">GitHub</a> |
-  <a href="https://zhp-li197.github.io/DataFlow-KG-Doc/zh/">Documentation</a>
+  <a href="https://zhp-li197.github.io/DataFlow-KG-Doc/zh/">Documentation</a> |
+  <a href="README.zh.md">中文 README</a>
 </p>
 
 ---
@@ -193,3 +198,4 @@ If you use DataFlow-KG in your research, please cite:
   year={2026},
   howpublished={\url{https://github.com/OpenDCAI/DataFlow-KG}}
 }
+```
