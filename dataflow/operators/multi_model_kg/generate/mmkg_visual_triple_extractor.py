@@ -114,7 +114,7 @@ class MMKGVisualTripleExtraction(OperatorABC):
 
             for entity in predicted_entities:
                 triples.append(
-                    f"<subj> {entity} <rel> depicted_in <obj> {img_key}"
+                    f"<subj> {entity} <obj> {img_key} <rel> depicted_in "
                 )
 
         return list(set(triples))
