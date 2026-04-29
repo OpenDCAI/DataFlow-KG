@@ -20,15 +20,15 @@ from dataflow.operators.general_kg.filter.kg_tuple_validation import (
 class KGExtractionPipeline:
     def __init__(self):
         self.storage = FileStorage(
-            first_entry_file_name="../example_data/KGExtractionPipeline.json",
-            cache_path="./cache_kg_extraction",
+            first_entry_file_name="../example_data/KGExtractionPipeline/input.json",
+            cache_path="./kg_extraction",
             file_name_prefix="kg_extraction_pipeline",
-            cache_type="jsonl",
+            cache_type="json",
         )
 
         self.llm_serving = APILLMServing_request(
             api_url="http://123.129.219.111:3000/v1/chat/completions",
-            model_name="gpt-4o-mini",
+            model_name="gpt-4o",
             max_workers=20,
         )
 

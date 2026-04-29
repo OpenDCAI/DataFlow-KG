@@ -15,15 +15,15 @@ class HyperKGQA_APIPipeline:
     def __init__(self):
         self.storage = FileStorage(
             first_entry_file_name="../example_data/HyperRelationKGPipeline/input.json",
-            cache_path="./cache_local",
+            cache_path="./hyper_kg",
             file_name_prefix="hyper_kg_qa_pipeline",
             cache_type="json",
         )
 
         self.llm_serving = APILLMServing_request(
-            api_url="https://api.openai.com/v1/chat/completions",
+            api_url="http://123.129.219.111:3000/v1/chat/completions",
             model_name="gpt-4o",
-            max_workers=30,
+            max_workers=20,
         )
 
         self.hyper_triple_extraction_step1 = HRKGTripleExtraction(

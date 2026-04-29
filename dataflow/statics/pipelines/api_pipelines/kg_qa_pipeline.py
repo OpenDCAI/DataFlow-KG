@@ -23,15 +23,15 @@ class KGQA_APIPipeline:
     def __init__(self):
         self.storage = FileStorage(
             first_entry_file_name="../example_data/KG2QAPipeline/input.json",
-            cache_path="./cache_local",
+            cache_path="./qa_generation",
             file_name_prefix="kg_qa_pipeline",
             cache_type="json",
         )
 
         self.llm_serving = APILLMServing_request(
-            api_url="https://api.openai.com/v1/chat/completions",
+            api_url="http://123.129.219.111:3000/v1/chat/completions",
             model_name="gpt-4o",
-            max_workers=30,
+            max_workers=10,
         )
 
         self.entity_extraction_step1 = KGEntityExtraction(

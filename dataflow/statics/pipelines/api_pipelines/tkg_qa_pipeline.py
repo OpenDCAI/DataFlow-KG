@@ -17,13 +17,13 @@ class TKGQA_APIPipeline:
     def __init__(self):
         self.storage = FileStorage(
             first_entry_file_name="../example_data/TemporalKGPipeline/input.json",
-            cache_path="./cache_local",
+            cache_path="./temporal_kg",
             file_name_prefix="tkg_qa_pipeline",
             cache_type="json",
         )
 
         self.llm_serving = APILLMServing_request(
-            api_url="https://api.openai.com/v1/chat/completions",
+            api_url="http://123.129.219.111:3000/v1/chat/completions",
             model_name="gpt-4o",
             max_workers=30,
         )
@@ -86,7 +86,7 @@ class TKGQA_APIPipeline:
 
         self.qa_natural_eval_step5.run(
             storage=self.storage.step(),
-            input_key="QA_pairs",
+            input_key="2_QA_pairs",
             output_key="naturalness_scores",
         )
 

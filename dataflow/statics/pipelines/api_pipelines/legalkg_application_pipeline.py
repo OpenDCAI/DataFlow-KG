@@ -3,28 +3,26 @@ from dataflow.utils.storage import FileStorage
 from dataflow.operators.domain_kg.utils.legalkg_get_ontology import (
     LegalKGGetBasicOntology,
 )
+from dataflow.operators.domain_kg.legal_kg.filter.legalkg_case_similarity_filtering import (
+    LegalKGCaseSimilarityFilter,
+)
+
 from dataflow.operators.domain_kg.legal_kg.generate.legalkg_triple_extractor import (
     LegalKGTupleExtraction,
+    LegalKGJudgementPrediction
 )
 
 from dataflow.operators.domain_kg.legal_kg.eval.legalkg_case_similarity_eval import (
     LegalKGCaseSummarySimilarity,
 )
-from dataflow.operators.domain_kg.legal_kg.filter.legalkg_case_similarity_filtering import (
-    LegalKGCaseSimilarityFilter,
-)
-from dataflow.operators.domain_kg.legal_kg.generate.legalkg_case_judgement_generator import (
-    LegalKGJudgementPrediction,
-)
-
 
 class LegalKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
             first_entry_file_name="../example_data/LegalKGPipeline/input.json",
-            cache_path="./cache_legalkg",
+            cache_path="./legalkg",
             file_name_prefix="legal_kg_pipeline",
-            cache_type="jsonl",
+            cache_type="json",
         )
         self.ontology_storage = FileStorage(
             first_entry_file_name="",
@@ -40,16 +38,20 @@ class LegalKGPipeline:
         )
 
         self.ontology_loader_step1 = LegalKGGetBasicOntology(lang="en")
+
         self.triple_extractor_step2 = LegalKGTupleExtraction(
             llm_serving=self.llm_serving,
             triple_type="relation",
             lang="en",
         )
+
         self.case_similarity_eval_step3 = LegalKGCaseSummarySimilarity(
             llm_serving=self.llm_serving,
             lang="en",
         )
+
         self.case_similarity_filter_step4 = LegalKGCaseSimilarityFilter()
+        
         self.judgement_prediction_step5 = LegalKGJudgementPrediction(
             llm_serving=self.llm_serving,
             lang="en",

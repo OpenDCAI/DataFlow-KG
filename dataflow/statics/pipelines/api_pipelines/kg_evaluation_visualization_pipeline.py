@@ -12,43 +12,20 @@ from dataflow.serving import APILLMServing_request
 class KGEvaluationVisualizationPipeline:
     """通用知识图谱评测与可视化流水线"""
 
-    def __init__(
-        self,
-        input_file: str = "",
-        cache_path: str = "./cache_kg_eval",
-        api_url: str = "https://api.openai.com/v1/chat/completions",
-        model_name: str = "gpt-4o-mini",
-        api_key_env: str = "DF_API_KEY",
-        max_workers: int = 10,
-        lang: str = "en",
-    ):
-        if not input_file:
-            pipeline_dir = os.path.dirname(os.path.abspath(__file__))
-            input_file = os.path.abspath(
-                os.path.join(
-                    pipeline_dir,
-                    "..",
-                    "example_data",
-                    "KGEvaluationPipeline",
-                    "input.json",
-                )
-            )
-
+    def __init__(self, lang: str = "en"):
         # -------- Storage --------
         self.storage = FileStorage(
-            first_entry_file_name=input_file,
-            cache_path=cache_path,
+            first_entry_file_name="../example_data/KGEvaluationPipeline/input.json",
+            cache_path="./kg_evaluation",
             file_name_prefix="kg_eval",
             cache_type="json",
         )
 
         # -------- LLM Serving --------
         self.llm_serving = APILLMServing_request(
-            api_url=api_url,
-            key_name_of_api_key=api_key_env,
-            model_name=model_name,
-            max_workers=max_workers,
-            temperature=0.0,
+            api_url="http://123.129.219.111:3000/v1/chat/completions",
+            model_name="gpt-4o",
+            max_workers=20,
         )
 
         # -------- 无需 LLM 的评测算子 --------

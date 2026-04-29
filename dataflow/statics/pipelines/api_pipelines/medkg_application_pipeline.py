@@ -15,9 +15,9 @@ class MedicalKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
             first_entry_file_name="../example_data/MedicalKGPipeline/input.json",
-            cache_path="./cache_medkg",
+            cache_path="./medkg",
             file_name_prefix="medical_kg_pipeline",
-            cache_type="jsonl",
+            cache_type="json",
         )
         self.ontology_storage = FileStorage(
             first_entry_file_name="",

@@ -15,9 +15,9 @@ class ScholarKGPipeline:
     def __init__(self):
         self.storage = FileStorage(
             first_entry_file_name="../example_data/ScholarKGPipeline/input.json",
-            cache_path="./cache_schokg",
+            cache_path="./schokg",
             file_name_prefix="scholar_kg_pipeline",
-            cache_type="jsonl",
+            cache_type="json",
         )
         self.ontology_storage = FileStorage(
             first_entry_file_name="",
@@ -33,6 +33,7 @@ class ScholarKGPipeline:
         )
 
         self.ontology_loader_step1 = SchoKGGetOntology()
+
         self.triple_extractor_step2 = SchoKGTripleExtraction(
             llm_serving=self.llm_serving,
             lang="en",
