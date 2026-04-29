@@ -18,7 +18,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
         - question: List[str]  # 单个行包含多个问题
         - entities: List[List[str]]  # 每个子列表对应一个问题的实体
         - relations: List[List[str]]
-        - triplet: List[str]
+        - triple: List[str]
 
     Output columns:
         - subgraph_prompt: List[str]  # 每个问题对应一个prompt
@@ -33,27 +33,27 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
         if lang == "zh":
             return (
                 "KGGraphRAGSubgraphRetrieval 用于围绕问题实体检索子图并生成 GraphRAG 提示词。",
-                "输入: question + entities + triplet; 输出: subgraph_prompt",
+                "输入: question + entities + triple; 输出: subgraph_prompt",
             )
         return (
             "KGGraphRAGSubgraphRetrieval is used to retrieve subgraphs around question entities and build GraphRAG prompts.",
-            "Input: question + entities + triplet; Output: subgraph_prompt",
+            "Input: question + entities + triple; Output: subgraph_prompt",
         )
 
     # --------------------------------------------------
-    # Triplet parsing
+    # triple parsing
     # --------------------------------------------------
     @staticmethod
-    def _parse_triplet(triplet: str):
+    def _parse_triple(triple: str):
         """
         Parse:
         "<subj> Henry <obj> Maria Rodriguez <rel> is_trained_by"
         -> (Henry, is_trained_by, Maria Rodriguez)
         """
         try:
-            subj = triplet.split("<subj>")[1].split("<obj>")[0].strip()
-            obj = triplet.split("<obj>")[1].split("<rel>")[0].strip()
-            rel = triplet.split("<rel>")[1].strip()
+            subj = triple.split("<subj>")[1].split("<obj>")[0].strip()
+            obj = triple.split("<obj>")[1].split("<rel>")[0].strip()
+            rel = triple.split("<rel>")[1].strip()
             return subj, rel, obj
         except Exception:
             return None, None, None
@@ -62,10 +62,10 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
     # Entity catalog induction
     # --------------------------------------------------
     @classmethod
-    def _build_entity_catalog(cls, triplets: List[str]):
+    def _build_entity_catalog(cls, triples: List[str]):
         entities = set()
-        for t in triplets:
-            h, _, o = cls._parse_triplet(t)
+        for t in triples:
+            h, _, o = cls._parse_triple(t)
             if h:
                 entities.add(h)
             if o:
@@ -78,21 +78,21 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
     @classmethod
     def _k_hop_subgraph(
         cls,
-        triplets: List[str],
+        triples: List[str],
         start_entity: str,
         hop: int,
     ):
         adj = defaultdict(list)
 
-        for t in triplets:
-            h, r, o = cls._parse_triplet(t)
+        for t in triples:
+            h, r, o = cls._parse_triple(t)
             if h is None:
                 continue
             adj[h].append((o, t))
             adj[o].append((h, t))  # treat as undirected
 
         visited_entities = {start_entity}
-        visited_triplets = set()
+        visited_triples = set()
         queue = deque([(start_entity, 0)])
 
         while queue:
@@ -101,12 +101,12 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
                 continue
 
             for nxt, raw_t in adj.get(cur, []):
-                visited_triplets.add(raw_t)
+                visited_triples.add(raw_t)
                 if nxt not in visited_entities:
                     visited_entities.add(nxt)
                     queue.append((nxt, depth + 1))
 
-        return list(visited_triplets)
+        return list(visited_triples)
 
     # --------------------------------------------------
     # Prompt construction (单个问题)
@@ -115,7 +115,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
         self,
         question: str,
         entities: List[str],
-        triplets: List[str],
+        triples: List[str],
     ) -> str:
         # 标准化实体列表（处理嵌套列表情况）
         normalized_entities = []
@@ -129,7 +129,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
         normalized_entities = list(set(normalized_entities))
 
         # 1. 构建KG中的实体目录
-        entity_catalog = self._build_entity_catalog(triplets)
+        entity_catalog = self._build_entity_catalog(triples)
 
         # 2. 种子实体 = 提取的实体 ∩ KG中的实体
         seed_entities = [
@@ -144,7 +144,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
         subgraphs = {}
         for ent in seed_entities:
             subgraphs[ent] = self._k_hop_subgraph(
-                triplets,
+                triples,
                 start_entity=ent,
                 hop=self.hop,
             )
@@ -163,7 +163,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
                 for t in sg:
                     lines.append(f"- {t}")
             else:
-                lines.append("- No relevant triplets found")
+                lines.append("- No relevant triples found")
             lines.append("")
 
         lines.append("Answer the question based on the above knowledge graph subgraphs.")
@@ -216,9 +216,9 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
                 entities_list = [[] for _ in questions]
 
             # 3. 提取三元组
-            triplets = row.get("triple", [])
-            if triplets is None or not isinstance(triplets, list):
-                triplets = []
+            triples = row.get("triple", [])
+            if triples is None or not isinstance(triples, list):
+                triples = []
 
             # 4. 确保问题数量和实体列表数量匹配
             max_len = max(len(questions), len(entities_list))
@@ -238,7 +238,7 @@ class KGGraphRAGSubgraphRetrieval(OperatorABC):
                 prompt = self._build_single_prompt(
                     question=q,
                     entities=ents,
-                    triplets=triplets,
+                    triples=triples,
                 )
                 row_prompts.append(prompt)
 

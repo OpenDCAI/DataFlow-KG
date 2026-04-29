@@ -28,8 +28,8 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                 <subj> EntityName
                 <obj> EntityName
                 <rel> Relation
-                <Attribute1> AttributeValue1
-                <Attribute2> AttributeValue2
+                <attribute1> attributeValue1
+                <attribute2> attributeValue2
                 ...
 
                 === CORE RULES ===
@@ -46,13 +46,13 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                    - Attributes MODIFY THE RELATION, NOT THE ENTITY
                    - Attributes must be explicitly supported by the text
                    - Typical attribute types include (but are not limited to):
-                     • Time (when)
-                     • Location (where)
-                     • Condition (under what condition)
-                     • Purpose / Goal (why)
-                     • Manner / Method (how)
-                     • Degree / Intensity
-                     • Frequency
+                     • time (when)
+                     • location (where)
+                     • condition (under what condition)
+                     • purpose / goal (why)
+                     • manner / method (how)
+                     • degree / intensity
+                     • frequency
                    - Do NOT invent attributes or values
 
                 4. FACT CONSTRAINT:
@@ -65,9 +65,9 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                 - Key: "tuple"
                 - Each item is a single string formatted exactly as:
 
-                  "<subj> Entity <obj> Entity <rel> Relation <AttributeName1> ValueName1 <AttributeName2> ValueName2"
+                  "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1 <attributeName2> valueName2"
 
-                  Replace AttributeName with specific relation attributes
+                  Replace attributeName with specific relation attributes
 
                 - Do NOT add explanations or extra text
             """)
@@ -121,9 +121,9 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                 - 键为 "tuple"
                 - 每条为字符串，格式为：
 
-                  "<subj> 实体 <obj> 实体 <rel> 关系 <AttributeName1> 属性值1"
+                  "<subj> 实体 <obj> 实体 <rel> 关系 <attributeName1> 属性值1"
 
-                  其中AttributeName1用具体的关系属性代替
+                  其中attributeName1用具体的关系属性代替
 
                 - 不输出任何解释性文本
             """)
@@ -139,8 +139,8 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                 Output ONLY JSON:
                 {{
                   "tuple": [
-                    "<subj> Entity <obj> Entity <rel> Relation <AttributeName1> ValueName1",
-                    "<subj> Entity <obj> Entity <rel> Relation <AttributeName1> ValueName1"
+                    "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1",
+                    "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1"
                   ]
                 }}
             """)
@@ -154,8 +154,8 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
                 仅输出 JSON：
                 {{
                   "tuple": [
-                    "<subj> 实体 <obj> 实体 <rel> 关系 <AttributeName1> 属性值1",
-                    "<subj> 实体 <obj> 实体 <rel> 关系 <AttributeName1> 属性值1"
+                    "<subj> 实体 <obj> 实体 <rel> 关系 <attributeName1> 属性值1",
+                    "<subj> 实体 <obj> 实体 <rel> 关系 <attributeName1> 属性值1"
                   ]
                 }}
             """)
@@ -390,12 +390,14 @@ class HRKGOneHopQAPathGenerationPrompt(PromptABC):
                 - Questions should be natural and fluent
 
                 Output format (STRICT JSON):
-                {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
-                }
+                    {
+                    "QA_pairs": [
+                        {
+                        "question": "...",
+                        "answer": "..."
+                        }
+                    ]
+                    }
             """)
 
         return textwrap.dedent("""\
@@ -421,10 +423,12 @@ class HRKGOneHopQAPathGenerationPrompt(PromptABC):
 
             输出格式（严格 JSON）：
             {
-              "QA_pairs": [
-                "Question: ... Answer: ...",
-                "Question: ... Answer: ..."
-              ]
+            "QA_pairs": [
+                {
+                "question": "...",
+                "answer": "..."
+                }
+            ]
             }
         """)
 
@@ -489,12 +493,14 @@ class HRKGTwoHopPathQAGenerationPrompt(PromptABC):
                 - Questions that ignore the path connection
 
                 Output format (STRICT JSON):
+            {
+            "QA_pairs": [
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                "question": "...",
+                "answer": "..."
                 }
+            ]
+            }
             """)
 
         return textwrap.dedent("""\
@@ -522,10 +528,12 @@ class HRKGTwoHopPathQAGenerationPrompt(PromptABC):
 
             输出格式（严格 JSON）：
             {
-              "QA_pairs": [
-                "Question: ... Answer: ...",
-                "Question: ... Answer: ..."
-              ]
+            "QA_pairs": [
+                {
+                "question": "...",
+                "answer": "..."
+                }
+            ]
             }
         """)
 

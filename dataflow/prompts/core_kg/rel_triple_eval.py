@@ -522,7 +522,7 @@ class KGQAConcisenessPrompt(PromptABC):
     Evaluate the conciseness of QA pairs.
 
     Each QA pair is formatted as:
-        "Question: ... Answer: ..."
+    {"question": "...", "answer": "..."}
 
     The model should score each QA pair independently based on how concise
     and direct the answer is.
@@ -619,7 +619,7 @@ class KGQACorrelationPrompt(PromptABC):
     Evaluate the correlation between question and answer in QA pairs.
 
     Each QA pair is formatted as:
-        "Question: ... Answer: ..."
+        {"question": "...", "answer": "..."}
 
     The model should determine whether the answer actually responds
     to the question.
@@ -722,7 +722,7 @@ class KGQANaturalnessPrompt(PromptABC):
     Evaluate the naturalness of QA pairs.
 
     Each QA pair is formatted as:
-        "Question: ... Answer: ..."
+        {"question": "...", "answer": "..."}
 
     The model should judge whether the QA pair sounds natural,
     fluent, and human-like.

@@ -354,10 +354,10 @@ class KGAttributeTripleSingleEntityQAGenerationPrompt(PromptABC):
 
                 === OUTPUT FORMAT (STRICT JSON) ===
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                  "QA_pairs": [{
+                    "question": "...", "answer": "..."},
+                    {"question": "...", "answer": "..."
+                  }]
                 }
 
                 Do NOT explain reasoning.
@@ -413,10 +413,10 @@ class KGAttributeTripleSingleEntityQAGenerationPrompt(PromptABC):
 
                 === 输出格式（严格 JSON）===
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                  "QA_pairs": [{
+                    "question": "...", "answer": "..."},
+                    {"question": "...", "answer": "..."
+                  }]
                 }
 
                 不输出推理过程，不提及三元组本身。

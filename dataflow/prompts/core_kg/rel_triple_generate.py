@@ -552,10 +552,10 @@ class KGOneHopQAPathGenerationPrompt(PromptABC):
 
                 Output format (STRICT JSON):
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                  "QA_pairs": [{
+                    "question": "...", "answer": "..."},
+                    {"question": "...", "answer": "..."
+                  }]
                 }
 
                 Triples:
@@ -588,10 +588,10 @@ class KGOneHopQAPathGenerationPrompt(PromptABC):
 
                 【输出格式（严格 JSON）】：
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                  "QA_pairs": [{
+                    "question": "...", "answer": "..."},
+                    {"question": "...", "answer": "..."
+                  }]
                 }
 
                 待处理三元组：
@@ -672,10 +672,10 @@ class KGTwoHopPathQAGenerationPrompt(PromptABC):
 
                 === OUTPUT FORMAT (STRICT JSON, DO NOT CHANGE) ===
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                  "QA_pairs": [{
+                    "question": "...", "answer": "..."},
+                    {"question": "...", "answer": "..."
+                  }]
                 }
 
                 Two-hop paths:
@@ -715,10 +715,10 @@ class KGTwoHopPathQAGenerationPrompt(PromptABC):
 
                 === 输出格式（严格 JSON，不得更改）===
                 {
-                  "QA_pairs": [
-                    "Question: ... Answer: ...",
-                    "Question: ... Answer: ..."
-                  ]
+                  "QA_pairs": [{
+                    "question": "...", "answer": "..."},
+                    {"question": "...", "answer": "..."
+                  }]
                 }
 
                 二跳路径：
