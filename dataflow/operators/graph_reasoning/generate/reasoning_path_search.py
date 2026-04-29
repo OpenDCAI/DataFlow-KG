@@ -126,7 +126,7 @@ class KGReasoningPathSearch(OperatorABC):
     # Validation
     # ----------------------------
     def _validate_dataframe(self, df: pd.DataFrame):
-        for col in ["triplet", "target_entity"]:
+        for col in ["triple", "target_entity"]:
             if col not in df.columns:
                 raise ValueError(f"Missing required column: {col}")
         if "mpath" in df.columns:
