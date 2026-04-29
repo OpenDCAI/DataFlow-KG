@@ -121,7 +121,6 @@ Pipelines with the same name across different folders are usually incremental va
 
 | Directory       | Required Resources    |
 | --------------- | --------------------- |
-| `cpu_pipelines` | CPU only              |
 | `api_pipelines` | CPU + LLM API         |
 | `gpu_pipelines` | CPU + API + local GPU |
 

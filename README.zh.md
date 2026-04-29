@@ -121,7 +121,6 @@ dfkg init
 
 | 目录 | 所需资源 |
 | --- | --- |
-| `cpu_pipelines` | 仅 CPU |
 | `api_pipelines` | CPU + LLM API |
 | `gpu_pipelines` | CPU + API + 本地 GPU |
 
