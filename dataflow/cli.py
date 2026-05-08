@@ -2,18 +2,9 @@
 # dataflow/cli.py - Enhanced with local model judge support and eval init/run
 # ===============================================================
 # DataFlow 命令行入口
-#   dataflow -v                         查看版本并检查更新
-#   dataflow init [...]                初始化脚本/配置
-#   dataflow env                       查看环境
-#   WEBUI 已经暂时移除！！！！！
-#   dataflow webui operators [opts]    启动算子/管线 UI
-#   dataflow webui agent     [opts]    启动 DataFlow-Agent UI（已整合后端）
-#   dataflow pdf2model init/train      PDF to Model 训练流程
-#   dataflow text2model init/train     Text to Model 训练流程
-#   dataflow chat                      聊天界面
-#   dataflow eval init                 初始化评估配置文件
-#   dataflow eval api                  运行API模型评估
-#   dataflow eval local                运行本地模型评估
+#   dfkg -v                         查看版本并检查更新
+#   dfkg init [...]                初始化脚本/配置
+#   dfkg env                       查看环境
 # ===============================================================
 
 import os
@@ -30,14 +21,14 @@ from dataflow.cli_funcs import cli_env, cli_init  # 项目已有工具
 from dataflow.version import __version__  # 版本号
 
 color_init(autoreset=True)
-PYPI_API_URL = "https://pypi.org/pypi/open-dataflow/json"
+PYPI_API_URL = "https://pypi.org/pypi/dataflow-kg/json"
 
 
 # ---------------- 版本检查 ----------------
 def version_and_check_for_updates() -> None:
     width = os.get_terminal_size().columns
     print(Fore.BLUE + "=" * width + Style.RESET_ALL)
-    print(f"open-dataflow-kg codebase version: {__version__}")
+    print(f"dataflow-kg codebase version: {__version__}")
 
     try:
         r = requests.get(PYPI_API_URL, timeout=5)
@@ -48,7 +39,7 @@ def version_and_check_for_updates() -> None:
         print(f"\tPyPI  version : {remote}")
         if remote != __version__:
             print(Fore.YELLOW + f"New version available: {remote}."
-                                "  Run 'pip install -U open-dataflow-kg' to upgrade."
+                                "  Run 'pip install -U dataflow-kg' to upgrade."
                   + Style.RESET_ALL)
         else:
             print(Fore.GREEN + f"You are using the latest version: {__version__}" + Style.RESET_ALL)
