@@ -13,7 +13,11 @@ import re
 
 from dataflow.core.prompt import prompt_restrict, DIYPromptABC
 
-@prompt_restrict(KGRelationTripleSubgraphNumericQAPrompt, KGRelationTripleSubgraphSetQAPrompt)
+@prompt_restrict(
+    KGRelationTripleSubgraphNumericQAPrompt, 
+    KGRelationTripleSubgraphSetQAPrompt,
+    KGRelationTripleSubgraphMultiTripleQAPrompt
+    )
 @OPERATOR_REGISTRY.register()
 class KGRelationTripleSubgraphQAGeneration(OperatorABC):
     r"""Processor for generating numeric or set-based QA pairs from KG triples.
@@ -49,6 +53,8 @@ class KGRelationTripleSubgraphQAGeneration(OperatorABC):
             self.prompt_template = KGRelationTripleSubgraphNumericQAPrompt(lang=self.lang)
         elif qa_type == 'set':
             self.prompt_template = KGRelationTripleSubgraphSetQAPrompt(lang=self.lang)
+        elif qa_type == 'base':
+            self.promt_template = KGRelationTripleSubgraphMultiTripleQAPrompt(lang=self.lang)
         else:
             raise ValueError(f"Unsupported qa_type: {qa_type}")
 

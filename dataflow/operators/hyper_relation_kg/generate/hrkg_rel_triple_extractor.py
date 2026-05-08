@@ -34,13 +34,11 @@ class HRKGTripleExtraction(OperatorABC):
         self,
         llm_serving: LLMServingABC,
         seed: int = 0,
-        lang: str = "en",
-        num_q: int = 5
+        lang: str = "en"
     ):
         self.rng = random.Random(seed)
         self.llm_serving = llm_serving
         self.lang = lang
-        self.num_q = num_q
         self.logger = get_logger()
 
         self.prompt_template = (

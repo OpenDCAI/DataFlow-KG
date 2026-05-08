@@ -976,6 +976,146 @@ class KGRelationTripleSubgraphSetQAPrompt(PromptABC):
 
 
 @PROMPT_REGISTRY.register()
+class KGRelationTripleSubgraphMultiTripleQAPrompt(PromptABC):
+    """
+    专属 Prompt：从【实体-关系-实体】三元组生成问答对，
+    不限制具体问答类型，但每个 QA 必须依赖至少两个三元组。
+    """
+
+    def __init__(self, lang: str = "zh"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are a knowledge graph QA generation expert.
+
+                === TASK ===
+                Given:
+                - A set of ENTITY–RELATION–ENTITY triples
+                - Multiple entities and multiple triples exist
+
+                Generate QA pairs based on the given triples.
+
+                === CORE REQUIREMENTS ===
+                1. Each question MUST rely on at least two triples.
+                2. The question type is NOT restricted.
+                   It may involve listing, comparison, reasoning, path reasoning,
+                   multi-hop reasoning, aggregation, relation inference, or other forms.
+                3. The answer can be an entity, a set of entities, a concept, a relation,
+                   a short phrase, or a concise natural-language answer, depending on the question.
+                4. Only use the given triples; do not introduce external knowledge.
+                5. Avoid questions that can be answered using only one triple.
+
+                Examples:
+                - "Which album released by A earned B?" 
+                  This requires one triple about A releasing the album and another triple about the album earning B.
+                - "What is the connection between A and C through B?"
+                  This requires at least two triples forming a path.
+                - "Which entities are related to both A and B?"
+                  This requires comparing multiple triples.
+                - "Why can X be considered connected to Y?"
+                  This requires combining evidence from multiple triples.
+
+                === OUTPUT FORMAT ===
+                {
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    },
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
+                }
+
+                Do NOT explain reasoning or mention triples explicitly.
+                Output JSON only.
+                Ensure each QA pair requires information from at least two triples.
+            """)
+        else:
+            return textwrap.dedent("""\
+                你是一名知识图谱问答生成专家。
+
+                === 任务 ===
+                已知：
+                - 一组【实体-关系-实体】三元组
+                - 三元组中可能包含多个实体和多条关系
+
+                目标：
+                基于给定三元组生成问答对。
+
+                === 核心要求 ===
+                1. 每个问题必须依赖至少两条三元组。
+                2. 不限制具体问答类型。
+                   可以是列举、比较、路径推理、多跳推理、聚合、关系推断、
+                   事实归纳、实体关联分析等任意形式。
+                3. 答案形式不做限制。
+                   答案可以是单个实体、多个实体组成的集合、概念、关系、
+                   短语，或简洁的自然语言回答。
+                4. 严格使用给定三元组，不允许引入外部知识。
+                5. 避免生成只依赖一条三元组即可回答的问题。
+
+                示例：
+                - “A 发布的哪个专辑获得了 B？”
+                  该问题需要结合“A 发布专辑”和“专辑获得 B”两条三元组。
+                - “A 和 C 之间通过 B 存在什么联系？”
+                  该问题需要至少两条三元组构成路径。
+                - “哪些实体同时与 A 和 B 有关？”
+                  该问题需要比较多条三元组。
+                - “为什么可以认为 X 与 Y 存在关联？”
+                  该问题需要综合多条三元组中的信息。
+
+                === 输出格式（严格 JSON）===
+                {
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    },
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
+                }
+
+                不输出推理过程，不显式提及“三元组”。
+                只输出 JSON。
+                确保每个问答对都必须使用至少两条三元组中的信息才能回答。
+            """)
+
+    def build_prompt(self, relation_triples: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Please generate QA pairs strictly following the rules above.
+
+                Each question MUST require information from at least two triples.
+                Do not generate questions that can be answered by a single triple.
+
+                ENTITY–RELATION–ENTITY triples:
+                {relation_triples}
+
+                Output QA pairs in JSON format only:
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                请严格按照上述规则，从以下实体关系三元组中生成问答对。
+
+                每个问题必须至少依赖两条三元组中的信息。
+                不要生成只依赖单条三元组即可回答的问题。
+
+                实体-关系-实体三元组：
+                {relation_triples}
+
+                仅以 JSON 格式输出 QA_pairs：
+            """)
+
+
+@PROMPT_REGISTRY.register()
 class KGMultiHopPathDialogueQAGenerationPrompt(PromptABC):
     """
     专属 Prompt：

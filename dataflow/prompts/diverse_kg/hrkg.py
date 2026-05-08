@@ -67,7 +67,7 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
 
                   "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1 <attributeName2> valueName2"
 
-                  Replace attributeName with specific relation attributes
+                  Replace attributeName1, attributeName2 with specific relation attributes
 
                 - Do NOT add explanations or extra text
             """)
@@ -132,6 +132,8 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
         if self.lang == "en":
             return textwrap.dedent(f"""\
                 Extract Hyper-Relation Knowledge Graphs from the following text according to the rules above.
+
+                Replace attributeName1 with specific relation attributes.
 
                 Text:
                 {text}

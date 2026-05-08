@@ -29,13 +29,11 @@ class KGTupleRemoveRepeated(OperatorABC):
         self,
         llm_serving: LLMServingABC = None,
         seed: int = 0,
-        lang: str = "en",
-        merge_to_input=False
+        lang: str = "en"
     ):
         self.rng = random.Random(seed)
         self.lang = lang
         self.logger = get_logger()
-        self.merge_to_input = merge_to_input
 
     @staticmethod
     def get_desc(lang: str = "en") -> tuple:

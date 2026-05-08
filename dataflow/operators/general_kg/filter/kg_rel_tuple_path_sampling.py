@@ -23,7 +23,6 @@ class KGRelationTuplePathGenerator(OperatorABC):
 
     def __init__(
         self,
-        llm_serving: LLMServingABC = None,
         seed: int = 0,
         lang: str = "en",
         k: int = 2,
