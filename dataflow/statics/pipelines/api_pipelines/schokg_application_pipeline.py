@@ -1,14 +1,8 @@
 from dataflow.serving.api_llm_serving_request import APILLMServing_request
 from dataflow.utils.storage import FileStorage
-from dataflow.operators.domain_kg.utils.schokg_get_ontology import (
-    SchoKGGetOntology,
-)
-from dataflow.operators.domain_kg.scholar_kg.generate.schokg_triple_extractor import (
-    SchoKGTripleExtraction,
-)
-from dataflow.operators.domain_kg.scholar_kg.generate.schokg_query_reasoning import (
-    SchoKGQueryReasoningOperator,
-)
+from dataflow.operators.domain_kg.utils import SchoKGGetOntology
+from dataflow.operators.domain_kg.scholar_kg import SchoKGTripleExtraction
+from dataflow.operators.domain_kg.scholar_kg import SchoKGQueryReasoningOperator
 
 
 class ScholarKGPipeline:

@@ -1,13 +1,11 @@
 from dataflow.serving.api_llm_serving_request import APILLMServing_request
 from dataflow.utils.storage import FileStorage
 from dataflow.operators.domain_kg.utils.medkg_get_drug_therapy_ontology import (
-    MedKGGetDrugTherapyOntology,
+    MedKGGetDrugTherapyOntology
 )
-from dataflow.operators.domain_kg.medical_kg.generate.medkg_triple_extractor import (
+from dataflow.operators.domain_kg.medical_kg import (
     MedKGTripleExtraction,
-)
-from dataflow.operators.domain_kg.medical_kg.generate.medkg_triple_drug_action_mechanism_discovery import (
-    MedKGTripleDrugActionMechanismDiscovery,
+    MedKGTripleDrugActionMechanismDiscovery
 )
 
 

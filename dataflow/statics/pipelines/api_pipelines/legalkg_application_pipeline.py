@@ -3,18 +3,13 @@ from dataflow.utils.storage import FileStorage
 from dataflow.operators.domain_kg.utils.legalkg_get_ontology import (
     LegalKGGetBasicOntology,
 )
-from dataflow.operators.domain_kg.legal_kg.filter.legalkg_case_similarity_filtering import (
+from dataflow.operators.domain_kg.legal_kg import (
     LegalKGCaseSimilarityFilter,
-)
-
-from dataflow.operators.domain_kg.legal_kg.generate.legalkg_triple_extractor import (
     LegalKGTupleExtraction,
-    LegalKGJudgementPrediction
+    LegalKGJudgementPrediction,
+    LegalKGCaseSummarySimilarity
 )
 
-from dataflow.operators.domain_kg.legal_kg.eval.legalkg_case_similarity_eval import (
-    LegalKGCaseSummarySimilarity,
-)
 
 class LegalKGPipeline:
     def __init__(self):

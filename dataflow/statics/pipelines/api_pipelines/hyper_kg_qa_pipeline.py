@@ -1,7 +1,7 @@
 from dataflow.serving import APILLMServing_request
 from dataflow.utils.storage import FileStorage
 
-from dataflow.operators.general_kg.eval.kg_qa_natural_eval import KGQANaturalEvaluator
+from dataflow.operators.general_kg import KGQANaturalEvaluator
 from dataflow.operators.hyper_relation_kg import HRKGRelationTripleAttributeFilter
 from dataflow.operators.hyper_relation_kg import (
     HRKGTripleExtraction,

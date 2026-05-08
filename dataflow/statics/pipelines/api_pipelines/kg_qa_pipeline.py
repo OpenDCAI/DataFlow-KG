@@ -1,22 +1,16 @@
 from dataflow.serving import APILLMServing_request
 from dataflow.utils.storage import FileStorage
 
-from dataflow.operators.general_kg.eval.kg_qa_natural_eval import KGQANaturalEvaluator
-from dataflow.operators.general_kg.eval.kg_subgraph_scale_eval import KGSubgraphScaleEvaluator
-from dataflow.operators.general_kg.filter.kg_rel_tuple_subgraph_sampling import (
-    KGEntityBasedSubgraphSampling,
-)
-from dataflow.operators.general_kg.filter.kg_subgraph_scale_filtering import (
+from dataflow.operators.general_kg import (
+    KGQANaturalEvaluator,
+    KGSubgraphScaleEvaluator,
     KGSubgraphScaleFilter,
-)
-from dataflow.operators.general_kg.filter.kg_tuple_remove_repeated import (
     KGTupleRemoveRepeated,
+    KGEntityBasedSubgraphSampling,
+    KGEntityExtraction,
+    KGTripleExtraction,
+    KGRelationTripleSubgraphQAGeneration
 )
-from dataflow.operators.general_kg.generate.kg_entity_extractor import KGEntityExtraction
-from dataflow.operators.general_kg.generate.kg_rel_triple_subgraph_qa_generator import (
-    KGRelationTripleSubgraphQAGeneration,
-)
-from dataflow.operators.general_kg.generate.kg_triple_extractor import KGTripleExtraction
 
 
 class KGQA_APIPipeline:

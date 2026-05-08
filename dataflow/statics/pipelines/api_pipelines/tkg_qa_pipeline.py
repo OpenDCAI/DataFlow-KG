@@ -5,10 +5,8 @@ import pandas as pd
 from dataflow.serving import APILLMServing_request
 from dataflow.utils.storage import FileStorage
 
-from dataflow.operators.general_kg.eval.kg_qa_natural_eval import KGQANaturalEvaluator
-from dataflow.operators.general_kg.filter.kg_rel_tuple_path_sampling import (
-    KGRelationTuplePathGenerator,
-)
+from dataflow.operators.general_kg import KGQANaturalEvaluator
+from dataflow.operators.general_kg import KGRelationTuplePathGenerator
 from dataflow.operators.temporal_kg import TKGTupleExtraction
 from dataflow.operators.temporal_kg import TKGTuplePathQAGeneration
 from dataflow.operators.temporal_kg import TKGTupleTimeFilter

@@ -1,16 +1,12 @@
 import os
 
 from dataflow.core import LLMServingABC
-from dataflow.operators.domain_kg.financial_kg.filter.finkg_4tuple_ontology_filtering import (
+from dataflow.operators.domain_kg.financial_kg import (
     FinKGTupleFilter,
-)
-from dataflow.operators.domain_kg.financial_kg.generate.finkg_4tuple_extractor import (
     FinKGTupleExtraction,
+    FinKGEntityRiskAssessment
 )
-from dataflow.operators.domain_kg.financial_kg.refine.finkg_entity_risk_assessment import (
-    FinKGEntityRiskAssessment,
-)
-from dataflow.operators.domain_kg.utils.finkg_get_ontology import load_finkg_ontology
+from dataflow.operators.domain_kg.utils import load_finkg_ontology
 from dataflow.pipeline import PipelineABC
 from dataflow.serving import APILLMServing_request
 from dataflow.utils.storage import FileStorage

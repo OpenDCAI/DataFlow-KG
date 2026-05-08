@@ -9,6 +9,7 @@ transformers<4.54.0
 accelerate
 rapidfuzz
 colorlog
+librosa
 appdirs
 datasketch
 httpx[socks]

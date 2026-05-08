@@ -1,11 +1,9 @@
 import os
 
 from dataflow.core import LLMServingABC
-from dataflow.operators.general_kg.generate.kg_entity_extractor import (
+from dataflow.operators.general_kg import (
     KGEntityExtraction,
-)
-from dataflow.operators.general_kg.generate.kg_triple_extractor import (
-    KGTripleExtraction,
+    KGTripleExtraction
 )
 from dataflow.operators.multi_model_kg import (
     MMKGEntityBasedSubgraphSampling,
