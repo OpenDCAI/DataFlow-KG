@@ -1,6 +1,13 @@
 [
   {
     "raw_chunk": "Tesla unveiled the Cybertruck at a product event. Elon Musk appeared on stage during the launch presentation. The presentation focused on electric vehicle design and manufacturing.",
-    "img_dict": {}
+    "img_dict": {
+      "img_cybertruck": "../example_data/MultimodalKGPipeline/images/cyber.jpg",
+      "img_musk_stage": "../example_data/MultimodalKGPipeline/images/musk.jpg"
+    },
+    "vis_url": [
+      "../example_data/MultimodalKGPipeline/images/cyber.jpg",
+      "../example_data/MultimodalKGPipeline/images/musk.jpg"
+    ]
   }
 ]

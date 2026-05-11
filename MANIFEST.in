@@ -6,8 +6,8 @@ recursive-include dataflow *.sh
 recursive-include dataflow *.txt
 
 # 包含样例文件夹下所有类型的文件
-# 样例文件夹路径为dataflow/exaple
-recursive-include dataflow/example */
+# 样例文件夹路径为dataflow/example
+recursive-include dataflow/example *
 
 # 包含顶层文档文件
 include README.md
