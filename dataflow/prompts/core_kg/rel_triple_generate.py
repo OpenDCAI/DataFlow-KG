@@ -640,89 +640,126 @@ class KGTwoHopPathQAGenerationPrompt(PromptABC):
                 You are a multi-hop knowledge graph question-answer generation expert.
 
                 Your task:
-                Generate QUESTION-ANSWER pairs that REQUIRE EXACTLY TWO HOPS of reasoning,
+                Generate as many high-quality and non-redundant QUESTION-ANSWER pairs as possible
+                that REQUIRE EXACTLY TWO HOPS of reasoning,
                 strictly based on the given two-hop knowledge graph paths.
 
                 === DEFINITION OF TWO-HOP PATH ===
                 A two-hop path has the form:
-                <triple> A <subj> B <obj> R1 || <triple> B <subj> C <obj> R2
+                <subj> A <obj> B <rel> R1 || <subj> B <obj> C <rel> R2
+
                 Example:
-                <triple> Henry <subj> Maple Leaves <obj> is_member_of || <triple> Maple Leaves <subj> Polar Lights <obj> released
+                <subj> Henry <obj> Maple Leaves <rel> is_member_of || <subj> Maple Leaves <obj> Polar Lights <rel> released
 
                 === CRITICAL REQUIREMENTS (MUST FOLLOW) ===
                 1. Each QA MUST be generated from a two-hop path and require BOTH triples in this path to answer.
-                   - If the question can be answered using only ONE triple → INVALID.
+                   - If the question can be answered using only ONE triple, it is INVALID.
                 2. Do NOT generate any one-hop questions.
-                3. Do NOT ask about intermediate entities directly unless required by both hops.
+                3. Do NOT ask about intermediate entities directly unless the question clearly depends on both hops.
                 4. Do NOT introduce external knowledge or assumptions.
                 5. Do NOT modify any entity or relation names.
+                6. Generate as many high-quality and non-redundant QA pairs as possible.
+                7. If multiple valid two-hop reasoning questions can be generated from the same path, generate all of them.
+                8. Avoid duplicate or near-duplicate questions.
+                9. Avoid questions with the same reasoning chain and the same answer unless they ask from clearly different perspectives.
 
                 === ALLOWED QUESTION PATTERNS ===
                 - Composition reasoning:
-                  (e.g., What did Henry belong to that released Polar Lights?)
+                  Example: What did Henry belong to that released Polar Lights?
                 - Two-step relational inference:
-                  (e.g., Which work was released by the group Henry is a member of?)
+                  Example: Which work was released by the group Henry is a member of?
+                - Reverse two-hop reasoning:
+                  Example: Who is a member of the group that released Polar Lights?
+                - Intermediate-bridged reasoning:
+                  Example: Which group connects Henry to Polar Lights?
                 - Indirect attribute questions:
-                  (e.g., When was the album released by Henry's group?)
+                  Example: When was the album released by Henry's group?
+                - Entity identification through two-hop evidence:
+                  Example: Which entity is connected to Polar Lights through membership in Maple Leaves?
 
                 === FORBIDDEN QUESTION TYPES ===
                 - Any question answerable from only one triple
                 - Simple subject-object queries
                 - Direct inverse questions of a single triple
+                - Questions that ignore the connection between the two triples
+                - Duplicate or near-duplicate paraphrases
 
                 === OUTPUT FORMAT (STRICT JSON, DO NOT CHANGE) ===
                 {
-                  "QA_pairs": [{
-                    "question": "...", "answer": "..."},
-                    {"question": "...", "answer": "..."
-                  }]
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    },
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
                 }
-
-                Two-hop paths:
-                {paths}
             """)
         else:
             return textwrap.dedent("""\
                 你是一名多跳知识图谱问答生成专家。
 
                 你的任务：
-                严格基于给定的【二跳（two-hop）知识路径】生成问答对，
-                且问题必须依赖完整的两跳推理才能回答。
+                严格基于给定的【二跳（two-hop）知识路径】，
+                尽可能多地生成高质量、非重复的问答对，
+                且每个问题必须依赖完整的两跳推理才能回答。
 
                 === 二跳路径定义 ===
                 二跳路径形式如下：
                 <subj> A <obj> B <rel> R1 || <subj> B <obj> C <rel> R2
+
                 例子：
                 <subj> Henry <obj> Maple Leaves <rel> is_member_of || <subj> Maple Leaves <obj> Polar Lights <rel> released
 
                 === 核心强制要求（必须遵守）===
-                1）每个 QA 必须从一条两跳路径中生成，并且同时使用该路径中的两条三元组才能回答  
-                   —— 若只用一条即可回答，则该 QA 视为无效  
-                2）禁止生成任何一跳问题  
-                3）禁止只询问中间节点，除非问题语义明确依赖两跳  
-                4）禁止引入外部知识或隐含假设  
-                5）不允许修改任何实体或关系名称  
+                1. 每个 QA 必须从一条两跳路径中生成，并且必须同时使用该路径中的两条三元组才能回答。
+                   - 若只用一条三元组即可回答，则该 QA 无效。
+                2. 禁止生成任何一跳问题。
+                3. 禁止只询问中间节点，除非问题语义明确依赖两跳。
+                4. 禁止引入外部知识或隐含假设。
+                5. 不允许修改任何实体或关系名称。
+                6. 在保证质量和不重复的前提下，尽可能多地生成问答对。
+                7. 如果同一条两跳路径可以生成多个有效的两跳推理问题，应尽量全部生成。
+                8. 避免生成重复或高度相似的问题。
+                9. 如果多个问题具有相同推理链和相同答案，只有在提问角度明显不同的情况下才保留。
 
                 === 允许的问题类型 ===
-                - 组合关系推理（例如：Henry 所属的团体发布了什么？）
-                - 两步关系反推（例如：Henry 所在团体发布的作品是什么？）
-                - 间接属性查询（例如：Henry 的团体发布的作品是什么时候发布的？）
+                - 组合关系推理：
+                  例如：Henry 所属的团体发布了什么？
+                - 两步关系推理：
+                  例如：Henry 所在团体发布的作品是什么？
+                - 反向两跳推理：
+                  例如：谁属于发布了 Polar Lights 的团体？
+                - 中间节点桥接推理：
+                  例如：哪个团体连接了 Henry 和 Polar Lights？
+                - 间接属性查询：
+                  例如：Henry 的团体发布的作品是什么时候发布的？
+                - 基于两跳证据的实体识别：
+                  例如：哪个实体通过 Maple Leaves 与 Polar Lights 产生联系？
 
                 === 严禁的问题类型 ===
                 - 可由单条三元组回答的问题
                 - 简单主谓宾查询
                 - 单条三元组的反向提问
+                - 无视两条三元组连接关系的问题
+                - 重复或高度相似的改写问题
 
                 === 输出格式（严格 JSON，不得更改）===
                 {
-                  "QA_pairs": [{
-                    "question": "...", "answer": "..."},
-                    {"question": "...", "answer": "..."
-                  }]
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    },
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
                 }
-
-                二跳路径：
-                {paths}
             """)
 
     def build_prompt(self, paths: str):
@@ -734,6 +771,11 @@ class KGTwoHopPathQAGenerationPrompt(PromptABC):
             return textwrap.dedent(f"""\
                 Please generate TWO-HOP question-answer pairs strictly following the rules above.
 
+                Generate as many high-quality and non-redundant two-hop QA pairs as possible.
+                Each QA must require BOTH triples in a two-hop path.
+                If a path supports multiple valid reasoning directions, generate all of them.
+                Do not generate one-hop questions.
+
                 Two-hop paths:
                 {paths}
 
@@ -742,6 +784,11 @@ class KGTwoHopPathQAGenerationPrompt(PromptABC):
         else:
             return textwrap.dedent(f"""\
                 请严格按照上述规则，从以下二跳路径中生成多跳问答对。
+
+                请在保证质量和不重复的前提下，尽可能多地生成两跳问答对。
+                每个 QA 都必须依赖某条二跳路径中的两条三元组。
+                如果同一条路径支持多个有效推理方向，请尽量全部生成。
+                禁止生成一跳问题。
 
                 二跳路径：
                 {paths}

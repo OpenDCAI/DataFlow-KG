@@ -2,6 +2,7 @@ from dataflow.prompts.core_kg.attri_triple import (
     KGAttributeTripleMultiEntityBaseQAGenerationPrompt,
     KGAttributeTripleMultiEntityNumericQAGenrationPrompt,
     KGAttributeTripleMultiEntitySetQAGenerationPrompt,
+    KGAttributeTripleMultiAttributeBaseQAGenerationPrompt
 )
 from dataflow.prompts.core_kg.attri_triple import KGAttributeTripleSingleEntityQAGenerationPrompt
 
@@ -23,7 +24,8 @@ import re
     KGAttributeTripleMultiEntityBaseQAGenerationPrompt,
     KGAttributeTripleMultiEntityNumericQAGenrationPrompt,
     KGAttributeTripleMultiEntitySetQAGenerationPrompt,
-    KGAttributeTripleSingleEntityQAGenerationPrompt
+    KGAttributeTripleSingleEntityQAGenerationPrompt,
+    KGAttributeTripleMultiAttributeBaseQAGenerationPrompt
 )
 @OPERATOR_REGISTRY.register()
 class KGAttributeTripleQAGeneration(OperatorABC):
@@ -53,6 +55,8 @@ class KGAttributeTripleQAGeneration(OperatorABC):
             self.prompt_template = KGAttributeTripleSingleEntityQAGenerationPrompt(lang=self.lang)
         elif qa_type == "multi_base":
             self.prompt_template = KGAttributeTripleMultiEntityBaseQAGenerationPrompt(lang=self.lang)
+        elif qa_type == "multi_attribute":
+            self.prompt_template = KGAttributeTripleMultiAttributeBaseQAGenerationPrompt(lang=self.lang)
         elif qa_type == "multi_num":
             self.prompt_template = KGAttributeTripleMultiEntityNumericQAGenrationPrompt(lang=self.lang)
         elif qa_type == "multi_set":

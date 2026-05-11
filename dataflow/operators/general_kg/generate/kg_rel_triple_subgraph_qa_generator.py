@@ -1,4 +1,4 @@
-from dataflow.prompts.core_kg.rel_triple_generate import KGRelationTripleSubgraphNumericQAPrompt, KGRelationTripleSubgraphSetQAPrompt
+from dataflow.prompts.core_kg.rel_triple_generate import KGRelationTripleSubgraphNumericQAPrompt, KGRelationTripleSubgraphSetQAPrompt, KGRelationTripleSubgraphMultiTripleQAPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger

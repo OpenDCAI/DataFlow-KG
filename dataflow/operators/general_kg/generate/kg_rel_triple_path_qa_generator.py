@@ -107,20 +107,24 @@ class KGRelationTriplePathQAGeneration(OperatorABC):
             responses = self.llm_serving.generate_from_input(user_inputs=user_inputs, system_prompt=sys_prompt)
 
             try:
-                parsed = json.loads(re.search(r'\{.*\}', responses[0], re.DOTALL).group())
+                match = re.search(r'\{.*\}', responses[0], re.DOTALL)
+                if not match:
+                    raise ValueError("No JSON object found in response")
+
+                parsed = json.loads(match.group())
                 qa_pairs = parsed.get("QA_pairs", [])
+
+                # 不限制 QA 数量：0 个、1 个、多个都保留
+                if not isinstance(qa_pairs, list):
+                    qa_pairs = []
+
             except Exception as e:
                 self.logger.warning(f"Failed to parse QA_pairs: {e}")
-                continue
-
-            # Enforce minimum QA pairs constraint
-            if not isinstance(qa_pairs, list) or len(qa_pairs) < 2:
-                self.logger.warning(f"Drop example: need >=2 QA_pairs, got {qa_pairs}")
-                continue
+                qa_pairs = []
 
             results.append({
-                'source_text': triples_text,
-                'QA_pairs': qa_pairs
+                "source_text": triples_text,
+                "QA_pairs": qa_pairs
             })
 
         return results

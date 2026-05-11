@@ -504,6 +504,20 @@ class KGAttributeTripleMultiEntityBaseQAGenerationPrompt(PromptABC):
                 4) Multi-entity aggregation
                    (e.g., Which cities among A, B, and C have population > X?)
 
+                === GENERATION COVERAGE REQUIREMENT ===
+                You MUST generate as many valid QA pairs as possible from the given triples.
+
+                Specifically:
+                - Enumerate ALL semantically distinct QA pairs that satisfy the rules above
+                - Consider all applicable combinations of entities, attributes, attribute values,
+                  and allowed question types
+                - Do NOT stop after generating only a few examples
+                - Do NOT omit a valid QA simply because other QAs have already been generated
+                  from the same triples
+                - Do NOT generate duplicate QAs or paraphrases with the same meaning
+
+                If no valid multi-entity QA can be formed, return an empty list.
+
                 === OUTPUT FORMAT (STRICT JSON) ===
                 {
                   "QA_pairs": [
@@ -557,6 +571,18 @@ class KGAttributeTripleMultiEntityBaseQAGenerationPrompt(PromptABC):
                 3）多实体是 / 否 验证  
                 4）多实体属性条件筛选
 
+                === 生成覆盖要求 ===
+                你必须基于给定三元组，尽可能完整地生成所有符合要求的问答对。
+
+                具体要求：
+                - 枚举所有满足上述规则、且语义不同的有效 QA
+                - 需要尽可能考虑所有可用的实体组合、属性、属性值以及允许的问题类型
+                - 不要只生成少量示例后就停止
+                - 不要因为某些三元组已经用于生成过其他 QA，就遗漏仍然合法的新 QA
+                - 不要生成语义重复的 QA，也不要仅生成同义改写
+
+                如果无法构造任何合法的多实体 QA，则返回空列表。
+
                 === 输出格式（严格 JSON）===
                 {
                   "QA_pairs": [
@@ -573,7 +599,9 @@ class KGAttributeTripleMultiEntityBaseQAGenerationPrompt(PromptABC):
     def build_prompt(self, attribute_triples: str):
         if self.lang == "en":
             return textwrap.dedent(f"""\
-                Please generate multi-entity QA pairs strictly following the rules above.
+                Please generate ALL valid and semantically distinct multi-entity QA pairs
+                that can be constructed from the triples below, strictly following the rules above.
+                Do not generate only a small number of examples.
 
                 Entity-Attribute-Value triples:
                 {attribute_triples}
@@ -582,7 +610,9 @@ class KGAttributeTripleMultiEntityBaseQAGenerationPrompt(PromptABC):
             """)
         else:
             return textwrap.dedent(f"""\
-                请严格按照上述规则，从以下实体属性三元组中生成多实体问答对。
+                请严格按照上述规则，从以下实体属性三元组中，
+                尽可能完整地生成【所有符合要求且语义不同】的多实体问答对。
+                不要只生成少量示例。
 
                 实体-属性-属性值三元组：
                 {attribute_triples}
@@ -590,6 +620,188 @@ class KGAttributeTripleMultiEntityBaseQAGenerationPrompt(PromptABC):
                 仅以 JSON 格式输出 QA_pairs：
             """)
 
+@PROMPT_REGISTRY.register()
+class KGAttributeTripleMultiAttributeBaseQAGenerationPrompt(PromptABC):
+    """
+    专属 Prompt：从【同一实体的多个 实体-属性-属性值 三元组】中生成多属性基础 QA
+
+    - 输入：具有相同实体的实体属性三元组
+    - 输出：必须联合使用【两个或以上三元组】的基础问答对
+    - 每个 QA 必须涉及同一实体的【两个或以上属性】
+    - 仅使用给定三元组，不引入外部知识
+    """
+
+    def __init__(self, lang: str = "zh"):
+        self.lang = lang
+        self.system_text = self.build_system_prompt()
+
+    def build_system_prompt(self):
+        if self.lang == "en":
+            return textwrap.dedent("""\
+                You are a knowledge graph multi-attribute QA generation expert.
+
+                === TASK ===
+                Given:
+                - A set of ENTITY–ATTRIBUTE–VALUE triples
+                - All triples describe the SAME entity
+
+                Generate BASIC question–answer pairs that require
+                **AT LEAST TWO DISTINCT TRIPLES** to answer.
+
+                === HARD CONSTRAINT (CRITICAL) ===
+                ❌ Any QA that can be answered using only ONE triple is INVALID.
+                ❌ Any question involving only ONE attribute of the entity is INVALID.
+
+                Every QA MUST:
+                - Be about the same entity
+                - Jointly use two or more different attributes of that entity
+                - Require information from at least two distinct triples to answer
+
+                === ALLOWED OPERATIONS (STRICTLY LIMITED) ===
+                You may ONLY:
+                - Ask for multiple attribute values of the same entity
+                - Verify whether the entity simultaneously satisfies multiple attribute–value conditions
+                - Ask for one attribute value under the condition of one or more other known attributes
+                - Summarize the entity using multiple explicitly given attributes
+
+                You may NOT:
+                - Introduce external or implicit knowledge
+                - Use information outside the given triples
+                - Invent attributes or values
+                - Generate any QA that depends on only one triple
+                - Convert attributes into hidden relations
+
+                === ALLOWED QUESTION TYPES (MULTI-ATTRIBUTE ONLY) ===
+                1) Multi-attribute retrieval
+                   (e.g., What are the nationality and occupation of A?)
+                2) Multi-attribute verification (Yes/No)
+                   (e.g., Is A a singer and a Canadian?)
+                3) Conditional attribute query
+                   (e.g., Given that A is a singer, what is A's nationality?)
+                4) Multi-attribute summary
+                   (e.g., What information is known about A's occupation and nationality?)
+
+                === GENERATION COVERAGE REQUIREMENT ===
+                You MUST generate as many valid QA pairs as possible from the given triples.
+
+                Specifically:
+                - Enumerate ALL semantically distinct QA pairs that satisfy the rules above
+                - Consider all valid combinations of two or more distinct attributes / triples
+                - For each valid attribute combination, consider all applicable allowed question types
+                - Do NOT stop after generating only a few examples
+                - Do NOT omit a valid QA simply because the same triples have already been used
+                  in another QA
+                - Do NOT generate duplicate QAs or paraphrases with the same meaning
+
+                If no valid multi-attribute QA can be formed, return an empty list.
+
+                === OUTPUT FORMAT (STRICT JSON) ===
+                {
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
+                }
+
+                Do NOT explain reasoning.
+                Do NOT mention triples explicitly.
+            """)
+        else:
+            return textwrap.dedent("""\
+                你是一名知识图谱【单实体多属性问答】生成专家。
+
+                === 任务 ===
+                已知：
+                - 一组【实体-属性-属性值】三元组
+                - 所有三元组描述的是【同一个实体】
+
+                目标：
+                生成【基础问答对】，且每个问答对都必须联合使用
+                【两个或以上不同三元组】中的信息。
+
+                === 强制约束（非常重要）===
+                ❌ 任何只依赖【一个三元组】即可回答的问题都是【非法的】
+                ❌ 任何只涉及该实体【一个属性】的问题都是【非法的】
+
+                每一个 QA 必须：
+                - 围绕同一个实体展开
+                - 联合使用该实体的【两个或以上不同属性】
+                - 回答时必须依赖【两个或以上不同三元组】的信息
+
+                === 允许的操作（严格受限）===
+                你只可以：
+                - 同时查询该实体的多个属性值
+                - 判断该实体是否同时满足多个属性-属性值条件
+                - 在已知一个或多个属性信息的条件下，查询该实体的另一个属性
+                - 基于多个已给属性，对该实体进行基础信息概括
+
+                严禁：
+                - 引入外部或常识性知识
+                - 使用未出现的属性或属性值
+                - 生成任何只依赖单个三元组即可回答的问题
+                - 将属性隐式转化为实体关系
+
+                === 允许的问题类型（仅限多属性）===
+                1）多属性联合查询  
+                   例如：A 的国籍和职业分别是什么？
+                2）多属性是 / 否验证  
+                   例如：A 是否既是歌手，又来自加拿大？
+                3）条件属性查询  
+                   例如：已知 A 的职业是歌手，那么 A 的国籍是什么？
+                4）多属性基础概括  
+                   例如：关于 A 的职业和国籍，已知哪些信息？
+
+                === 生成覆盖要求 ===
+                你必须基于给定三元组，尽可能完整地生成所有符合要求的问答对。
+
+                具体要求：
+                - 枚举所有满足上述规则、且语义不同的有效 QA
+                - 尽可能考虑所有由【两个或以上不同属性 / 三元组】构成的合法组合
+                - 对于每一种合法属性组合，尽可能生成所有适用的问题类型
+                - 不要只生成少量示例后就停止
+                - 不要因为某些三元组已经用于生成过其他 QA，就遗漏仍然合法的新 QA
+                - 不要生成语义重复的 QA，也不要仅生成同义改写
+
+                如果无法构造任何合法的多属性 QA，则返回空列表。
+
+                === 输出格式（严格 JSON）===
+                {
+                  "QA_pairs": [
+                    {
+                      "question": "...",
+                      "answer": "..."
+                    }
+                  ]
+                }
+
+                不输出推理过程，不提及三元组本身。
+            """)
+
+    def build_prompt(self, attribute_triples: str):
+        if self.lang == "en":
+            return textwrap.dedent(f"""\
+                Please generate ALL valid and semantically distinct multi-attribute QA pairs
+                that can be constructed from the triples below, strictly following the rules above.
+                Do not generate only a small number of examples.
+
+                Entity-Attribute-Value triples of the same entity:
+                {attribute_triples}
+
+                Output QA pairs in JSON format only:
+            """)
+        else:
+            return textwrap.dedent(f"""\
+                请严格按照上述规则，从以下同一实体的属性三元组中，
+                尽可能完整地生成【所有符合要求且语义不同】的多属性问答对。
+                不要只生成少量示例。
+
+                同一实体的【实体-属性-属性值】三元组：
+                {attribute_triples}
+
+                仅以 JSON 格式输出 QA_pairs：
+            """)
 
 @PROMPT_REGISTRY.register()
 class KGAttributeTripleMultiEntityNumericQAGenrationPrompt(PromptABC):

@@ -3,6 +3,7 @@ from dataflow.utils.registry import PROMPT_REGISTRY
 from dataflow.core.prompt import PromptABC
 import json
 
+
 @PROMPT_REGISTRY.register()
 class HRKGHyperRelationExtractorPrompt(PromptABC):
     """
@@ -18,114 +19,173 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
             return textwrap.dedent("""\
                 You are an expert in extracting Hyper-Relation Knowledge Graphs from natural language text.
 
-                A Hyper-Relation KG extends a standard (Entity–Relation–Entity) triple by attaching
-                structured attributes to the RELATION, capturing contextual constraints such as
-                time, condition, purpose, manner, frequency, reason, or degree.
+                A Hyper-Relation KG extends a standard Entity–Relation–Entity triple by attaching
+                structured attributes to the RELATION. These attributes describe contextual constraints
+                such as time, location, condition, reason, purpose, manner, degree, frequency, source,
+                evidence, historical background, or other relation-specific information.
 
                 === TASK DEFINITION ===
-                Extract hyper-relation knowledge in the following form:
+                Extract hyper-relation knowledge in the following string format:
 
-                <subj> EntityName
-                <obj> EntityName
-                <rel> Relation
-                <attribute1> attributeValue1
-                <attribute2> attributeValue2
-                ...
+                "<subj> Entity <obj> Entity <rel> Relation <semantic_attribute_name> attribute_value"
 
                 === CORE RULES ===
+
                 1. ENTITY:
-                   - Clear noun or noun phrase (concrete or abstract)
-                   - NO pronouns (he / she / it / they)
-                   - Normalized, concise wording
+                   - The subject and object must be clear nouns or noun phrases.
+                   - Do NOT use pronouns such as he, she, it, they.
+                   - Normalize entity names when possible.
+                   - Keep entities concise.
 
                 2. RELATION:
-                   - A commonsense or semantic relation describing what / why / how
-                   - Examples: UsedFor, Causes, CapableOf, AtLocation, Helps, Makes, HasProperty
+                   - The relation must describe the core fact between subject and object.
+                   - Use concise semantic relation names such as:
+                     BornIn, MarriedTo, Released, PerformedAt, Experienced, CausedBy,
+                     InfluencedBy, StudiedAt, CollaboratedWith, Won, NominatedFor.
+                   - Do NOT put time, location, reason, purpose, or manner inside the relation name.
+                   - Each hyper-relation must express only ONE core fact.
 
-                3. RELATION ATTRIBUTES (CRITICAL):
-                   - Attributes MODIFY THE RELATION, NOT THE ENTITY
-                   - Attributes must be explicitly supported by the text
-                   - Typical attribute types include (but are not limited to):
-                     • time (when)
-                     • location (where)
-                     • condition (under what condition)
-                     • purpose / goal (why)
-                     • manner / method (how)
-                     • degree / intensity
-                     • frequency
-                   - Do NOT invent attributes or values
+                3. RELATION ATTRIBUTES:
+                   - Attributes modify the RELATION, not the entity.
+                   - Attribute names are NOT restricted to a fixed vocabulary.
+                   - You may create any concise and meaningful semantic attribute name based on the text.
+                   - Attribute names must clearly describe the role of the attribute value.
+                   - Good attribute names include examples such as:
+                     <time>, <location>, <reason>, <cause>, <purpose>, <manner>,
+                     <condition>, <degree>, <frequency>, <source>, <evidence>,
+                     <historical_context>, <political_context>, <award_year>,
+                     <publication_date>, <performance_place>, <album_name>.
+                   - Do NOT invent attributes or values.
+                   - If no valid attribute is available, output only:
+                     "<subj> Entity <obj> Entity <rel> Relation"
 
-                4. FACT CONSTRAINT:
-                   - Each hyper-relation expresses ONE core fact
-                   - Attributes only add constraints to that fact
-                   - Avoid mixing multiple relations into one extraction
+                4. FORBIDDEN ATTRIBUTE NAMES:
+                   Never use placeholder or generic attribute names such as:
+                   <attribute1>, <attribute2>, <attribute3>,
+                   <attributeName1>, <attributeName2>,
+                   <attr1>, <attr2>, <property1>, <property2>.
+
+                   Incorrect:
+                   "<subj> Chopin <obj> Financial Struggle <rel> Experienced <attribute1> political strife and instability <attribute2> time February 1848"
+
+                   Correct:
+                   "<subj> Chopin <obj> Financial Struggle <rel> Experienced <political_context> political strife and instability <time> February 1848"
+
+                    Incorrect:
+                    "<subj> Beyoncé Entity <obj> Destiny's Child Entity <rel> MemberOfRelation <time_period> late 1990s"
+
+                    Correct:
+                    "<subj> Beyoncé <obj> Destiny's Child <rel> MemberOf <time_period> late 1990s"
+
+                    Incorrect:
+                    "<subj> Beyoncé Entity <obj> Dangerously in Love Entity <rel> ReleasedRelation <time> 2003"
+
+                    Correct:
+                    "<subj> Beyoncé <obj> Dangerously in Love <rel> Released <time> 2003"
+
+                5. ATTRIBUTE FORMAT:
+                   - Every attribute must be written as an XML-like tag.
+                   - The attribute name should be lowercase or snake_case.
+                   - Attribute type words should not be placed inside the value.
+
+                   Incorrect:
+                   "<attribute2> time February 1848"
+
+                   Correct:
+                   "<time> February 1848"
 
                 === OUTPUT FORMAT ===
-                - Output ONLY a JSON object
-                - Key: "tuple"
-                - Each item is a single string formatted exactly as:
+                Output ONLY a valid JSON object:
 
-                  "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1 <attributeName2> valueName2"
+                {
+                  "tuple": [
+                    "<subj> subject_name <obj> object_name <rel> relation_name <attribute_name> attribute_value",
+                    "<subj> subject_name <obj> object_name <rel> relation_name <attribute_name> attribute_value"
+                  ]
+                }
 
-                  Replace attributeName1, attributeName2 with specific relation attributes
-
-                - Do NOT add explanations or extra text
+                Do NOT output explanations.
+                Do NOT output markdown.
+                Do NOT output placeholder attribute names.
             """)
         else:
             return textwrap.dedent("""\
                 你是一名专业的 Hyper-Relation 知识图谱抽取专家。
 
-                Hyper-Relation 知识图谱是在传统“实体-关系-实体”三元组的基础上，
-                为【关系】附加结构化属性，用于刻画时间、条件、目的、方式、频率等上下文约束。
+                Hyper-Relation 知识图谱是在传统“实体-关系-实体”三元组基础上，
+                为【关系】附加结构化属性，用于刻画时间、地点、条件、原因、目的、方式、程度、频率、
+                来源、证据、历史背景或其他与该关系相关的上下文信息。
 
                 === 任务定义 ===
-                从文本中抽取如下格式的超关系知识：
+                从文本中抽取如下字符串格式的超关系知识：
 
-                <subj> 实体名
-                <obj> 实体名
-                <rel> 关系
-                <属性1> 属性值1
-                <属性2> 属性值2
-                ...
+                "<subj> 实体 <obj> 实体 <rel> 关系 <语义化属性名> 属性值"
 
                 === 核心规则 ===
-                1. 实体（Entity）：
-                   - 清晰的名词或名词短语（具体或抽象）
-                   - 禁止使用代词（他 / 她 / 它 / 他们）
-                   - 表达应规范、简洁
 
-                2. 关系（Relation）：
-                   - 描述“做什么 / 为什么 / 如何”的语义关系
-                   - 示例：用于、导致、能够、位于、帮助、使、具有属性
+                1. 实体：
+                   - 主语和宾语必须是清晰的名词或名词短语。
+                   - 禁止使用代词。
+                   - 实体名应规范、简洁。
 
-                3. 关系属性（关键要求）：
-                   - 属性是【关系的修饰信息】，不是实体属性
-                   - 属性和值必须能从文本中明确推导
-                   - 常见属性类型包括（但不限于）：
-                     · 时间
-                     · 地点
-                     · 条件
-                     · 目的
-                     · 方式
-                     · 程度
-                     · 频率
-                   - 严禁虚构属性或属性值
+                2. 关系：
+                   - 关系必须描述主语和宾语之间的核心事实。
+                   - 使用简洁的语义关系名，例如：
+                     BornIn, MarriedTo, Released, PerformedAt, Experienced, CausedBy,
+                     InfluencedBy, StudiedAt, CollaboratedWith, Won, NominatedFor。
+                   - 不要把时间、地点、原因、目的、方式写进关系名。
+                   - 每条 hyper-relation 只表达一个核心事实。
 
-                4. 事实约束：
-                   - 每条 hyper-relation 仅表达一个核心事实
-                   - 属性仅用于补充该关系的上下文约束
-                   - 不得在一条中混合多个不同关系
+                3. 关系属性：
+                   - 属性修饰的是【关系】，不是实体。
+                   - 不限制具体属性类型。
+                   - 可以根据文本自由生成简洁、明确、有语义的属性名。
+                   - 属性名必须能够说明属性值在该关系中的作用。
+                   - 可使用的属性名示例包括但不限于：
+                     <time>, <location>, <reason>, <cause>, <purpose>, <manner>,
+                     <condition>, <degree>, <frequency>, <source>, <evidence>,
+                     <historical_context>, <political_context>, <award_year>,
+                     <publication_date>, <performance_place>, <album_name>。
+                   - 不允许虚构属性或属性值。
+                   - 如果没有合适属性，可以只输出：
+                     "<subj> 实体 <obj> 实体 <rel> 关系"
+
+                4. 禁止使用占位符属性名：
+                   严禁使用以下属性名：
+                   <attribute1>, <attribute2>, <attribute3>,
+                   <attributeName1>, <attributeName2>,
+                   <attr1>, <attr2>, <property1>, <property2>。
+
+                   错误：
+                   "<subj> Chopin <obj> Financial Struggle <rel> Experienced <attribute1> political strife and instability <attribute2> time February 1848"
+
+                   正确：
+                   "<subj> Chopin <obj> Financial Struggle <rel> Experienced <political_context> political strife and instability <time> February 1848"
+
+                5. 属性格式：
+                   - 每个属性必须写成 XML 风格标签。
+                   - 属性名建议使用小写或 snake_case。
+                   - 属性类型不要混进属性值里。
+
+                   错误：
+                   "<attribute2> time February 1848"
+
+                   正确：
+                   "<time> February 1848"
 
                 === 输出格式 ===
-                - 仅输出 JSON 对象
-                - 键为 "tuple"
-                - 每条为字符串，格式为：
+                只输出合法 JSON 对象：
 
-                  "<subj> 实体 <obj> 实体 <rel> 关系 <attributeName1> 属性值1"
+                {
+                  "tuple": [
+                    "<subj> 实体 <obj> 实体 <rel> 关系 <语义化属性名> 属性值",
+                    "<subj> 实体 <obj> 实体 <rel> 关系 <语义化属性名> 属性值"
+                  ]
+                }
 
-                  其中attributeName1用具体的关系属性代替
-
-                - 不输出任何解释性文本
+                不输出解释。
+                不输出 markdown。
+                不输出占位符属性名。
             """)
 
     def build_prompt(self, text: str):
@@ -133,31 +193,41 @@ class HRKGHyperRelationExtractorPrompt(PromptABC):
             return textwrap.dedent(f"""\
                 Extract Hyper-Relation Knowledge Graphs from the following text according to the rules above.
 
-                Replace attributeName1 with specific relation attributes.
+                Important:
+                - Attribute names are free-form and not restricted to a fixed vocabulary.
+                - However, every attribute name must be meaningful and semantic.
+                - Do NOT use placeholder attribute names such as <attribute1>, <attribute2>, <attributeName1>, <attr1>.
+                - Use lowercase or snake_case attribute tags.
+                - Output ONLY valid JSON.
 
                 Text:
                 {text}
 
-                Output ONLY JSON:
+                Output:
                 {{
                   "tuple": [
-                    "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1",
-                    "<subj> Entity <obj> Entity <rel> Relation <attributeName1> valueName1"
+                    "<subj> subject_name <obj> object_name <rel> relation_name <attribute_name> attribute_value"
                   ]
                 }}
             """)
         else:
             return textwrap.dedent(f"""\
-                按照上述规则，从以下文本中抽取 Hyper-Relation 知识图谱：
+                请按照上述规则，从以下文本中抽取 Hyper-Relation 知识图谱。
+
+                重要要求：
+                - 属性名可以自由生成，不限制为固定属性集合。
+                - 但是每个属性名必须有明确语义。
+                - 禁止使用 <attribute1>, <attribute2>, <attributeName1>, <attr1> 等占位符属性名。
+                - 属性名建议使用小写或 snake_case。
+                - 只输出合法 JSON。
 
                 文本：
                 {text}
 
-                仅输出 JSON：
+                输出：
                 {{
                   "tuple": [
-                    "<subj> 实体 <obj> 实体 <rel> 关系 <attributeName1> 属性值1",
-                    "<subj> 实体 <obj> 实体 <rel> 关系 <attributeName1> 属性值1"
+                    "<subj> 实体 <obj> 实体 <rel> 关系 <语义化属性名> 属性值"
                   ]
                 }}
             """)
@@ -375,31 +445,54 @@ class HRKGOneHopQAPathGenerationPrompt(PromptABC):
                 hyper-relational tuples.
 
                 Definition of ONE-HOP QA:
-                - Each question must be answerable using exactly ONE tuple
-                - The answer must come directly from that tuple
-                - The question may ask about the subject, object, or explicit
-                  relation attributes in the tuple
-                - Do not combine information from multiple tuples
-                - Do not introduce external or implicit knowledge
+                - Each question must be answerable using exactly ONE tuple.
+                - The answer must come directly from that tuple.
+                - The question may ask about the subject, object, relation, or explicit
+                  relation attributes in the tuple.
+                - Do not combine information from multiple tuples.
+                - Do not introduce external or implicit knowledge.
 
-                Rules:
-                - Preserve the tuple meaning and explicit qualifiers
-                - Do not ignore relation attributes such as Time, Location,
-                  Condition, Purpose, Value, Degree, Market, or Method
-                - Do not invent missing attributes or values
-                - Do not explain reasoning
-                - Each tuple may generate one or more QA pairs
-                - Questions should be natural and fluent
+                Core requirements:
+                1. Preserve the tuple meaning and explicit qualifiers.
+                2. Do not ignore relation attributes such as time, location, condition,
+                   purpose, value, degree, market, method, reason, source, evidence,
+                   or any other explicitly provided attribute.
+                3. Do not invent missing attributes or values.
+                4. Do not explain reasoning.
+                5. Each tuple should generate as many high-quality and non-redundant QA pairs as possible.
+                6. If a tuple contains multiple useful elements, generate separate QA pairs for them:
+                   - subject-oriented questions
+                   - object-oriented questions
+                   - relation-oriented questions
+                   - attribute-oriented questions
+                   - qualifier-aware questions
+                7. Avoid duplicate or near-duplicate questions.
+                8. Avoid questions with the same answer and nearly identical meaning unless they ask from clearly different perspectives.
+                9. Questions should be natural, fluent, and directly answerable from the tuple.
+
+                Allowed one-hop question types:
+                - Ask for the object given the subject and relation.
+                - Ask for the subject given the object and relation.
+                - Ask for the relation between subject and object.
+                - Ask for an explicit attribute value, such as time, location, reason, purpose, method, degree, or condition.
+                - Ask a qualifier-aware factual question that still depends on only one tuple.
+
+                Forbidden question types:
+                - Questions requiring more than one tuple.
+                - Questions requiring external knowledge.
+                - Questions that infer unstated facts.
+                - Duplicate or near-duplicate paraphrases.
+                - Questions whose answer is not explicitly present in the tuple.
 
                 Output format (STRICT JSON):
+                {
+                  "QA_pairs": [
                     {
-                    "QA_pairs": [
-                        {
-                        "question": "...",
-                        "answer": "..."
-                        }
-                    ]
+                      "question": "...",
+                      "answer": "..."
                     }
+                  ]
+                }
             """)
 
         return textwrap.dedent("""\
@@ -409,28 +502,51 @@ class HRKGOneHopQAPathGenerationPrompt(PromptABC):
             严格基于给定的 hyper-relation tuples 生成一跳问答对。
 
             一跳 QA 定义：
-            - 每个问题必须且只能由一条 tuple 直接回答
-            - 答案必须直接来自该 tuple
-            - 问题可以询问主体、客体或 tuple 中显式给出的关系属性
-            - 不允许跨 tuple 组合信息
-            - 不允许引入外部知识或隐含推断
+            - 每个问题必须且只能由一条 tuple 直接回答。
+            - 答案必须直接来自该 tuple。
+            - 问题可以询问主体、客体、关系，或 tuple 中显式给出的关系属性。
+            - 不允许跨 tuple 组合信息。
+            - 不允许引入外部知识或隐含推断。
 
-            规则：
-            - 保持 tuple 原始语义和限定条件
-            - 不要忽略 Time、Location、Condition、Purpose、Value、Degree、Market、Method 等关系属性
-            - 不要虚构缺失的属性或属性值
-            - 不输出推理过程
-            - 每条 tuple 可以生成一个或多个问答对
-            - 问题表达要自然流畅
+            核心要求：
+            1. 保持 tuple 原始语义和显式限定条件。
+            2. 不要忽略 time、location、condition、purpose、value、degree、market、method、
+               reason、source、evidence 或其他显式给出的关系属性。
+            3. 不要虚构缺失的属性或属性值。
+            4. 不输出推理过程。
+            5. 每条 tuple 应在保证质量和不重复的前提下，尽可能多地生成问答对。
+            6. 如果一条 tuple 中包含多个可提问元素，应尽量分别生成不同角度的问题：
+               - 围绕主体提问
+               - 围绕客体提问
+               - 围绕关系提问
+               - 围绕属性提问
+               - 结合限定条件提问
+            7. 避免重复或高度相似的问题。
+            8. 如果多个问题答案相同，只有在提问角度明显不同的情况下才保留。
+            9. 问题表达要自然流畅，并且必须能从该 tuple 中直接回答。
+
+            允许的一跳问题类型：
+            - 已知主体和关系，询问客体。
+            - 已知客体和关系，询问主体。
+            - 询问主体和客体之间的关系。
+            - 询问显式属性值，例如时间、地点、原因、目的、方式、程度、条件等。
+            - 结合属性限定条件生成事实性问题，但仍然只能依赖一条 tuple。
+
+            禁止的问题类型：
+            - 需要多条 tuple 才能回答的问题。
+            - 需要外部知识的问题。
+            - 需要推断未明示事实的问题。
+            - 重复或高度相似的改写问题。
+            - 答案不在 tuple 中明确出现的问题。
 
             输出格式（严格 JSON）：
             {
-            "QA_pairs": [
+              "QA_pairs": [
                 {
-                "question": "...",
-                "answer": "..."
+                  "question": "...",
+                  "answer": "..."
                 }
-            ]
+              ]
             }
         """)
 
@@ -438,6 +554,10 @@ class HRKGOneHopQAPathGenerationPrompt(PromptABC):
         if self.lang == "en":
             return textwrap.dedent(f"""\
                 Please generate one-hop QA pairs strictly following the rules above.
+
+                Generate as many high-quality and non-redundant one-hop QA pairs as possible.
+                For each tuple, try to generate QA pairs from different valid perspectives:
+                subject, object, relation, and explicit attributes.
 
                 Hyper-relational tuples:
                 {tuples}
@@ -447,6 +567,10 @@ class HRKGOneHopQAPathGenerationPrompt(PromptABC):
 
         return textwrap.dedent(f"""\
             请严格按照上述规则，从以下超关系 tuples 中生成一跳问答对。
+
+            请在保证质量和不重复的前提下，尽可能多地生成一跳问答对。
+            对于每条 tuple，请尽量从不同有效角度生成问题：
+            主体、客体、关系，以及显式属性。
 
             超关系 tuples：
             {tuples}
