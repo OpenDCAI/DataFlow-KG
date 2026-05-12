@@ -191,8 +191,8 @@ class MMKGEntityBasedSubgraphSampling(OperatorABC):
 
         for vt in vis_triples:
 
-            subj_match = re.search(r"<subj>\s*(.+?)\s*(?=<rel>)", vt)
-            obj_match = re.search(r"<obj>\s*(.+?)\s*$", vt)
+            subj_match = re.search(r"<subj>\s*(.+?)\s*(?=<obj>)", vt)
+            obj_match = re.search(r"<obj>\s*(.+?)\s*(?=<rel>)", vt)
 
             if not subj_match or not obj_match:
                 continue
@@ -283,7 +283,7 @@ class MMKGEntityBasedSubgraphSampling(OperatorABC):
 
             for vt in vis_triples:
 
-                subj_match = re.search(r"<subj>\s*(.+?)\s*(?=<rel>)", vt)
+                subj_match = re.search(r"<subj>\s*(.+?)\s*(?=<obj>)", vt)
 
                 if subj_match:
 

@@ -1,4 +1,5 @@
 import json
+import re
 from typing import List, Dict, Any
 from tqdm import tqdm
 
@@ -115,15 +116,24 @@ class MMKGSubgraphBaseQAGeneration(OperatorABC):
         all_qas = []
 
         for _, row in tqdm(df.iterrows(), total=len(df), desc="Generating QA"):
-            # 构建 img_dict: key 从 vis_triple 中抽取图片ID, value 从 vis_url
+            # 构建 img_dict: key 从 vis_triple 中按首次出现顺序去重抽取图片ID, value 从 vis_url
+            # 注意: vis_url 在 step4 中已按首次出现顺序去重, 所以这里 img_id 也按首次出现顺序去重才能正确配对
             img_dict = {}
             vis_url_list = row.get(input_key, [])
             vis_triple_list = row.get("vis_triple", [])
 
-            # 提取图片ID对应 URL
-            for triple, url in zip(vis_triple_list, vis_url_list):
-                # triple 格式: "<subj> X <rel> <obj> img_ID"
-                img_id = triple.strip().split()[-1]
+            ordered_img_ids = []
+            seen_img_ids = set()
+            for triple in vis_triple_list:
+                m = re.search(r"<obj>\s*(.+?)\s*(?=<rel>)", triple)
+                if not m:
+                    continue
+                img_id = m.group(1).strip()
+                if img_id not in seen_img_ids:
+                    seen_img_ids.add(img_id)
+                    ordered_img_ids.append(img_id)
+
+            for img_id, url in zip(ordered_img_ids, vis_url_list):
                 img_dict[img_id] = url
 
             subgraph = row.get(input_key_meta, [])
