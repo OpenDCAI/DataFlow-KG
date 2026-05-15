@@ -1,4 +1,4 @@
-from dataflow.prompts.kbcleaning import KnowledgeCleanerPrompt
+from dataflow.prompts.kbcleaning.text import KnowledgeCleanerPrompt
 import pandas as pd
 from dataflow.utils.registry import OPERATOR_REGISTRY
 from dataflow import get_logger

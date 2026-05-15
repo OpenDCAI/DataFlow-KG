@@ -17,6 +17,7 @@ modelscope
 addict
 pytest
 rich
+chonkie
 pydantic
 nltk
 colorama
