@@ -440,34 +440,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p_pdf2model_train = p_pdf2model_sub.add_parser("train", help="Start training after PDF processing")
     p_pdf2model_train.add_argument("--lf_yaml", default=None,
                                    help="LlamaFactory config file (default: {cache}/.cache/train_config.yaml)")
-
-    # --- text2model ---
-    p_text2model = top.add_parser("text2model", help="Train model from JSON/JSONL data")
-    p_text2model_sub = p_text2model.add_subparsers(dest="text2model_action", required=True)
-
-    p_text2model_init = p_text2model_sub.add_parser("init", help="Initialize text2model pipeline")
-    p_text2model_init.add_argument("--cache", default="./", help="Cache directory path")
-
-    p_text2model_train = p_text2model_sub.add_parser("train", help="Start training after text processing")
-    p_text2model_train.add_argument('input_dir', nargs='?', default='./',
-                                    help='Input directory to scan (default: ./)')
-    p_text2model_train.add_argument('--input-keys', default=None,
-                                    help='Fields to process (default: text)')
-    p_text2model_train.add_argument("--lf_yaml", default=None,
-                                    help="LlamaFactory config file (default: {cache}/.cache/train_config.yaml)")
-
-    # --- webui ---
-    p_webui = top.add_parser("webui", help="Launch Gradio WebUI")
-    p_webui.add_argument("-H", "--host", default="127.0.0.1", help="Bind host (default 127.0.0.1)")
-    p_webui.add_argument("-P", "--port", type=int, default=7862, help="Port (default 7862)")
-    p_webui.add_argument("--show-error", action="store_true", help="Show Gradio error tracebacks")
-
-    #    webui 二级子命令：operators / agent
-    w_sub = p_webui.add_subparsers(dest="ui_mode", required=False)
-    w_sub.add_parser("operators", help="Launch operator / pipeline UI")
-    w_sub.add_parser("agent", help="Launch DataFlow-Agent UI (backend included)")
-    w_sub.add_parser("pdf", help="Launch PDF Knowledge Base Cleaning UI")
-
     return parser
 
 
@@ -512,26 +484,6 @@ def main() -> None:
 
     elif args.command == "chat":
         smart_chat_command(model_path=args.model, cache_path=args.cache)
-
-    elif args.command == "webui":
-        # 默认使用 operators
-        mode = args.ui_mode or "operators"
-        if mode == "operators":
-            print("Currently webui is under maintenance. Please check back later.")
-            # from dataflow.webui.operator_pipeline import demo
-            # demo.launch(
-            #     server_name=args.host,
-            #     server_port=args.port,
-            #     show_error=args.show_error,
-            # )
-        elif mode == "agent":
-            print("Agent UI is deprecated in Dataflow main repo, please use the dedicated https://github.com/OpenDCAI/DataFlow-Agent repo.")
-        elif mode == "pdf":
-            print("Currently webui is under maintenance. Please check back later.")
-            # from dataflow.webui import kbclean_webui
-            # kbclean_webui.create_ui().launch()
-        else:
-            parser.error(f"Unknown ui_mode {mode!r}")
 
 
 if __name__ == "__main__":
