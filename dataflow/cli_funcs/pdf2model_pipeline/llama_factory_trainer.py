@@ -42,7 +42,7 @@ class LlamaFactoryTrainer:
             "do_train": True,
 
             # === 模型配置 ===
-            "model_name_or_path": "Qwen/Qwen2.5-7B-Instruct",
+            "model_name_or_path": str(self.cache_path / "Qwen2.5-7B-Instruct"),
             "template": "qwen",
             "trust_remote_code": True,
 

@@ -3,18 +3,23 @@
 import argparse
 import os
 from pathlib import Path
-from dataflow.operators.knowledge_cleaning import (
-    KBCChunkGeneratorBatch,
-    FileOrURLToMarkdownConverterBatch,
-    KBCTextCleanerBatch,
-    KBCMultiHopQAGeneratorBatch,
+from dataflow.operators.general_kg import (
+    KGEntityExtraction,
+    KGTripleExtraction,
+    KGEntityBasedSubgraphSampling,
+    KGRelationTripleSubgraphQAGeneration,
     QAExtractor
+)
+from dataflow.operators.pdf2text import (
+    KBCTextCleaner,
+    KBCChunkGenerator
 )
 from dataflow.utils.storage import FileStorage
 from dataflow.serving import LocalModelLLMServing_vllm
+from dataflow.serving import APILLMServing_request
 
 
-class KBCleaning_batchvllm_GPUPipeline():
+class PDF2QA_GPUPipeline():
     def __init__(self, cache_base="./"):
         # 处理cache_base相对路径
         cache_path = Path(cache_base)
@@ -23,77 +28,101 @@ class KBCleaning_batchvllm_GPUPipeline():
             cache_path = caller_cwd / cache_path
 
         self.storage = FileStorage(
-            first_entry_file_name=str(cache_path / ".cache" / "gpu" / "pdf_list.jsonl"),
+            first_entry_file_name=str(cache_path / ".cache" / "gpu" / "wikipedia_3.json"),
             cache_path=str(cache_path / ".cache" / "gpu"),
             file_name_prefix="batch_cleaning_step",
             cache_type="json",
         )
 
-        self.knowledge_cleaning_step1 = FileOrURLToMarkdownConverterBatch(
-            intermediate_dir=str(cache_path / ".cache"),
-            lang="en",
-            mineru_backend="vlm-vllm-engine",  # 可选 pipeline, vlm-vllm-engine, vlm-vllm-transformer, vlm-http-client
+        self.llm_serving = APILLMServing_request(
+            api_url="http://123.129.219.111:3000/v1/chat/completions",
+            model_name="gpt-4o-mini",
+            max_workers=10,
         )
 
-        self.knowledge_cleaning_step2 = KBCChunkGeneratorBatch(
+        self.qa_generation_step1 = KBCChunkGenerator(
             split_method="token",
             chunk_size=512,
             tokenizer_name="./Qwen2.5-7B-Instruct",
         )
 
-        self.extract_format_qa = QAExtractor(
-            qa_key="qa_pairs",
+        self.qa_generation_step2 = KBCTextCleaner(
+            llm_serving=self.llm_serving,
+            lang="en"
+        )
+
+        self.qa_generation_step3 = KGEntityExtraction(
+            llm_serving=self.llm_serving,
+            lang="en",
+        )
+
+        self.qa_generation_step4 = KGTripleExtraction(
+            llm_serving=self.llm_serving,
+            lang="en",
+            triple_type="relation"
+        )
+
+        self.qa_generation_step5 = KGEntityBasedSubgraphSampling(
+            llm_serving=self.llm_serving,
+            lang="en",
+        )
+
+        self.qa_generation_step6 = KGRelationTripleSubgraphQAGeneration(
+            llm_serving=self.llm_serving,
+            lang="en",
+            qa_type="num",
+            num_q=5,
+        )
+
+        self.qa_generation_step7 = QAExtractor(
             output_json_file="./.cache/data/qa.json",
         )
 
     def forward(self):
         """执行完整的Pipeline流程"""
-        print("🔄 Step 1: File/URL to Markdown conversion...")
-        self.knowledge_cleaning_step1.run(
-            storage=self.storage.step(),
-            input_key="raw_content",
-            output_key="text_path"
-        )
-
-        print("🔄 Step 2: Text splitting into chunks...")
-        self.knowledge_cleaning_step2.run(
+        print("🔄 Step 1: Text splitting into chunks...")
+        self.qa_generation_step1.run(
+            input_key="text",
             storage=self.storage.step(),
         )
 
-        print("🔄 Starting LLM serving...")
-        self.llm_serving = LocalModelLLMServing_vllm(
-            hf_model_name_or_path="./Qwen2.5-7B-Instruct",
-            vllm_max_tokens=2048,
-            vllm_tensor_parallel_size=1,  # 使用的GPU数量
-            vllm_gpu_memory_utilization=0.6,  # GPU利用率
-            vllm_repetition_penalty=1.2
-        )
-
-        self.knowledge_cleaning_step3 = KBCTextCleanerBatch(
-            llm_serving=self.llm_serving,
-            lang="en"
-        )
-
-        self.knowledge_cleaning_step4 = KBCMultiHopQAGeneratorBatch(
-            llm_serving=self.llm_serving,
-            lang="en",
-        )
-
-        print("🔄 Step 3: Knowledge cleaning...")
-        self.knowledge_cleaning_step3.run(
+        self.qa_generation_step2.run(
             storage=self.storage.step(),
+            input_key="raw_chunk",
+            output_key="cleaned_chunk",
+        )
+
+        print("🔄 Step 2: Knowledge graph construction...")
+        self.qa_generation_step3.run(
+            storage=self.storage.step(),
+        )
+
+        self.qa_generation_step4.run(
+            storage=self.storage.step(),
+            input_key="cleaned_chunk",
+            output_key="triple"
+        )
+
+        print("🔄 Step 3: Subgraph sampling...")
+        self.qa_generation_step5.run(
+            storage=self.storage.step(),
+            input_key="triple",
+            output_key="subgraph",
+            sampling_type="hop",
+            hop=2,
+            M=5,
         )
 
         print("🔄 Step 4: Multi-hop QA generation...")
-        self.knowledge_cleaning_step4.run(
+        self.qa_generation_step6.run(
             storage=self.storage.step(),
+            input_key="subgraph",
+            output_key="QA_pairs",
         )
 
-        print("🔄 Step 5: Extract and format QA...")
-        self.extract_format_qa.run(
+        self.qa_generation_step7.run(
             storage=self.storage.step(),
-            input_key="question,reasoning_steps",
-            output_key="answer"
+            input_qa_key="QA_pairs"
         )
 
         print("✅ Pipeline completed! Output saved to: ./.cache/data/qa.json")
@@ -104,13 +133,13 @@ def main():
     parser.add_argument("--cache", default="./", help="Cache directory path")
     args = parser.parse_args()
 
-    print("🚀 Starting KB Cleaning Pipeline...")
+    print("🚀 Starting PDF-to-QA Pipeline...")
     print(f"📄 Input: {args.cache}.cache/gpu/pdf_list.jsonl")
     print(f"💾 Cache: {args.cache}.cache/gpu/")
     print(f"📤 Output: {args.cache}.cache/data/qa.json")
     print("-" * 60)
 
-    model = KBCleaning_batchvllm_GPUPipeline(cache_base=args.cache)
+    model = PDF2QA_GPUPipeline(cache_base=args.cache)
     model.forward()
 
 

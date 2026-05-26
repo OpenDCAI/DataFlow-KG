@@ -436,7 +436,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p_pdf2model_sub = p_pdf2model.add_subparsers(dest="pdf2model_action", required=True)
 
     p_pdf2model_init = p_pdf2model_sub.add_parser("init", help="Initialize PDF to model pipeline")
-
+    p_pdf2model_init.add_argument("--model", default=None, help="Base model name or path (default: Qwen/Qwen2.5-7B-Instruct)")                                                                        
+    p_pdf2model_init.add_argument("--pdf2qa", default="pdf2qa", help="Pipeline type: pdf2qa")  
     p_pdf2model_train = p_pdf2model_sub.add_parser("train", help="Start training after PDF processing")
     p_pdf2model_train.add_argument("--lf_yaml", default=None,
                                    help="LlamaFactory config file (default: {cache}/.cache/train_config.yaml)")
@@ -465,22 +466,17 @@ def main() -> None:
     elif args.command == "pdf2model":
         if args.pdf2model_action == "init":
             from dataflow.cli_funcs.cli_pdf import cli_pdf2model_init
-            cli_pdf2model_init(cache_path=args.cache)
+            # cli_pdf2model_init(cache_path=args.cache)
+            cli_pdf2model_init(                                                                                                                                                           
+                cache_path=args.cache,                                                                                                                                                    
+                model_name=getattr(args, 'model', None),                                                                                                                                  
+                qa_type=getattr(args, 'pdf2qa'),                                                                                                                                       
+            )  
         elif args.pdf2model_action == "train":
             from dataflow.cli_funcs.cli_pdf import cli_pdf2model_train
             # If no lf_yaml specified, use default path relative to cache
             lf_yaml = args.lf_yaml or f"{args.cache}/.cache/train_config.yaml"
             cli_pdf2model_train(lf_yaml=lf_yaml, cache_path=args.cache)
-
-    elif args.command == "text2model":
-        from dataflow.cli_funcs.cli_text import cli_text2model_init, cli_text2model_train
-
-        if args.text2model_action == "init":
-            cli_text2model_init(cache_path=getattr(args, 'cache', './'))
-        elif args.text2model_action == "train":
-            # 如果没有指定lf_yaml，使用默认路径
-            lf_yaml = getattr(args, 'lf_yaml', None) or "./.cache/train_config.yaml"
-            cli_text2model_train(input_keys=getattr(args, 'input_keys', None), lf_yaml=lf_yaml)
 
     elif args.command == "chat":
         smart_chat_command(model_path=args.model, cache_path=args.cache)

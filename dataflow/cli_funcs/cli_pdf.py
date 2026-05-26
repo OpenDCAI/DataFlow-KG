@@ -198,7 +198,6 @@ def check_required_files():
     """Check if required built-in scripts exist"""
     # 检查所有需要的内置脚本
     required_scripts = [
-        "path_to_jsonl_script.py",
         "llama_factory_trainer.py"
     ]
 
@@ -321,10 +320,10 @@ def cli_pdf2model_train(lf_yaml: str = ".cache/train_config.yaml", cache_path: s
 
     try:
         # Step 1: PDF Detection
-        script1_path = get_dataflow_script_path("path_to_jsonl_script.py")
-        args1 = ["./", "--output", str(cache_path_obj / ".cache" / "gpu" / "pdf_list.jsonl")]
-        if not run_script_with_args(script1_path, "Step 1: PDF Detection", args1, cwd=str(current_dir)):
-            return False
+        # script1_path = get_dataflow_script_path("path_to_jsonl_script.py")
+        # args1 = ["./", "--output", str(cache_path_obj / ".cache" / "gpu" / "pdf_list.jsonl")]
+        # if not run_script_with_args(script1_path, "Step 1: PDF Detection", args1, cwd=str(current_dir)):
+        #     return False
 
         # Step 2: Data Processing
         script2 = current_dir / "pdf_to_qa_pipeline.py"

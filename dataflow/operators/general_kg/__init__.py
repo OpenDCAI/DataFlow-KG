@@ -38,6 +38,7 @@ if TYPE_CHECKING:
     from .generate.kg_triple_extractor import KGTripleExtraction
     from .generate.kg_triple_merge import KGTripleMerger
     from .generate.kg_tuple2text import KGTupleTextGeneration
+    from .generate.kg_qa2alpaca import QAExtractor
 
     # refinement
     from .refinement.kg_entity_alignment import KGGraphEntityAligner
