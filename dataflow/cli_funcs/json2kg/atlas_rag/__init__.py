@@ -1,0 +1,1 @@
+"""Minimal AutoSchemaKG extraction package."""

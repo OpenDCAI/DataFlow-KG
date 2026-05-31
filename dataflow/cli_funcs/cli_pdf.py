@@ -405,7 +405,7 @@ def cli_pdf2model_train(lf_yaml: str = ".cache/train_config.yaml", cache_path: s
         print("Training completed successfully!")
         print(f"Model saved to: {actual_output_dir}")
         print("Next steps:")
-        print(f"{Style.BRIGHT}Test the trained model with 'dataflow chat'")
+        print(f"{Style.BRIGHT}Test the trained model with 'dfkg chat'")
 
         return True
 

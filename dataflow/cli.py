@@ -17,7 +17,7 @@ import json
 import subprocess
 from pathlib import Path
 from colorama import init as color_init, Fore, Style
-from dataflow.cli_funcs import cli_env, cli_init  # 项目已有工具
+from dataflow.cli_funcs import cli_env, cli_init, cli_json2kg_init, cli_json2kg_autoschemakg, cli_json2kg_wikontic  # 项目已有工具
 from dataflow.version import __version__  # 版本号
 
 color_init(autoreset=True)
@@ -416,6 +416,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p_chat.add_argument("--model", default=None, help="Model path (default: use latest trained model from cache)")
     p_chat.add_argument("--cache", default="./", help="Cache directory path")
 
+    # --- json2kg ---
+    p_json2kg = top.add_parser("json2kg", help="Knowledge graph pipeline from JSON data")
+    p_json2kg_sub = p_json2kg.add_subparsers(dest="json2kg_action", required=True)
+    p_json2kg_init = p_json2kg_sub.add_parser("init", help="Load a dataset into current directory")
+    p_json2kg_init.add_argument("dataset", help="Dataset name to load (e.g. input)")
+    p_json2kg_autoschemakg = p_json2kg_sub.add_parser("autoschemakg", help="Run AutoSchemaKG on a dataset")
+    p_json2kg_autoschemakg.add_argument("dataset", help="Dataset name to run (e.g. input)")
+    p_json2kg_wikontic = p_json2kg_sub.add_parser("wikontic", help="Run Wikontic on a dataset")
+    p_json2kg_wikontic.add_argument("dataset", help="Dataset name to run (e.g. input)")
+
     # --- eval 命令
     p_eval = top.add_parser("eval", help="Model evaluation using BenchDatasetEvaluator")
     eval_sub = p_eval.add_subparsers(dest="eval_action", help="Evaluation actions")
@@ -460,6 +470,14 @@ def main() -> None:
     elif args.command == "env":
         cli_env()
 
+    elif args.command == "json2kg":
+        if args.json2kg_action == "init":
+            cli_json2kg_init(dataset=args.dataset)
+        elif args.json2kg_action == "autoschemakg":
+            cli_json2kg_autoschemakg(dataset=args.dataset)
+        elif args.json2kg_action == "wikontic":
+            cli_json2kg_wikontic(dataset=args.dataset)
+
     elif args.command == "eval":
         handle_eval_command(args)
 
@@ -469,8 +487,7 @@ def main() -> None:
             # cli_pdf2model_init(cache_path=args.cache)
             cli_pdf2model_init(                                                                                                                                                           
                 cache_path=args.cache,                                                                                                                                                    
-                model_name=getattr(args, 'model', None),                                                                                                                                  
-                qa_type=getattr(args, 'pdf2qa'),                                                                                                                                       
+                model_name=getattr(args, 'model', None) or "Qwen/Qwen2.5-7B-Instruct",                                                                                                                                                                                                                                                                     
             )  
         elif args.pdf2model_action == "train":
             from dataflow.cli_funcs.cli_pdf import cli_pdf2model_train
