@@ -5,18 +5,10 @@ from dataflow.serving import LocalModelLLMServing_vllm
 
 from dataflow.operators.general_kg.generate.kg_entity_extractor import (
     KGEntityExtraction,
-)
-from dataflow.operators.general_kg.generate.kg_triple_extractor import (
     KGTripleExtraction,
-)
-from dataflow.operators.general_kg.generate.kg_rel_triple_inference import (
     KGRelationTripleInference,
-)
-from dataflow.operators.general_kg.filter.kg_tuple_remove_repeated import (
     KGTupleRemoveRepeated,
-)
-from dataflow.operators.general_kg.filter.kg_tuple_validation import (
-    KGTupleValidity,
+    KGTupleValidity
 )
 
 

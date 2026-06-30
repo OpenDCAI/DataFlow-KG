@@ -3,7 +3,7 @@ import os
 from dataflow.serving import LocalModelLLMServing_vllm
 from dataflow.utils.storage import FileStorage
 
-from dataflow.operators.general_kg.eval.kg_qa_natural_eval import KGQANaturalEvaluator
+from dataflow.operators.general_kg import KGQANaturalEvaluator
 from dataflow.operators.hyper_relation_kg import HRKGRelationTripleAttributeFilter
 from dataflow.operators.hyper_relation_kg import (
     HRKGTripleExtraction,
