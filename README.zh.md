@@ -88,11 +88,11 @@ dfkg -v
 如果安装正确，并且你使用的是最新版本，输出会类似：
 
 ```log
-open-dataflow-kg codebase version: 0.9.0
+open-dataflow-kg codebase version: 1.0.1
         Checking for updates...
-        Local version:  0.9.0
-        PyPI newest version:  0.9.0
-        You are using the latest version: 0.9.0.
+        Local version:  1.0.1
+        PyPI newest version:  1.0.1
+        You are using the latest version: 1.0.1.
 ```
 
 此外，也可以使用 `dfkg env` 查看当前硬件和软件环境，这在排查 bug 时很有帮助：

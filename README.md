@@ -1,9 +1,9 @@
 # DataFlow Knowledge Graph
 *Knowledge graph data preparation with DataFlow style operators and pipelines*
 
-<p align="center">
+<!-- <p align="center">
   <img src="static/dataflow-KG%20framework.png" alt="DataFlow-KG framework" width="100%">
-</p>
+</p> -->
 
 <p align="center">
   <b>DataFlow Knowledge Graph</b>: An LLM-Driven Knowledge Graph Processing Library
@@ -88,11 +88,11 @@ dfkg -v
 If the installation is correct and DataFlow-KG is the latest release, you will see something like:
 
 ```log
-open-dataflow-kg codebase version: 1.0.0
+open-dataflow-kg codebase version: 1.0.1
         Checking for updates...
-        Local version:  1.0.0
-        PyPI newest version:  1.0.0
-        You are using the latest version: 1.0.0.
+        Local version:  1.0.1
+        PyPI newest version:  1.0.1
+        You are using the latest version: 1.0.1.
 ```
 
 In addition, the `dfkg env` command can be used to inspect the current hardware and software environment, which is useful for bug reporting:
